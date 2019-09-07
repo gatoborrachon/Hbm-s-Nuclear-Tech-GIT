@@ -1,3 +1,5 @@
+Hi, I'm Drillgon200. This is my regular workspace where I test random stuff and add features that I think should be in the mod. It's pretty buggy and has a lot of random stuff in it so that's why I'm not using the main branch.
+
 # Hbm-s-Nuclear-Tech-GIT
 
 https://minecraft.curseforge.com/projects/hbms-nuclear-tech-mod?gameCategorySlug=mc-mods&projectID=235439
