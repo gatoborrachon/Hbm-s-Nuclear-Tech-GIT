@@ -9,20 +9,22 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 
 public class TEFluidPipePacket implements IMessage {
 
 	int x;
 	int y;
 	int z;
-	FluidType type;
+	Fluid type;
 
 	public TEFluidPipePacket()
 	{
 		
 	}
 
-	public TEFluidPipePacket(int x, int y, int z, FluidType type)
+	public TEFluidPipePacket(int x, int y, int z, Fluid type)
 	{
 		this.x = x;
 		this.y = y;
@@ -35,7 +37,7 @@ public class TEFluidPipePacket implements IMessage {
 		x = buf.readInt();
 		y = buf.readInt();
 		z = buf.readInt();
-		type = FluidType.getEnum(buf.readInt());
+		type = FluidRegistry.getFluid(buf.readInt());
 	}
 
 	@Override
@@ -43,13 +45,7 @@ public class TEFluidPipePacket implements IMessage {
 		buf.writeInt(x);
 		buf.writeInt(y);
 		buf.writeInt(z);
-        for (int i = 0; i < FluidType.values().length; ++i)
-        {
-            if(FluidType.values()[i] == type) {
-            	buf.writeInt(i);
-            	break;
-            }
-        }
+        buf.writeInt(type.getID());
 	}
 
 	public static class Handler implements IMessageHandler<TEFluidPipePacket, IMessage> {

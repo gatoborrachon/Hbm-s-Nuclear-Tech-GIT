@@ -490,4 +490,16 @@ public class TileEntityMachineFluidTank extends TileEntity implements
 		list.clear();
 		
 	}
+
+	@Override
+	public Object getTact() {
+		//TODO deal with this
+		return null;
+	}
+
+	@Override
+	public void fillFluid(int x, int i, int z, Object tact, Fluid type) {
+		// TODO Auto-generated method stub
+		
+	}
 }
