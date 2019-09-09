@@ -5,7 +5,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import com.hbm.blocks.ModBlocks;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemBattery;
@@ -22,6 +24,8 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class MachineRecipes {
@@ -477,17 +481,20 @@ public class MachineRecipes {
 	}
 	
 	//return: FluidType, amount produced, amount required, heat required (°C * 100)
-	@SuppressWarnings("incomplete-switch")
-	public static Object[] getBoilerOutput(FluidType type) {
+	public static Object[] getBoilerOutput(Fluid type) {
 		
-		switch(type) {
-		case WATER: return new Object[] { FluidType.STEAM, 500, 5, 10000 };
-		case STEAM: return new Object[] { FluidType.HOTSTEAM, 5, 50, 30000 };
-		case HOTSTEAM: return new Object[] { FluidType.SUPERHOTSTEAM, 5, 50, 45000 };
-		case OIL: return new Object[] { FluidType.HOTOIL, 5, 5, 35000 };
+		if(type == FluidRegistry.WATER){
+			return new Object[] { ModForgeFluids.steam, 500, 5, 10000 };
+		} else if (type == ModForgeFluids.steam){
+			return new Object[] { ModForgeFluids.hotsteam, 5, 50, 30000 };
+		} else if (type == ModForgeFluids.hotsteam){
+			return new Object[] { ModForgeFluids.superhotsteam, 5, 50, 45000 };
+		} else if (type == ModForgeFluids.oil){
+			return new Object[] { ModForgeFluids.hotoil, 5, 5, 35000 };
+		} else {
+			return null;
 		}
-		
-		return null;
+
 	}
 	
 	//return: FluidType, amount produced, amount required, HE produced
@@ -659,9 +666,6 @@ public class MachineRecipes {
 
 			if(input.getItem() == ModItems.assembly_nopip)
 				return new ItemStack(ModItems.ammo_44);
-			
-			if(input.getItem() == ModItems.ammo_rocket)
-				return new ItemStack(ModItems.ammo_44_rocket);
 		}
 		
 		if(stamp.getItem() == ModItems.stamp_9) {
@@ -674,9 +678,6 @@ public class MachineRecipes {
 				return new ItemStack(ModItems.gun_mp_ammo);
 			if(input.getItem() == ModItems.assembly_lacunae)
 				return new ItemStack(ModItems.ammo_5mm);
-			
-			if(input.getItem() == ModItems.ammo_rocket)
-				return new ItemStack(ModItems.ammo_9mm_rocket);
 		}
 		
 		if(stamp.getItem() == ModItems.stamp_50) {
@@ -758,13 +759,11 @@ public class MachineRecipes {
 
 		recipes.put(new Object[] { i_stamps_44, new ItemStack(ModItems.assembly_nopip) }, getPressResultNN(i_stamps_44.get(0).getItem(), ModItems.assembly_nopip));
 		//recipes.put(new Object[] { i_stamps_44, new ItemStack(ModItems.assembly_pip) }, getPressResultNN(i_stamps_44.get(0).getItem(), ModItems.assembly_pip));
-		recipes.put(new Object[] { i_stamps_44, new ItemStack(ModItems.ammo_rocket) }, getPressResultNN(i_stamps_44.get(0).getItem(), ModItems.ammo_rocket));
 
 		recipes.put(new Object[] { i_stamps_9, new ItemStack(ModItems.assembly_smg) }, getPressResultNN(i_stamps_9.get(0).getItem(), ModItems.assembly_smg));
 		recipes.put(new Object[] { i_stamps_9, new ItemStack(ModItems.assembly_uzi) }, getPressResultNN(i_stamps_9.get(0).getItem(), ModItems.assembly_uzi));
 		recipes.put(new Object[] { i_stamps_9, new ItemStack(ModItems.assembly_lacunae) }, getPressResultNN(i_stamps_9.get(0).getItem(), ModItems.assembly_lacunae));
 		recipes.put(new Object[] { i_stamps_9, new ItemStack(Items.gold_ingot) }, getPressResultNN(i_stamps_9.get(0).getItem(), Items.gold_ingot));
-		recipes.put(new Object[] { i_stamps_9, new ItemStack(ModItems.ammo_rocket) }, getPressResultNN(i_stamps_9.get(0).getItem(), ModItems.ammo_rocket));
 		
 		recipes.put(new Object[] { i_stamps_50, new ItemStack(ModItems.assembly_actionexpress) }, getPressResultNN(i_stamps_50.get(0).getItem(), ModItems.assembly_actionexpress));
 		recipes.put(new Object[] { i_stamps_50, new ItemStack(ModItems.assembly_calamity) }, getPressResultNN(i_stamps_50.get(0).getItem(), ModItems.assembly_calamity));
@@ -4907,8 +4906,8 @@ public class MachineRecipes {
 
 		Map<Object, Object> recipes = new HashMap<Object, Object>();
 		
-		for(int i = 0; i < FluidType.values().length; i++) {
-			Object[] outs = getBoilerOutput(FluidType.getEnum(i));
+		for(int i = 0; i < FluidRegistry.getRegisteredFluidIDsByFluid().size(); i++) {
+			Object[] outs = getBoilerOutput(FluidRegistry.getFluid(i));
 			
 			if(outs != null) {
 
@@ -5185,10 +5184,10 @@ public class MachineRecipes {
 			input[0] = new FluidStack(600, FluidType.PETROLEUM);
         	break;
     	case SF_BIOGAS:
-			input[0] = new FluidStack(3500, FluidType.BIOGAS);
+			input[0] = new FluidStack(400, FluidType.BIOGAS);
         	break;
     	case SF_BIOFUEL:
-			input[0] = new FluidStack(1500, FluidType.BIOFUEL);
+			input[0] = new FluidStack(300, FluidType.BIOFUEL);
         	break;
         case POLYMER:
 			input[0] = new FluidStack(600, FluidType.PETROLEUM);

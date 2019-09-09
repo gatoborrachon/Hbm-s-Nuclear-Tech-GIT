@@ -8,12 +8,9 @@ import com.hbm.entity.projectile.EntityBullet;
 import com.hbm.handler.BulletConfiguration;
 import com.hbm.lib.RefStrings;
 import com.hbm.main.ResourceManager;
-import com.hbm.render.model.ModelBaleflare;
 import com.hbm.render.model.ModelBuckshot;
 import com.hbm.render.model.ModelBullet;
 import com.hbm.render.model.ModelGrenade;
-import com.hbm.render.model.ModelMIRV;
-import com.hbm.render.model.ModelMiniNuke;
 import com.hbm.render.model.ModelRocket;
 
 import net.minecraft.client.renderer.Tessellator;
@@ -27,18 +24,12 @@ public class RenderBullet extends Render {
 	private ModelBuckshot buckshot;
 	private ModelRocket rocket;
 	private ModelGrenade grenade;
-	private ModelMiniNuke nuke;
-	private ModelMIRV mirv;
-	private ModelBaleflare bf;
 
 	public RenderBullet() {
 		bullet = new ModelBullet();
 		buckshot = new ModelBuckshot();
 		rocket = new ModelRocket();
 		grenade = new ModelGrenade();
-		nuke = new ModelMiniNuke();
-		mirv = new ModelMIRV();
-		bf = new ModelBaleflare();
 	}
 
 	@Override
@@ -65,9 +56,6 @@ public class RenderBullet extends Render {
 			case BulletConfiguration.STYLE_PELLET: renderBuckshot(); break;
 			case BulletConfiguration.STYLE_ROCKET: renderRocket(trail); break;
 			case BulletConfiguration.STYLE_GRENADE: renderGrenade(trail); break;
-			case BulletConfiguration.STYLE_NUKE: renderNuke(0); break;
-			case BulletConfiguration.STYLE_MIRV: renderNuke(1); break;
-			case BulletConfiguration.STYLE_BF: renderNuke(2); break;
 			default: renderBullet(trail); break;
 		}
 		
@@ -145,24 +133,6 @@ public class RenderBullet extends Render {
 		}
 		
 		grenade.renderAll(0.0625F);
-	}
-	
-	private void renderNuke(int type) {
-
-        GL11.glScalef(1.5F, 1.5F, 1.5F);
-		
-		switch(type) {
-		case 0:
-			bindTexture(new ResourceLocation(RefStrings.MODID + ":textures/models/MiniNuke.png"));
-			nuke.renderAll(0.0625F); break;
-		case 1:
-			bindTexture(new ResourceLocation(RefStrings.MODID + ":textures/models/Mirv.png"));
-			mirv.renderAll(0.0625F); break;
-		case 2:
-			bindTexture(new ResourceLocation(RefStrings.MODID + ":textures/models/BaleFlare.png"));
-			bf.renderAll(0.0625F); break;
-		}
-
 	}
 	
 	private void renderFlechette() {

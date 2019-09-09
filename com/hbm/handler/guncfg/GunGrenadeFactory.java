@@ -31,7 +31,6 @@ public class GunGrenadeFactory {
 		config.crosshair = Crosshair.L_CIRCUMFLEX;
 		config.firingSound = "hbm:weapon.hkShoot";
 		config.reloadSound = GunConfiguration.RSOUND_GRENADE;
-		config.reloadSoundEnd = false;
 		
 		config.name = "Granatpistole HK69";
 		config.manufacturer = "Heckler & Koch";

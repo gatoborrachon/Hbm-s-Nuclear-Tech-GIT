@@ -238,7 +238,7 @@ public class TileEntityMachineBoilerElectric extends TileEntity implements ISide
 			tanks[0].setType(0, 1, slots);
 			tanks[0].loadTank(2, 3, slots);
 			
-			Object[] outs = MachineRecipes.getBoilerOutput(tanks[0].getTankType());
+			Object[] outs = null;//MachineRecipes.getBoilerOutput(tanks[0].getTankType());
 			
 			if(outs == null) {
 				tanks[1].setTankType(FluidType.NONE);

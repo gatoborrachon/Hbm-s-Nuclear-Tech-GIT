@@ -362,6 +362,7 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 							tanks[2].getFill() > 0 && tanks[3].getFill() > 0) {
 
 						power += (powerBase * powerMod * gauss(1, (heat - (maxHeat / 2)) / maxHeat)) / 1000 * getFuelPower(tanks[2].getTankType()) * getFuelPower(tanks[3].getTankType());
+						System.out.println((powerBase * powerMod * gauss(1, (heat - (maxHeat / 2)) / maxHeat)) / 1000 * getFuelPower(tanks[2].getTankType()) * getFuelPower(tanks[3].getTankType()));
 						heat += (heatBase * heatMod) / (float)(this.field / 100F);
 						tanks[2].setFill((int)(tanks[2].getFill() - fuelBase * fuelMod));
 						tanks[3].setFill((int)(tanks[3].getFill() - fuelBase * fuelMod));
@@ -371,7 +372,7 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 							tanks[3].setFill(0);
 						
 						radiation();
-						
+
 						if(heat > maxHeat) {
 							explode();
 							heat = maxHeat;

@@ -769,15 +769,6 @@ public class GUIHandler implements IGuiHandler {
 					}
 					return null;
 				}
-	
-				case ModBlocks.guiID_soyuz_launcher:
-				{
-					if(entity instanceof TileEntitySoyuzLauncher)
-					{
-						return new ContainerSoyuzLauncher(player.inventory, (TileEntitySoyuzLauncher) entity);
-					}
-					return null;
-				}
 			}
 		} else {
 			//NON-TE CONTAINERS
@@ -1542,15 +1533,6 @@ public class GUIHandler implements IGuiHandler {
 					if(entity instanceof TileEntityLaunchTable)
 					{
 						return new GUIMachineLaunchTable(player.inventory, (TileEntityLaunchTable) entity);
-					}
-					return null;
-				}
-				
-				case ModBlocks.guiID_soyuz_launcher:
-				{
-					if(entity instanceof TileEntitySoyuzLauncher)
-					{
-						return new GUISoyuzLauncher(player.inventory, (TileEntitySoyuzLauncher) entity);
 					}
 					return null;
 				}

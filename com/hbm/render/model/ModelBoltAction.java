@@ -202,6 +202,8 @@ public class ModelBoltAction extends ModelBase {
 		HandleBottom.render(f5);
 		HandleGrip.render(f5);
 		
+		
+		
 		GL11.glPushMatrix();
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_LIGHTING);

@@ -125,8 +125,7 @@ public class ItemRenderGunAnim implements IItemRenderer {
 				}
 				
 				if(item.getItem() == ModItems.gun_bolt_action || item.getItem() == ModItems.gun_bolt_action_green ||
-						item.getItem() == ModItems.gun_lever_action || item.getItem() == ModItems.gun_lever_action_dark
-						 || item.getItem() == ModItems.gun_bolt_action_saturnite) {
+						item.getItem() == ModItems.gun_lever_action || item.getItem() == ModItems.gun_lever_action_dark) {
 					GL11.glTranslatef(0.0F, -0.4F, 0.0F);
 					GL11.glRotatef(-20.0F, 0.0F, 0.0F, 1.0F);
 					GL11.glRotatef(5.0F, 0.0F, 1.0F, 0.0F);

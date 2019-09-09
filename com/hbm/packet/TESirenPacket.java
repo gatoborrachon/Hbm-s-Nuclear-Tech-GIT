@@ -91,10 +91,12 @@ public class TESirenPacket implements IMessage {
 		@Override
 		@SideOnly(Side.CLIENT)
 		public IMessage onMessage(TESirenPacket m, MessageContext ctx) {
+			System.out.println("Called on message");
 			//TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(m.x, m.y, m.z);
 			TileEntity te2 = null;
 			if(m.worldId != -1){
 			te2 = MinecraftServer.getServer().worldServers[m.worldId].getTileEntity(m.x, m.y, m.z);
+			System.out.println(te2);
 			}
 	
 			

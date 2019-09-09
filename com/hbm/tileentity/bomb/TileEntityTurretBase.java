@@ -6,7 +6,6 @@ import java.util.List;
 import com.hbm.blocks.bomb.TurretBase;
 import com.hbm.entity.logic.EntityBomber;
 import com.hbm.entity.missile.EntityMissileBaseAdvanced;
-import com.hbm.entity.missile.EntityMissileCustom;
 import com.hbm.items.tool.ItemTurretBiometry;
 import com.hbm.lib.Library;
 import com.hbm.packet.LoopedSoundPacket;
@@ -104,10 +103,10 @@ public abstract class TileEntityTurretBase extends TileEntity {
 	}
 	
 	private boolean isInSight(Entity e) {
-		if(!(e instanceof EntityLivingBase) && !(e instanceof EntityMissileBaseAdvanced) && !(e instanceof EntityBomber) && !(e instanceof EntityMissileCustom))
+		if(!(e instanceof EntityLivingBase) && !(e instanceof EntityMissileBaseAdvanced) && !(e instanceof EntityBomber))
 			return false;
 		
-		if(this instanceof TileEntityTurretCIWS && !(e instanceof EntityMissileBaseAdvanced) && !(e instanceof EntityBomber) && !(e instanceof EntityMissileCustom))
+		if(this instanceof TileEntityTurretCIWS && !(e instanceof EntityMissileBaseAdvanced) && !(e instanceof EntityBomber))
 			return false;
 		
 		if(e instanceof EntityPlayer && players.contains((((EntityPlayer)e).getUniqueID().toString())))

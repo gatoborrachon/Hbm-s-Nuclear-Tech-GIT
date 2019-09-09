@@ -386,6 +386,7 @@ public class Silo extends WorldGenerator
 		world.setBlock(x + 17, y + -20, z + 10, Blocks.air, 0, 3);
 		world.setBlock(x + 18, y + -20, z + 10, Library.getRandomConcrete(), 0, 3);
 		world.setBlock(x + 19, y + -20, z + 10, Blocks.chest, 5, 3);
+		System.out.println((x+19) + " " + (y+-20) + " " + (z + 10));
 		world.setBlockMetadataWithNotify(x + 19, y + -20, z + 10, 5, 3);
 		if(world.getBlock(x + 19, y + -20, z + 10) == Blocks.chest)
 		{

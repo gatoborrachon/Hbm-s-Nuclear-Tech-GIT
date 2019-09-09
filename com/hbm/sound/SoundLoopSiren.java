@@ -22,13 +22,16 @@ public class SoundLoopSiren extends SoundLoopMachine {
 	public float intendedVolume;
 	public SoundType type;
 
+
 	public SoundLoopSiren(ResourceLocation path, TileEntity te, SoundType type) {
 		super(path, te);
 		list.add(this);
 		intendedVolume = 10.0F;
 		this.field_147666_i = ISound.AttenuationType.NONE;
 		this.type = type;
+
 	}
+
 
 	@Override
 	public void update() {

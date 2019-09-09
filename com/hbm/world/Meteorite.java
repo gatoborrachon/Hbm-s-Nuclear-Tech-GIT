@@ -24,7 +24,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class Meteorite {
-	
+	public static int fatDuck = 0;
 	public void generate(World world, Random rand, int x, int y, int z) {
 		
 		List<Entity> list = (List<Entity>)world.getEntitiesWithinAABBExcludingEntity(null, 
@@ -33,14 +33,15 @@ public class Meteorite {
 		for(Entity e : list) {
 			e.attackEntityFrom(ModDamageSource.meteorite, 1000);
 		}
-		
-		if(MainRegistry.enableSpecialMeteors)
-			switch(rand.nextInt(300)) {
+		if(!MainRegistry.enableSpecialMeteors)
+			//switch(rand.nextInt(300)) {
+			switch(fatDuck) {
 			case 0:
 				//Meteor-only tiny meteorite
 				List<ItemStack> list0 = new ArrayList<ItemStack>();
 				list0.add(new ItemStack(ModBlocks.block_meteor));
 				generateBox(world, rand, x, y, z, list0);
+				fatDuck++;
 				return;
 			case 1:
 				//Large ore-only meteorite
@@ -50,6 +51,7 @@ public class Meteorite {
 				for(int j = 0; j < i; j++)
 					list1.add(new ItemStack(Blocks.stone));
 				generateSphere7x7(world, rand, x, y, z, list1);
+				fatDuck++;
 				return;
 			case 2:
 				//Medium ore-only meteorite
@@ -59,17 +61,20 @@ public class Meteorite {
 				for(int j = 0; j < k; j++)
 					list2.add(new ItemStack(Blocks.stone));
 				generateSphere5x5(world, rand, x, y, z, list2);
+				fatDuck++;
 				return;
 			case 3:
 				//Small pure ore meteorite
 				List<ItemStack> list3 = new ArrayList<ItemStack>();
 				list3.addAll(this.getRandomOre(rand));
 				generateBox(world, rand, x, y, z, list3);
+				fatDuck++;
 				return;
 			case 4:
 				//Bamboozle
 				world.createExplosion(null, x + 0.5, y + 0.5, z + 0.5, 15F, true);
 				ExplosionLarge.spawnRubble(world, x, y, z, 25);
+				fatDuck++;
 				return;
 			case 5:
 				//Large treasure-only meteorite
@@ -77,6 +82,7 @@ public class Meteorite {
 				list4.add(new ItemStack(ModBlocks.block_meteor_treasure));
 				list4.add(new ItemStack(ModBlocks.block_meteor_broken));
 				generateSphere7x7(world, rand, x, y, z, list4);
+				fatDuck++;
 				return;
 			case 6:
 				//Medium treasure-only meteorite
@@ -85,12 +91,14 @@ public class Meteorite {
 				list5.add(new ItemStack(ModBlocks.block_meteor_treasure));
 				list5.add(new ItemStack(ModBlocks.block_meteor_broken));
 				generateSphere5x5(world, rand, x, y, z, list5);
+				fatDuck++;
 				return;
 			case 7:
 				//Small pure treasure meteorite
 				List<ItemStack> list6 = new ArrayList<ItemStack>();
 				list6.add(new ItemStack(ModBlocks.block_meteor_treasure));
 				generateBox(world, rand, x, y, z, list6);
+				fatDuck++;
 				return;
 			case 8:
 				//Large nuclear meteorite
@@ -100,6 +108,7 @@ public class Meteorite {
 				list8.add(new ItemStack(ModBlocks.toxic_block));
 				generateSphere7x7(world, rand, x, y, z, list7);
 				generateSphere5x5(world, rand, x, y, z, list8);
+				fatDuck++;
 				return;
 			case 9:
 				//Giant ore meteorite
@@ -107,6 +116,7 @@ public class Meteorite {
 				list9.add(new ItemStack(ModBlocks.block_meteor_broken));
 				generateSphere9x9(world, rand, x, y, z, list9);
 				generateSphere7x7(world, rand, x, y, z, this.getRandomOre(rand));
+				fatDuck++;
 				return;
 			case 10:
 				//Tainted Meteorite
@@ -114,6 +124,7 @@ public class Meteorite {
 				list10.add(new ItemStack(ModBlocks.block_meteor_broken));
 				generateSphere5x5(world, rand, x, y, z, list10);
 				world.setBlock(x, y, z, ModBlocks.taint, 9, 2);
+				fatDuck++;
 				return;
 			case 11:
 				//Atomic meteorite
@@ -140,6 +151,7 @@ public class Meteorite {
 	    	    	} else {
 	    	    		ExplosionParticle.spawnMush(world, x, y - 3, z);
 	    	    	}
+	    	    fatDuck++;
 				return;
 			case 12:
 				//Star Blaster
@@ -148,6 +160,7 @@ public class Meteorite {
 				stack.setStackDisplayName("§9Star Blaster§r");
 				EntityItem blaster = new EntityItem(world, x + 0.5, y + 0.5, z + 0.5, stack);
 				world.spawnEntityInWorld(blaster);
+				fatDuck = 0;
 				return;
 			}
 		

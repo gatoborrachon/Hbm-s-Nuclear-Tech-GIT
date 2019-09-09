@@ -5,9 +5,10 @@ import net.minecraft.client.particle.EntityCloudFX;
 import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -24,6 +25,7 @@ import com.hbm.entity.missile.*;
 import com.hbm.entity.mob.*;
 import com.hbm.entity.particle.*;
 import com.hbm.entity.projectile.*;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.items.ModItems;
 import com.hbm.particle.ParticleContrail;
 import com.hbm.particle.ParticleSmokePlume;
@@ -33,8 +35,6 @@ import com.hbm.render.item.*;
 import com.hbm.render.misc.MissilePart;
 import com.hbm.render.tileentity.*;
 import com.hbm.render.util.HmfModelLoader;
-import com.hbm.sound.AudioWrapper;
-import com.hbm.sound.AudioWrapperClient;
 import com.hbm.tileentity.bomb.*;
 import com.hbm.tileentity.conductor.*;
 import com.hbm.tileentity.deco.*;
@@ -42,6 +42,9 @@ import com.hbm.tileentity.machine.*;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class ClientProxy extends ServerProxy
 {
@@ -58,6 +61,8 @@ public class ClientProxy extends ServerProxy
 		RenderingRegistry.registerBlockHandler(new RenderSteelBeam());
 		RenderingRegistry.registerBlockHandler(new RenderBarrel());
 
+		MinecraftForgeClient.registerItemRenderer(ModItems.fluid_barrel_full, new ItemRenderFluidBarrel());
+		MinecraftForgeClient.registerItemRenderer(ModItems.fluid_tank_full, new ItemRenderFluidTank());
 		MinecraftForgeClient.registerItemRenderer(ModItems.assembly_template, new ItemRenderTemplate());
 		MinecraftForgeClient.registerItemRenderer(ModItems.chemistry_template, new ItemRenderTemplate());
 		
@@ -527,13 +532,6 @@ public class ClientProxy extends ServerProxy
 			Minecraft.getMinecraft().effectRenderer.addEffect(contrail);
 		}
 	}
-	
-	@Override
-	public AudioWrapper getLoopedSound(String sound, float x, float y, float z, float volume, float pitch) {
-		
-		AudioWrapperClient audio = new AudioWrapperClient(new ResourceLocation(sound));
-		audio.updatePosition(x, y, z);
-		return audio;
-	}
+
 }
 

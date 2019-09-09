@@ -7,6 +7,7 @@ import com.hbm.handler.MultiblockHandler;
 import com.hbm.interfaces.IMultiblock;
 import com.hbm.main.MainRegistry;
 import com.hbm.tileentity.machine.TileEntityDummy;
+import com.hbm.tileentity.machine.TileEntityDummyFluidPort;
 import com.hbm.tileentity.machine.TileEntityMachineFluidTank;
 import com.hbm.tileentity.machine.TileEntityMachineGasFlare;
 
@@ -83,32 +84,32 @@ public class MachineFluidTank extends BlockContainer implements IMultiblock {
 				DummyBlockFluidTank.safeBreak = true;
 				world.setBlock(x + 1, y, z + 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te = world.getTileEntity(x + 1, y, z + 1);
-				if(te instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te;
+				if(te instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
 				}
 				world.setBlock(x + 1, y, z - 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te1 = world.getTileEntity(x + 1, y, z - 1);
-				if(te1 instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te1;
+				if(te1 instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te1;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
 				}
 				world.setBlock(x - 1, y, z + 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te2 = world.getTileEntity(x - 1, y, z + 1);
-				if(te2 instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te2;
+				if(te2 instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te2;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
 				}
 				world.setBlock(x - 1, y, z - 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te3 = world.getTileEntity(x - 1, y, z - 1);
-				if(te3 instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te3;
+				if(te3 instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te3;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
@@ -128,32 +129,32 @@ public class MachineFluidTank extends BlockContainer implements IMultiblock {
 				DummyBlockFluidTank.safeBreak = true;
 				world.setBlock(x + 1, y, z + 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te = world.getTileEntity(x + 1, y, z + 1);
-				if(te instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te;
+				if(te instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
 				}
 				world.setBlock(x + 1, y, z - 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te1 = world.getTileEntity(x + 1, y, z - 1);
-				if(te1 instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te1;
+				if(te1 instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te1;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
 				}
 				world.setBlock(x - 1, y, z + 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te2 = world.getTileEntity(x - 1, y, z + 1);
-				if(te2 instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te2;
+				if(te2 instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te2;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
 				}
 				world.setBlock(x - 1, y, z - 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te3 = world.getTileEntity(x - 1, y, z - 1);
-				if(te3 instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te3;
+				if(te3 instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te3;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
@@ -173,32 +174,32 @@ public class MachineFluidTank extends BlockContainer implements IMultiblock {
 				DummyBlockFluidTank.safeBreak = true;
 				world.setBlock(x + 1, y, z + 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te = world.getTileEntity(x + 1, y, z + 1);
-				if(te instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te;
+				if(te instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
 				}
 				world.setBlock(x + 1, y, z - 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te1 = world.getTileEntity(x + 1, y, z - 1);
-				if(te1 instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te1;
+				if(te1 instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te1;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
 				}
 				world.setBlock(x - 1, y, z + 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te2 = world.getTileEntity(x - 1, y, z + 1);
-				if(te2 instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te2;
+				if(te2 instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te2;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
 				}
 				world.setBlock(x - 1, y, z - 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te3 = world.getTileEntity(x - 1, y, z - 1);
-				if(te3 instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te3;
+				if(te3 instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te3;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
@@ -218,32 +219,32 @@ public class MachineFluidTank extends BlockContainer implements IMultiblock {
 				DummyBlockFluidTank.safeBreak = true;
 				world.setBlock(x + 1, y, z + 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te = world.getTileEntity(x + 1, y, z + 1);
-				if(te instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te;
+				if(te instanceof TileEntityDummyFluidPort) {
+					TileEntityDummy dummy = (TileEntityDummyFluidPort)te;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
 				}
 				world.setBlock(x + 1, y, z - 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te1 = world.getTileEntity(x + 1, y, z - 1);
-				if(te1 instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te1;
+				if(te1 instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te1;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
 				}
 				world.setBlock(x - 1, y, z + 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te2 = world.getTileEntity(x - 1, y, z + 1);
-				if(te2 instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te2;
+				if(te2 instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te2;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;
 				}
 				world.setBlock(x - 1, y, z - 1, ModBlocks.dummy_port_fluidtank);
 				TileEntity te3 = world.getTileEntity(x - 1, y, z - 1);
-				if(te3 instanceof TileEntityDummy) {
-					TileEntityDummy dummy = (TileEntityDummy)te3;
+				if(te3 instanceof TileEntityDummyFluidPort) {
+					TileEntityDummyFluidPort dummy = (TileEntityDummyFluidPort)te3;
 					dummy.targetX = x;
 					dummy.targetY = y;
 					dummy.targetZ = z;

@@ -26,6 +26,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.IFluidContainerItem;
 
 public class MachineBoiler extends BlockContainer {
 
@@ -149,6 +151,7 @@ public class MachineBoiler extends BlockContainer {
 	
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+
 		if(world.isRemote)
 		{
 			return true;
@@ -159,8 +162,10 @@ public class MachineBoiler extends BlockContainer {
 			if(te instanceof TileEntityMachineBoiler) {
 				
 				TileEntityMachineBoiler entity = (TileEntityMachineBoiler) te;
+				
 				if(entity != null)
 				{
+
 					FMLNetworkHandler.openGui(player, MainRegistry.instance, ModBlocks.guiID_machine_boiler, world, x, y, z);
 				}
 			}
@@ -338,4 +343,6 @@ public class MachineBoiler extends BlockContainer {
         	}
         }
     }
+	
+
 }

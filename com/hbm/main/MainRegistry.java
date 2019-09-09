@@ -30,6 +30,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.common.util.EnumHelper;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry.FluidContainerData;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -38,9 +41,9 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.Metadata;
 import cpw.mods.fml.common.ModMetadata;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.logging.log4j.Logger;
@@ -56,6 +59,7 @@ import com.hbm.entity.missile.*;
 import com.hbm.entity.mob.*;
 import com.hbm.entity.particle.*;
 import com.hbm.entity.projectile.*;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.handler.*;
 import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.inventory.*;
@@ -315,7 +319,7 @@ public class MainRegistry
 	public static int fogCh = 20;
 	public static float hellRad = 0.1F;
 
-	public static int generalOverride = 0;
+	public static int generalOverride = 11;
 	public static int polaroidID = 1;
 
 	public static int taintID = 62;
@@ -446,6 +450,7 @@ public class MainRegistry
 		GameRegistry.registerTileEntity(TileEntityHatch.class, "tileentity_seal_lid");
 		GameRegistry.registerTileEntity(TileEntityMachineIGenerator.class, "tileentity_igenerator");
 		GameRegistry.registerTileEntity(TileEntityDummy.class, "tileentity_dummy");
+		GameRegistry.registerTileEntity(TileEntityDummyFluidPort.class, "tileentity_dummy_fluid_port");
 		GameRegistry.registerTileEntity(TileEntityMachineCyclotron.class, "tileentity_cyclotron");
 		GameRegistry.registerTileEntity(TileEntityMachineOilWell.class, "tileentity_derrick");
 		GameRegistry.registerTileEntity(TileEntityMachineGasFlare.class, "tileentity_gasflare");
@@ -534,7 +539,6 @@ public class MainRegistry
 		GameRegistry.registerTileEntity(TileEntityMultiblock.class, "tileentity_multi_core");
 		GameRegistry.registerTileEntity(TileEntityChlorineSeal.class, "tileentity_chlorine_seal");
 		GameRegistry.registerTileEntity(TileEntityCableSwitch.class, "tileentity_he_switch");
-		GameRegistry.registerTileEntity(TileEntitySoyuzLauncher.class, "tileentity_soyuz_launcher");
 
 	    EntityRegistry.registerModEntity(EntityRocket.class, "entity_rocket", 0, this, 250, 1, true);
 	    EntityRegistry.registerModEntity(EntityNukeExplosion.class, "entity_nuke_explosion", 1, this, 250, 1, true);
@@ -685,6 +689,8 @@ public class MainRegistry
 	    EntityRegistry.registerGlobalEntityID(EntityHunterChopper.class, "entity_mob_hunter_chopper", EntityRegistry.findGlobalUniqueEntityId(), 0x000020, 0x2D2D72);
 	    EntityRegistry.registerGlobalEntityID(EntityCyberCrab.class, "entity_cyber_crab", EntityRegistry.findGlobalUniqueEntityId(), 0xAAAAAA, 0x444444);
 	
+	    ModForgeFluids.PreInit();
+	    
 		ForgeChunkManager.setForcedChunkLoadingCallback(this, new LoadingCallback() {
 			
 	        @Override
@@ -1342,6 +1348,9 @@ public class MainRegistry
 		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.rod_quad_coolant), new ItemStack(ModItems.rod_quad_empty), FluidType.COOLANT, 4000));
 		
 		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_oil), new ItemStack(ModItems.canister_empty), FluidType.OIL, 1000));
+		
+		net.minecraftforge.fluids.FluidContainerRegistry.registerFluidContainer(net.minecraftforge.fluids.FluidRegistry.getFluidStack("hbmoil", 1000), new ItemStack(ModItems.canister_oil), new ItemStack(ModItems.canister_empty));
+		
 		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_smear), new ItemStack(ModItems.canister_empty), FluidType.SMEAR, 1000));
 		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_heavyoil), new ItemStack(ModItems.canister_empty), FluidType.HEAVYOIL, 1000));
 		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_bitumen), new ItemStack(ModItems.canister_empty), FluidType.BITUMEN, 1000));
@@ -1383,12 +1392,18 @@ public class MainRegistry
 		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.tank_waste, 1, 6), new ItemStack(ModItems.tank_waste, 1, 5), FluidType.WATZ, 8000));
 		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.tank_waste, 1, 7), new ItemStack(ModItems.tank_waste, 1, 6), FluidType.WATZ, 8000));
 		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.tank_waste, 1, 8), new ItemStack(ModItems.tank_waste, 1, 7), FluidType.WATZ, 8000));
-		
-		for(int i = 1; i < FluidType.values().length; i++) {
+		int i = 1;
+		for(;i < FluidType.values().length; i++) {
 			FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.fluid_tank_full, 1, i), new ItemStack(ModItems.fluid_tank_empty), FluidType.getEnum(i), 1000));
 			FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.fluid_barrel_full, 1, i), new ItemStack(ModItems.fluid_barrel_empty), FluidType.getEnum(i), 16000));
 		}
-
+		for(Map.Entry<String, Fluid> entry : FluidRegistry.getRegisteredFluids().entrySet()){
+			i++;
+			net.minecraftforge.fluids.FluidContainerRegistry.registerFluidContainer(net.minecraftforge.fluids.FluidRegistry.getFluidStack(entry.getKey(), 1000), new ItemStack(ModItems.fluid_tank_full, 1, i), new ItemStack(ModItems.fluid_tank_empty));
+			net.minecraftforge.fluids.FluidContainerRegistry.registerFluidContainer(net.minecraftforge.fluids.FluidRegistry.getFluidStack(entry.getKey(), 16000), new ItemStack(ModItems.fluid_barrel_full, 1, i), new ItemStack(ModItems.fluid_barrel_empty));
+	}
+				
+				
 		HazmatRegistry.instance.registerHazmat(ModItems.hazmat_helmet, 0.2F);
 		HazmatRegistry.instance.registerHazmat(ModItems.hazmat_plate, 0.4F);
 		HazmatRegistry.instance.registerHazmat(ModItems.hazmat_legs, 0.3F);
@@ -1497,8 +1512,6 @@ public class MainRegistry
 		
 		proxy.registerMissileItems();
 	}
-	
-	public static List<String> templateBlacklist = new ArrayList();
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
@@ -1749,15 +1762,24 @@ public class MainRegistry
         ciwsHitrate = propRadarAltitude.getInt();
 
         final String CATEGORY_POTION = "08_potion_effects";
-        taintID = createConfigInt(config, CATEGORY_POTION, "8.00_taintPotionID", "What potion ID the taint effect will have", 62);
-        radiationID = createConfigInt(config, CATEGORY_POTION, "8.01_radiationPotionID", "What potion ID the radiation effect will have", 63);
-        bangID = createConfigInt(config, CATEGORY_POTION, "8.02_bangPotionID", "What potion ID the B93 timebomb effect will have", 64);
-        mutationID = createConfigInt(config, CATEGORY_POTION, "8.03_mutationPotionID", "What potion ID the taint mutation effect will have", 65);
-        radxID = createConfigInt(config, CATEGORY_POTION, "8.04_radxPotionID", "What potion ID the Rad-X effect will have", 66);
-        leadID = createConfigInt(config, CATEGORY_POTION, "8.05_leadPotionID", "What potion ID the lead poisoning effect will have", 67);
-
-        final String CATEGORY_MACHINE = "09_machines";
-        templateBlacklist = Arrays.asList(createConfigStringList(config, CATEGORY_MACHINE, "9.00_templateBlacklist", "Which machine templates should be prohibited from being created (args: enum names)"));
+        Property propTaintID = config.get(CATEGORY_POTION, "8.00_taintPotionID", 62);
+        propTaintID.comment = "What potion ID the taint effect will have";
+        taintID = propTaintID.getInt();
+        Property propRadiationID = config.get(CATEGORY_POTION, "8.01_radiationPotionID", 63);
+        propRadiationID.comment = "What potion ID the radiation effect will have";
+        radiationID = propRadiationID.getInt();
+        Property propBangID = config.get(CATEGORY_POTION, "8.02_bangPotionID", 64);
+        propBangID.comment = "What potion ID the B93 timebomb effect will have";
+        bangID = propBangID.getInt();
+        Property propMutationID = config.get(CATEGORY_POTION, "8.03_mutationPotionID", 65);
+        propMutationID.comment = "What potion ID the taint mutation effect will have";
+        mutationID = propMutationID.getInt();
+        Property propRadxID = config.get(CATEGORY_POTION, "8.04_radxPotionID", 66);
+        propRadxID.comment = "What potion ID the Rad-X effect will have";
+        radxID = propRadxID.getInt();
+        Property propLeadID = config.get(CATEGORY_POTION, "8.05_leadPotionID", 67);
+        propLeadID.comment = "What potion ID the lead poisoning effect will have";
+        leadID = propLeadID.getInt();
         
         config.save();
         
@@ -1795,19 +1817,5 @@ public class MainRegistry
 		}
 		
 		return value;
-	}
-	
-	private static int createConfigInt(Configuration config, String category, String name, String comment, int def) {
-
-        Property prop = config.get(category, name, def);
-        prop.comment = comment;
-        return prop.getInt();
-	}
-	
-	private static String[] createConfigStringList(Configuration config, String category, String name, String comment) {
-
-        Property prop = config.get(category, name, new String[] { "PLACEHOLDER" } );
-        prop.comment = comment;
-        return prop.getStringList();
 	}
 }

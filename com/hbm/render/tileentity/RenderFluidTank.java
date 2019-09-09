@@ -1,16 +1,20 @@
 package com.hbm.render.tileentity;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.lib.RefStrings;
 import com.hbm.tileentity.machine.TileEntityMachineFluidTank;
-import com.hbm.tileentity.machine.TileEntityMachineIGenerator;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
+import net.minecraftforge.fluids.FluidRegistry;
 
 public class RenderFluidTank extends TileEntitySpecialRenderer {
 
@@ -56,7 +60,7 @@ public class RenderFluidTank extends TileEntitySpecialRenderer {
 		}
 
         bindTexture(genTexture);
-        
+ 
         genModel.renderAll();
 
         GL11.glPopMatrix();
@@ -89,9 +93,23 @@ public class RenderFluidTank extends TileEntitySpecialRenderer {
 		}
 
 		String s = "NONE";
-		if(tileEntity instanceof TileEntityMachineFluidTank)
-			s = ((TileEntityMachineFluidTank)tileEntity).tank.getTankType().name();
+		
+		if(tileEntity instanceof TileEntityMachineFluidTank){
+			if(((TileEntityMachineFluidTank)tileEntity).tank.getFluid() !=null){
+			
+			s = FluidRegistry.getFluidName(((TileEntityMachineFluidTank)tileEntity).tank.getFluid()).toUpperCase();
+			}
+		}
+		
 		rotTexture = new ResourceLocation(RefStrings.MODID, "textures/models/tank_" + s + ".png");
+		
+		try {
+			Minecraft.getMinecraft().getResourceManager().getResource(rotTexture);
+		} catch (IOException e) {
+			//Set to my really ugly unknown texture
+		 rotTexture = new ResourceLocation(RefStrings.MODID, "textures/models/tank_UNKNOWN.png");
+		}
+
         bindTexture(rotTexture);
         rotModel.renderAll();
 
