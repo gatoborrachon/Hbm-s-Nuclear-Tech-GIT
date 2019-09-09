@@ -59,6 +59,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidHandler;
 
 public class Library {
@@ -1337,8 +1338,8 @@ public class Library {
 			}
 		}
 		
-		if(tileentity instanceof IHBMFluidHandler && newTact && !(tileentity instanceof TileEntityMachineFluidTank && ((TileEntityMachineFluidTank)tileentity).dna())
-				&& ((IHBMFluidHandler)tileentity).getMaxFluidFill(type) > 0 && ((IHBMFluidHandler)tileentity).getMaxFluidFill(type) - ((IFluidAcceptor)tileentity).getFluidFill(type) > 0)
+		if(tileentity instanceof IFluidHandler && newTact && !(tileentity instanceof TileEntityMachineFluidTank && ((TileEntityMachineFluidTank)tileentity).dna())
+				&& ((IFluidHandler)tileentity).fill(ForgeDirection.UNKNOWN, new FluidStack(type, 1), false) > 0)
 		{
 			that.getFluidList(type).add((IFluidHandler)tileentity);
 		}
@@ -1349,7 +1350,7 @@ public class Library {
 			if(size > 0)
 			{
 				int part = that.getFluidFill(type) / size;
-				for(IFluidAcceptor consume : that.getFluidList(type))
+				for(IFluidHandler consume : that.getFluidList(type))
 				{
 					if(consume.getFluidFill(type) < consume.getMaxFluidFill(type))
 					{
