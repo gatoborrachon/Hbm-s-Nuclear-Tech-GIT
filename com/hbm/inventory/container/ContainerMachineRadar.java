@@ -15,6 +15,7 @@ public class ContainerMachineRadar extends Container {
 	private TileEntityMachineRadar radar;
 	
 	public ContainerMachineRadar(InventoryPlayer invPlayer, TileEntityMachineRadar tedf) {
+
 		this.radar = tedf;
 	}
 	

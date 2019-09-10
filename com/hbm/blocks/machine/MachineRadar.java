@@ -61,7 +61,7 @@ public class MachineRadar extends BlockContainer {
 		} else if(!player.isSneaking())
 		{
 			TileEntityMachineRadar entity = (TileEntityMachineRadar) world.getTileEntity(x, y, z);
-			if(entity != null && (player.getHeldItem() == null || player.getHeldItem().getItem() != ModItems.stealth_boy))
+			if(entity != null/* && (player.getHeldItem() == null || player.getHeldItem().getItem() != ModItems.stealth_boy)*/)
 			{
 				
 				FMLNetworkHandler.openGui(player, MainRegistry.instance, ModBlocks.guiID_radar, world, x, y, z);

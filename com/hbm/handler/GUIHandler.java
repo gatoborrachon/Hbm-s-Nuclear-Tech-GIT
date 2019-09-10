@@ -10,6 +10,7 @@ import com.hbm.tileentity.bomb.*;
 import com.hbm.tileentity.machine.*;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.network.IGuiHandler;
@@ -1308,7 +1309,7 @@ public class GUIHandler implements IGuiHandler {
 				{
 					if(entity instanceof TileEntityMachineRadar)
 					{
-					
+
 						return new GUIMachineRadar(player.inventory, (TileEntityMachineRadar) entity);
 					}
 					return null;

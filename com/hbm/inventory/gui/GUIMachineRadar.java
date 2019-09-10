@@ -23,7 +23,9 @@ public class GUIMachineRadar extends GuiInfoContainer {
 	private TileEntityMachineRadar diFurnace;
 
 	public GUIMachineRadar(InventoryPlayer invPlayer, TileEntityMachineRadar tedf) {
+		
 		super(new ContainerMachineRadar(invPlayer, tedf));
+		System.out.println("new container complete");
 		diFurnace = tedf;
 		
 		this.xSize = 216;
@@ -80,6 +82,7 @@ public class GUIMachineRadar extends GuiInfoContainer {
 		
 		this.fontRendererObj.drawString(name, this.xSize / 2 - this.fontRendererObj.getStringWidth(name) / 2, 6, 4210752);
 	}
+
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float p_146976_1_, int p_146976_2_, int p_146976_3_) {
