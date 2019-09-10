@@ -11,19 +11,16 @@ import com.hbm.interfaces.IFluidDuct;
 import com.hbm.lib.Library;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.packet.TEFluidPipePacket;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
 
 public class TileEntityFluidDuct extends TileEntity implements IFluidDuct {
 	
 	public ForgeDirection[] connections = new ForgeDirection[6];
-	public Fluid type;
+	public FluidType type = FluidType.NONE;
 	public List<UnionOfTileEntitiesAndBooleansForFluids> uoteab = new ArrayList<UnionOfTileEntitiesAndBooleansForFluids>();
 	
 	public TileEntityFluidDuct() {
@@ -63,14 +60,14 @@ public class TileEntityFluidDuct extends TileEntity implements IFluidDuct {
 	public void readFromNBT(NBTTagCompound nbt)
     {
 		super.readFromNBT(nbt);
-		type = FluidRegistry.getFluid(nbt.getInteger("fluid"));
+		type = FluidType.getEnum(nbt.getInteger("fluid"));
     }
 
     @Override
 	public void writeToNBT(NBTTagCompound nbt)
     {
 		super.writeToNBT(nbt);
-		nbt.setInteger("fluid", type.getID());
+		nbt.setInteger("fluid", Arrays.asList(FluidType.values()).indexOf(type));
     }
 	
 	@Override
@@ -81,7 +78,7 @@ public class TileEntityFluidDuct extends TileEntity implements IFluidDuct {
 	}
 
 	@Override
-	public Fluid getType() {
+	public FluidType getType() {
 		return type;
 	}
 }

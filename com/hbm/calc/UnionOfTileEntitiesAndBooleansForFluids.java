@@ -6,12 +6,12 @@ import com.hbm.interfaces.IOilSource;
 
 public class UnionOfTileEntitiesAndBooleansForFluids {
 	
-	public UnionOfTileEntitiesAndBooleansForFluids(IHBMFluidHandler tileentity, boolean bool)
+	public UnionOfTileEntitiesAndBooleansForFluids(IFluidSource tileentity, boolean bool)
 	{
 		source = tileentity;
 		ticked = bool;
 	}
 
-	public IHBMFluidHandler source;
+	public IFluidSource source;
 	public boolean ticked = false;
 }

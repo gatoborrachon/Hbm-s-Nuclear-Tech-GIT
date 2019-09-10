@@ -1,5 +1,7 @@
 package com.hbm.forgefluid;
 
+import java.util.List;
+
 import com.hbm.inventory.gui.GuiInfoContainer;
 
 import net.minecraft.client.renderer.Tessellator;
@@ -7,12 +9,19 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.IFluidHandler;
 
 public class FFUtils {
+	public int sendFluid(FluidStack fluid, boolean doFill, List<IFluidHandler> list) {
+		
+		return 0;
+	}
+	
 	public static void drawLiquid(FluidTank tank, int guiLeft, int guiTop,
 			float zLevel, int sizeX, int sizeY, int offsetX, int offsetY) {
 		if (tank.getFluid() != null) {
 			IIcon liquidIcon = tank.getFluid().getFluid().getStillIcon();
+			
 			if (liquidIcon != null) {
 				int level = (int) (((double) tank.getFluidAmount() / (double) tank
 						.getCapacity()) * 52.0D);

@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.hbm.calc.UnionOfTileEntitiesAndBooleansForFluids;
 import com.hbm.calc.UnionOfTileEntitiesAndBooleansForGas;
-import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.interfaces.IFluidDuct;
 import com.hbm.interfaces.IGasDuct;
@@ -19,12 +18,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.fluids.Fluid;
 
 public class TileEntityGasDuct extends TileEntity implements IFluidDuct {
 	
 	public ForgeDirection[] connections = new ForgeDirection[6];
-	public Fluid type = ModForgeFluids.gas;
+	public FluidType type = FluidType.GAS;
 	public List<UnionOfTileEntitiesAndBooleansForFluids> uoteab = new ArrayList<UnionOfTileEntitiesAndBooleansForFluids>();
 	
 	public TileEntityGasDuct() {
@@ -64,7 +62,7 @@ public class TileEntityGasDuct extends TileEntity implements IFluidDuct {
 	public void readFromNBT(NBTTagCompound nbt)
     {
 		super.readFromNBT(nbt);
-		type = ModForgeFluids.gas;
+		type = FluidType.GAS;
     }
 
     @Override
@@ -81,7 +79,7 @@ public class TileEntityGasDuct extends TileEntity implements IFluidDuct {
 	}
 
 	@Override
-	public Fluid getType() {
+	public FluidType getType() {
 		return type;
 	}
 }

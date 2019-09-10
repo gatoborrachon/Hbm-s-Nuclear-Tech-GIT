@@ -35,7 +35,7 @@ import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
 public class TileEntityMachineFluidTank extends TileEntity implements
-		ISidedInventory, IHBMFluidHandler {
+		ISidedInventory, IFluidHandler {
 
 	private ItemStack slots[];
 
@@ -479,27 +479,5 @@ public class TileEntityMachineFluidTank extends TileEntity implements
 		readFromNBT(pkt.func_148857_g());
 	}
 
-	@Override
-	public List<IFluidHandler> getFluidList(Fluid type) {
-		
-		return list;
-	}
 
-	@Override
-	public void clearFluidList(Fluid type) {
-		list.clear();
-		
-	}
-
-	@Override
-	public Object getTact() {
-		//TODO deal with this
-		return null;
-	}
-
-	@Override
-	public void fillFluid(int x, int i, int z, Object tact, Fluid type) {
-		// TODO Auto-generated method stub
-		
-	}
 }

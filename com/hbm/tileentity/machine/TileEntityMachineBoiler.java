@@ -6,6 +6,7 @@ import java.util.List;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.machine.MachineBoiler;
 import com.hbm.forgefluid.ModForgeFluids;
+import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.interfaces.IFluidAcceptor;
 import com.hbm.interfaces.IHBMFluidHandler;
 import com.hbm.inventory.MachineRecipes;
@@ -33,7 +34,7 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityMachineBoiler extends TileEntity implements ISidedInventory, IHBMFluidHandler {
+public class TileEntityMachineBoiler extends TileEntity implements ISidedInventory, IFluidHandler {
 
 	private ItemStack slots[];
 
@@ -445,21 +446,10 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 
 	public void fillFluidInit() {
 
-		fillFluid(this.xCoord + 1, this.yCoord, this.zCoord, getTact(),
-				tanks[1].getFluid() != null ? tanks[1].getFluid().getFluid() : null);
-		fillFluid(this.xCoord - 1, this.yCoord, this.zCoord, getTact(),
-				tanks[1].getFluid() != null ? tanks[1].getFluid().getFluid() : null);
-		fillFluid(this.xCoord, this.yCoord + 1, this.zCoord, getTact(),
-				tanks[1].getFluid() != null ? tanks[1].getFluid().getFluid() : null);
-		fillFluid(this.xCoord, this.yCoord - 1, this.zCoord, getTact(),
-				tanks[1].getFluid() != null ? tanks[1].getFluid().getFluid() : null);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord + 1, getTact(),
-				tanks[1].getFluid() != null ? tanks[1].getFluid().getFluid() : null);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord - 1, getTact(),
-				tanks[1].getFluid() != null ? tanks[1].getFluid().getFluid() : null);
+
 	}
 
-	@Override
+
 	public boolean getTact() {
 		if (age >= 0 && age < 10) {
 			return true;
@@ -570,31 +560,6 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 		}
 	}
 
-	@Override
-	public List<IFluidHandler> getFluidList(Fluid type) {
-		return list;
 
-	}
-
-	@Override
-	public void clearFluidList(Fluid type) {
-		list.clear();
-
-	}
-
-	@Override
-	public void fillFluid(int x, int y, int z, Boolean newTact, Fluid type) {
-		Library.transmitFluid(x, y, z, newTact, this, worldObj, type);
-
-	}
-
-	@Override
-	public int getFluidFill(Fluid type) {
-		if (tanks[0].getFluid() != null && tanks[0].getFluid().getFluid() == type)
-			return tanks[0].getFluidAmount();
-		if (tanks[1].getFluid() != null && tanks[1].getFluid().getFluid() == type)
-			return tanks[1].getFluidAmount();
-		return 0;
-	}
 
 }

@@ -6,6 +6,6 @@ import com.hbm.handler.FluidTypeHandler.FluidType;
 
 public interface IFluidDuct {
 	
-	public Fluid getType();
+	public FluidType getType();
 
 }

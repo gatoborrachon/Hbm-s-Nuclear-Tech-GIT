@@ -21,7 +21,6 @@ import com.hbm.interfaces.IFluidSource;
 import com.hbm.interfaces.IGasAcceptor;
 import com.hbm.interfaces.IGasDuct;
 import com.hbm.interfaces.IGasSource;
-import com.hbm.interfaces.IHBMFluidHandler;
 import com.hbm.interfaces.IOilDuct;
 import com.hbm.interfaces.IOilAcceptor;
 import com.hbm.interfaces.IOilSource;
@@ -57,10 +56,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidHandler;
 
 public class Library {
 	
@@ -440,38 +435,7 @@ public class Library {
 		return false;
 	}
 	
-	public static boolean checkFluidConnectables(World world, int x, int y, int z, Fluid type)
-	{
-		TileEntity tileentity = world.getTileEntity(x, y, z);
-		if(tileentity != null && tileentity instanceof IFluidDuct && ((IFluidDuct)tileentity).getType() == type)
-			return true;
-		if((tileentity != null && (tileentity instanceof IFluidAcceptor || 
-				tileentity instanceof IFluidSource)) || 
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_well ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_flare ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_chemplant ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_fluidtank ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_refinery ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_pumpjack ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_turbofan ||
-				world.getBlock(x, y, z) == ModBlocks.reactor_hatch ||
-				world.getBlock(x, y, z) == ModBlocks.reactor_conductor ||
-				world.getBlock(x, y, z) == ModBlocks.fusion_hatch ||
-				world.getBlock(x, y, z) == ModBlocks.watz_hatch ||
-				world.getBlock(x, y, z) == ModBlocks.fwatz_hatch ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_ams_limiter ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_ams_emitter ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_ams_base ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_reactor_small ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_compact_launcher ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_launch_table)
-		{
-			return true;
-		}
-		return false;
-	}
-	
-	public static boolean checkFluidConnectablesTest(World world, int x, int y, int z, Fluid type)
+	public static boolean checkFluidConnectables(World world, int x, int y, int z, FluidType type)
 	{
 		TileEntity tileentity = world.getTileEntity(x, y, z);
 		if(tileentity != null && tileentity instanceof IFluidDuct && ((IFluidDuct)tileentity).getType() == type)
@@ -515,7 +479,7 @@ public class Library {
 		return false;
 	}
 	
-	public static boolean checkUnionListForFluids(List<UnionOfTileEntitiesAndBooleansForFluids> list, IHBMFluidHandler that) {
+	public static boolean checkUnionListForFluids(List<UnionOfTileEntitiesAndBooleansForFluids> list, IFluidSource that) {
 		
 		for(UnionOfTileEntitiesAndBooleansForFluids union : list)
 		{
@@ -1105,7 +1069,7 @@ public class Library {
 		}
 	}
 	
-	public static void transmitFluid(int x, int y, int z, boolean newTact, IHBMFluidHandler that, World worldObj, Fluid type) {
+	public static void transmitFluid(int x, int y, int z, boolean newTact, IFluidSource that, World worldObj, FluidType type) {
 		Block block = worldObj.getBlock(x, y, z);
 		TileEntity tileentity = worldObj.getTileEntity(x, y, z);
 		
@@ -1216,7 +1180,7 @@ public class Library {
 		
 		if(tileentity instanceof IFluidDuct)
 		{
-			if(tileentity instanceof TileEntityFluidDuct && ((TileEntityFluidDuct)tileentity).type.getUnlocalizedName().equals(type.getUnlocalizedName()))
+			if(tileentity instanceof TileEntityFluidDuct && ((TileEntityFluidDuct)tileentity).type.name().equals(type.name()))
 			{
 				if(Library.checkUnionListForFluids(((TileEntityFluidDuct)tileentity).uoteab, that))
 				{
@@ -1240,7 +1204,7 @@ public class Library {
 					((TileEntityFluidDuct)tileentity).uoteab.add(new UnionOfTileEntitiesAndBooleansForFluids(that, newTact));
 				}
 			}
-			if(tileentity instanceof TileEntityGasDuct && ((TileEntityGasDuct)tileentity).type.getUnlocalizedName().equals(type.getUnlocalizedName()))
+			if(tileentity instanceof TileEntityGasDuct && ((TileEntityGasDuct)tileentity).type.name().equals(type.name()))
 			{
 				if(Library.checkUnionListForFluids(((TileEntityGasDuct)tileentity).uoteab, that))
 				{
@@ -1264,7 +1228,7 @@ public class Library {
 					((TileEntityGasDuct)tileentity).uoteab.add(new UnionOfTileEntitiesAndBooleansForFluids(that, newTact));
 				}
 			}
-			/*if(tileentity instanceof TileEntityOilDuct && ((TileEntityOilDuct)tileentity).type.name().equals(type.name()))
+			if(tileentity instanceof TileEntityOilDuct && ((TileEntityOilDuct)tileentity).type.getUnlocalizedName().equals(type.name()))
 			{
 				if(Library.checkUnionListForFluids(((TileEntityOilDuct)tileentity).uoteab, that))
 				{
@@ -1287,8 +1251,8 @@ public class Library {
 				} else {
 					((TileEntityOilDuct)tileentity).uoteab.add(new UnionOfTileEntitiesAndBooleansForFluids(that, newTact));
 				}
-			}*/
-			if(tileentity instanceof TileEntityGasDuctSolid && ((TileEntityGasDuctSolid)tileentity).type.getUnlocalizedName().equals(type.getUnlocalizedName()))
+			}
+			if(tileentity instanceof TileEntityGasDuctSolid && ((TileEntityGasDuctSolid)tileentity).type.name().equals(type.name()))
 			{
 				if(Library.checkUnionListForFluids(((TileEntityGasDuctSolid)tileentity).uoteab, that))
 				{
@@ -1312,7 +1276,7 @@ public class Library {
 					((TileEntityGasDuctSolid)tileentity).uoteab.add(new UnionOfTileEntitiesAndBooleansForFluids(that, newTact));
 				}
 			}
-			if(tileentity instanceof TileEntityOilDuctSolid && ((TileEntityOilDuctSolid)tileentity).type.getUnlocalizedName().equals(type.getUnlocalizedName()))
+			if(tileentity instanceof TileEntityOilDuctSolid && ((TileEntityOilDuctSolid)tileentity).type.name().equals(type.name()))
 			{
 				if(Library.checkUnionListForFluids(((TileEntityOilDuctSolid)tileentity).uoteab, that))
 				{
@@ -1338,10 +1302,10 @@ public class Library {
 			}
 		}
 		
-		if(tileentity instanceof IFluidHandler && newTact && !(tileentity instanceof TileEntityMachineFluidTank && ((TileEntityMachineFluidTank)tileentity).dna())
-				&& ((IFluidHandler)tileentity).fill(ForgeDirection.UNKNOWN, new FluidStack(type, 1), false) > 0)
+		if(tileentity instanceof IFluidAcceptor && newTact && !(tileentity instanceof TileEntityMachineFluidTank && ((TileEntityMachineFluidTank)tileentity).dna())
+				&& ((IFluidAcceptor)tileentity).getMaxFluidFill(type) > 0 && ((IFluidAcceptor)tileentity).getMaxFluidFill(type) - ((IFluidAcceptor)tileentity).getFluidFill(type) > 0)
 		{
-			that.getFluidList(type).add((IFluidHandler)tileentity);
+			that.getFluidList(type).add((IFluidAcceptor)tileentity);
 		}
 		
 		if(!newTact)
@@ -1350,7 +1314,7 @@ public class Library {
 			if(size > 0)
 			{
 				int part = that.getFluidFill(type) / size;
-				for(IFluidHandler consume : that.getFluidList(type))
+				for(IFluidAcceptor consume : that.getFluidList(type))
 				{
 					if(consume.getFluidFill(type) < consume.getMaxFluidFill(type))
 					{
@@ -1368,8 +1332,6 @@ public class Library {
 			that.clearFluidList(type);
 		}
 	}
-	
-
 	
 	public static boolean isArrayEmpty(Object[] array) {
 		if(array == null)
