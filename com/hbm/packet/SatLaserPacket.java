@@ -73,6 +73,8 @@ public class SatLaserPacket implements IMessage {
 		    		
 		    		//ExplosionLarge.explodeFire(p.worldObj, m.x, y, m.z, 50, true, true, true);
 		    		EntityDeathBlast blast = new EntityDeathBlast(p.worldObj);
+		    		blast.setUpgrade(sat.laserUpgraded);
+		    		System.out.println(sat.laserUpgraded);
 		    		blast.posX = m.x;
 		    		blast.posY = y;
 		    		blast.posZ = m.z;

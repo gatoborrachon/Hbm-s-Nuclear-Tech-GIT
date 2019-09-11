@@ -11,10 +11,15 @@ import net.minecraft.world.World;
 public class EntityDeathBlast extends Entity {
 	
 	public static final int maxAge = 60;
+	public boolean penUpgrade = false;
 
 	public EntityDeathBlast(World p_i1582_1_) {
 		super(p_i1582_1_);
 		this.ignoreFrustumCheck = true;
+	}
+	
+	public void setUpgrade(boolean bool){
+		penUpgrade = bool;
 	}
 
 	@Override
@@ -33,6 +38,8 @@ public class EntityDeathBlast extends Entity {
 			this.setDead();
     		
     		ExplosionLarge.explodeFire(worldObj, posX, posY, posZ, 25, true, true, true);
+    		if(penUpgrade)
+    		ExplosionLarge.penetration(worldObj, (int)Math.floor(posX), (int)Math.floor(posY), (int)Math.floor(posZ), 10.0F);
 		}
 	}
 

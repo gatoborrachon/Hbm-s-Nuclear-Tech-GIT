@@ -137,42 +137,9 @@ public class MachineBoiler extends BlockContainer {
 		if (itemStack.hasDisplayName()) {
 			((TileEntityMachineBoiler) world.getTileEntity(x, y, z)).setCustomName(itemStack.getDisplayName());
 		}
-		int r = 3;
-		int r2 = r * r;
-		double strengthMult = 1.0;
-		for (int j = -r; j <= r; j++) {
-			int j2 = j * j;
-			for (int k = -r; k <= r; k++) {
-				int yValue = j2 * 5 + k * k * 5;
-
-				if (j * j + k * k <= r2) {
-					double strength = y - yValue * strengthMult;
-					
-					traceDown(x + j, z + k, y, yValue, world, strength);
-				}
-			}
-		}
+	
 	}
 	
-	public void traceDown(int x, int z, int y1, int y2, World world, double strength){
-		double strengthVar = strength;
-		for (int test = y1; test >= y2; test--) {
-			strengthVar -=5;
-			if (strengthVar <= 0)
-				return;
-			
-			if (strengthVar > 0) {
-				Block block = world.getBlock(x, test, z);
-				if (block != null) {
-					if (block.getExplosionResistance(null)/100 <= strengthVar) {
-						world.setBlock(x, test, z, Blocks.air);
-						
-					} 
-					strengthVar -= block.getExplosionResistance(null)/100;
-				}
-			}
-		}
-	}
 
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX,

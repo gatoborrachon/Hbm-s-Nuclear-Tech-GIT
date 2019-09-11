@@ -12,6 +12,7 @@ public class SatelliteSaveStructure {
 	public int satDim;
 	public SatelliteType satelliteType;
 	public long lastOp;
+	public boolean laserUpgraded;
 	
 	public SatelliteSaveStructure() { }
 	
@@ -55,6 +56,7 @@ public class SatelliteSaveStructure {
 		satelliteType = SatelliteType.getEnum(nbt.getInteger("sat_" + index + "_type"));
 		satDim = nbt.getInteger("sat_" + index + "_dim");
 		lastOp = nbt.getLong("sat_" + index + "_op");
+		laserUpgraded = nbt.getBoolean("sat_" + index + "_upgrade");
 	}
 
 	public void writeToNBT(NBTTagCompound nbt, int index) {
@@ -62,6 +64,16 @@ public class SatelliteSaveStructure {
 		nbt.setInteger("sat_" + index + "_type", satelliteType.getID());
 		nbt.setInteger("sat_" + index + "_dim", satDim);
 		nbt.setLong("sat_" + index + "_op", lastOp);
+		nbt.setBoolean("sat_" + index + "_upgrade", laserUpgraded);
+	}
+	
+	public boolean upgrade(){
+		if(satelliteType != null && satelliteType == SatelliteType.LASER){
+			laserUpgraded = true;
+			return true;
+			
+		}
+		return false;
 	}
 
 }

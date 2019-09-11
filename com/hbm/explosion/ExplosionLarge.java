@@ -9,6 +9,7 @@ import com.hbm.entity.projectile.EntityOilSpill;
 import com.hbm.entity.projectile.EntityRubble;
 import com.hbm.entity.projectile.EntityShrapnel;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityItem;
@@ -210,6 +211,59 @@ public class ExplosionLarge {
 		for(int i = 0; i < depth; i += 2) {
 			
 			world.createExplosion((Entity)null, x + vector.xCoord * i, y + vector.yCoord * i, z + vector.zCoord * i, strength, true);
+		}
+	}
+	
+	public static void penetration(World world, int x, int y, int z, float penetration){
+		Random rand = new Random();
+		int r = 4;
+		int r2 = r * r;
+		for (int j = -r; j <= r; j++) {
+			int j2 = j * j;
+			for (int k = -r; k <= r; k++) {
+				int yValue = j2 * 2 + k * k * 2;
+
+				if (j * j + k * k <= r2) {
+					double strength = 170 - yValue * penetration; //170 is an arbitrary value that looked about right
+					
+					traceDown(x + j, z + k, y, yValue, world, strength, rand);
+				}
+			}
+		}
+	}
+	
+	public static void traceDown(int x, int z, int y1, int y2, World world, double strength, Random rand){
+		if(world.isRemote){
+			return;
+		}
+		double strengthVar = strength;
+		
+		for (int test = y1; test >= y2; test--) {
+			int chance = rand.nextInt(3);
+			strengthVar -=10;
+			if (strengthVar <= 0)
+				return;
+			
+			if (strengthVar > 0) {
+				Block block = world.getBlock(x, test, z);
+				if (block != null) {
+					if (chance == 0 &&block.getExplosionResistance(null)/100 <= strengthVar) {
+						world.setBlock(x, test, z, Blocks.air);
+						
+					} else if (chance == 1 && block.getExplosionResistance(null)/50 <= strengthVar){
+						world.setBlock(x, test, z, Blocks.air);
+					} else if (chance == 2 && block.getExplosionResistance(null)/20 <= strengthVar){
+						world.setBlock(x, test, z, Blocks.air);
+					}
+					if(chance == 0){
+					strengthVar -= block.getExplosionResistance(null)/100;
+					} else if(chance == 1) {
+						strengthVar -= block.getExplosionResistance(null)/50;
+					} else {
+						strengthVar -= block.getExplosionResistance(null)/20;
+					}
+				}
+			}
 		}
 	}
 	
