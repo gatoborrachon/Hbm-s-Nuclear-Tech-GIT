@@ -20,6 +20,22 @@ public class FFPipeNetwork {
 		this.type = fluid;
 	}
 	
+	public static FFPipeNetwork mergeNetworks(FFPipeNetwork net, FFPipeNetwork merge) {
+		if(net != null && merge != null) {
+			for(IFluidPipe pipe : merge.pipes) {
+				net.pipes.add(pipe);
+				pipe.setNetwork(net);
+			}
+			for(IFluidHandler fill : merge.fillables) {
+				net.fillables.add(fill);
+				
+			}
+			return net;
+		} else {
+			return null;
+		}
+	}
+	
 	public void setType(Fluid fluid){
 		this.type = fluid;
 	}

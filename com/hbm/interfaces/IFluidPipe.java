@@ -6,6 +6,8 @@ import net.minecraftforge.fluids.Fluid;
 
 public interface IFluidPipe {
 	public FFPipeNetwork getNetwork();
+	public void setNetwork(FFPipeNetwork net);
 	public Fluid getType();
+	
 	
 }
