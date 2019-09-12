@@ -42,18 +42,30 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
 	public void checkOtherNetworks() {
 		List<FFPipeNetwork> list = new ArrayList<FFPipeNetwork>();
 		TileEntity te;
-		int largeNet = 0;
+		FFPipeNetwork largeNet = null;
 		for (int i = 0; i < 6; i++) {
 			te = FFPipeNetwork.getTileEntityAround(this, i);
-			if(te instanceof IFluidPipe && ((IFluidPipe)te).getNetwork() != null && ((IFluidPipe)te).getNetwork().getType() == this.getType()){
-				if(!list.contains(((IFluidPipe)te).getNetwork())){
-					list.add(((IFluidPipe)te).getNetwork());
-					if(((IFluidPipe)te).getNetwork().getSize() > largeNet)
-						largeNet = ((IFluidPipe)te).getNetwork().getSize();
+			if (te instanceof IFluidPipe
+					&& ((IFluidPipe) te).getNetwork() != null
+					&& ((IFluidPipe) te).getNetwork().getType() == this
+							.getType()) {
+				if (!list.contains(((IFluidPipe) te).getNetwork())) {
+					list.add(((IFluidPipe) te).getNetwork());
+					if (largeNet == null
+							|| ((IFluidPipe) te).getNetwork().getSize() > largeNet
+									.getSize())
+						largeNet = ((IFluidPipe) te).getNetwork();
 				}
 			}
 		}
-		
+		if (largeNet != null) {
+			for (FFPipeNetwork network : list) {
+				FFPipeNetwork.mergeNetworks(largeNet, network);
+			}
+			this.network = largeNet;
+		} else {
+			this.network = this.createNewNetwork();
+		}
 	}
 
 }

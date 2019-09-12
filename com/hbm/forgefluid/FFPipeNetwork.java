@@ -30,7 +30,7 @@ public class FFPipeNetwork {
 	}
 
 	public static FFPipeNetwork mergeNetworks(FFPipeNetwork net, FFPipeNetwork merge) {
-		if (net != null && merge != null) {
+		if (net != null && merge != null && net != merge) {
 			for (IFluidPipe pipe : merge.pipes) {
 				net.pipes.add(pipe);
 				pipe.setNetwork(net);
@@ -46,20 +46,26 @@ public class FFPipeNetwork {
 		}
 	}
 
-	public static FFPipeNetwork buildNewnetwork(TileEntity pipe) {
-		FFPipeNetwork net = null;
+	public static FFPipeNetwork buildNewNetwork(TileEntity pipe) {
+		FFPipeNetwork net = new ;
 		if (pipe instanceof IFluidPipe) {
 			IFluidPipe fPipe = (IFluidPipe) pipe;
-			
+			List[] netVars = iteratePipes(fPipe.getNetwork().pipes, fPipe.getNetwork().fillables, pipe);
+			net = new FFPipeNetwork();
+			net.pipes = netVars[0];
+			net.fillables = netVars[1];
 			net.setType(fPipe.getType());
 		}
 		return net;
 	}
 
 	public static List[] iteratePipes(List<IFluidPipe> pipes, List<IFluidHandler> consumers, TileEntity te) {
-		if (te == null) {
+		if(pipes == null)
+			pipes = new ArrayList<IFluidPipe>();
+		if(consumers == null)
+			consumers = new ArrayList<IFluidHandler>();
+		if (te == null)
 			return new List[]{pipes, consumers};
-		}
 		TileEntity next = null;
 		if (te.getWorldObj().getTileEntity(te.xCoord, te.yCoord, te.zCoord) != null) {
 			for (int i = 0; i < 6; i++) {
@@ -70,7 +76,7 @@ public class FFPipeNetwork {
 					pipes.addAll(nextPipe[0]);
 					consumers.addAll(nextPipe[1]);
 				} else if (next instanceof IFluidHandler) {
-
+					consumers.add((IFluidHandler) next);
 				}
 			}
 
@@ -102,6 +108,7 @@ public class FFPipeNetwork {
 	public void Destroy() {
 		this.fillables.clear();
 		this.pipes.clear();
+		
 	}
 
 	public void setType(Fluid fluid) {
