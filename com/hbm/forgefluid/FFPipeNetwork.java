@@ -15,6 +15,7 @@ public class FFPipeNetwork {
 	protected Fluid type;
 	protected List<IFluidHandler> fillables = new ArrayList<IFluidHandler>();
 	protected List<IFluidPipe> pipes = new ArrayList<IFluidPipe>();
+	
 
 	public FFPipeNetwork() {
 		this(null);
@@ -22,6 +23,10 @@ public class FFPipeNetwork {
 
 	public FFPipeNetwork(Fluid fluid) {
 		this.type = fluid;
+	}
+	
+	public int getSize() {
+		return pipes.size() + fillables.size();
 	}
 
 	public static FFPipeNetwork mergeNetworks(FFPipeNetwork net, FFPipeNetwork merge) {
