@@ -47,11 +47,10 @@ public class FFPipeNetwork {
 	}
 
 	public static FFPipeNetwork buildNewNetwork(TileEntity pipe) {
-		FFPipeNetwork net = new ;
+		FFPipeNetwork net = new FFPipeNetwork();
 		if (pipe instanceof IFluidPipe) {
 			IFluidPipe fPipe = (IFluidPipe) pipe;
 			List[] netVars = iteratePipes(fPipe.getNetwork().pipes, fPipe.getNetwork().fillables, pipe);
-			net = new FFPipeNetwork();
 			net.pipes = netVars[0];
 			net.fillables = netVars[1];
 			net.setType(fPipe.getType());

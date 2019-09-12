@@ -8,6 +8,7 @@ public interface IFluidPipe {
 	public FFPipeNetwork getNetwork();
 	public void setNetwork(FFPipeNetwork net);
 	public Fluid getType();
+	void setType(Fluid fluid);
 	
 	
 }

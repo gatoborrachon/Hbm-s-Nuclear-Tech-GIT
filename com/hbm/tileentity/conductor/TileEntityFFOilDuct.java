@@ -1,23 +1,37 @@
 package com.hbm.tileentity.conductor;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.hbm.forgefluid.FFPipeNetwork;
 import com.hbm.forgefluid.ModForgeFluids;
+import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.interfaces.IFluidPipe;
 
 public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
 
+	public ForgeDirection[] connections = new ForgeDirection[6];
 	public Fluid type = ModForgeFluids.oil;
 	public FFPipeNetwork network = null;
 
+	public TileEntityFFOilDuct() {
+		this.checkOtherNetworks();
+	}
+	
 	@Override
 	public Fluid getType() {
 		return this.type;
+	}
+	
+	@Override
+	public void setType(Fluid fluid) {
+		this.type = ModForgeFluids.oil;
 	}
 
 	public FFPipeNetwork createNewNetwork() {
@@ -29,7 +43,8 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
 		if (this.network != null) {
 			return this.network;
 		} else {
-			return this.createNewNetwork();
+			this.checkOtherNetworks();
+			return this.network;
 		}
 	}
 
@@ -45,10 +60,7 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
 		FFPipeNetwork largeNet = null;
 		for (int i = 0; i < 6; i++) {
 			te = FFPipeNetwork.getTileEntityAround(this, i);
-			if (te instanceof IFluidPipe
-					&& ((IFluidPipe) te).getNetwork() != null
-					&& ((IFluidPipe) te).getNetwork().getType() == this
-							.getType()) {
+			if (te instanceof IFluidPipe && ((IFluidPipe) te).getNetwork() != null && ((IFluidPipe) te).getNetwork().getType() == this.getType()) {
 				if (!list.contains(((IFluidPipe) te).getNetwork())) {
 					list.add(((IFluidPipe) te).getNetwork());
 					if (largeNet == null
@@ -67,5 +79,19 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
 			this.network = this.createNewNetwork();
 		}
 	}
+	
+    @Override
+	public void readFromNBT(NBTTagCompound nbt)
+    {
+		super.readFromNBT(nbt);
+		type = FluidRegistry.getFluid(nbt.getInteger("FluidType"));
+    }
+
+    @Override
+	public void writeToNBT(NBTTagCompound nbt)
+    {
+		super.writeToNBT(nbt);
+		nbt.setInteger("FluidType", this.type.getID());
+    }
 
 }
