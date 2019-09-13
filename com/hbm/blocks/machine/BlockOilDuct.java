@@ -1,11 +1,13 @@
 package com.hbm.blocks.machine;
 
+import com.hbm.interfaces.IFluidPipe;
 import com.hbm.tileentity.conductor.TileEntityFFOilDuct;
 import com.hbm.tileentity.conductor.TileEntityOilDuct;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
@@ -83,7 +85,20 @@ public class BlockOilDuct extends BlockContainer {
 	
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int whatever){
+		if(world.getTileEntity(x, y, z) instanceof TileEntityFFOilDuct) {
+			((TileEntityFFOilDuct)world.getTileEntity(x, y, z)).onRemoved();
+		}
 		super.breakBlock(world, x, y, z, block, whatever);
-		
 	}
+	
+	@Override
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int int0, float f0, float f1, float f2)
+    {
+		if(world.getTileEntity(x, y, z) != null) {
+			System.out.println(((IFluidPipe)world.getTileEntity(x, y, z)).getNetwork());
+		}
+        return false;
+    }
+	
+	
 }

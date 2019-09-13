@@ -1,9 +1,7 @@
 package com.hbm.tileentity.conductor;
 
-import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -14,9 +12,7 @@ import java.util.List;
 import com.hbm.forgefluid.FFPipeNetwork;
 import com.hbm.forgefluid.FFUtils;
 import com.hbm.forgefluid.ModForgeFluids;
-import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.interfaces.IFluidPipe;
-import com.hbm.lib.Library;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.packet.TEFluidTypePacketTest;
 
@@ -97,6 +93,7 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
 
 	public void checkOtherNetworks() {
 		List<FFPipeNetwork> list = new ArrayList<FFPipeNetwork>();
+		
 		TileEntity te;
 		FFPipeNetwork largeNet = null;
 		for (int i = 0; i < 6; i++) {
@@ -142,6 +139,8 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
 		return 65536.0D;
 	}
 	
-
+	public void onRemoved() {
+		
+	}
 
 }
