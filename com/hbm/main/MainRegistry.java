@@ -456,6 +456,7 @@ public class MainRegistry
 		GameRegistry.registerTileEntity(TileEntityMachineGasFlare.class, "tileentity_gasflare");
 		GameRegistry.registerTileEntity(TileEntityMachineRefinery.class, "tileentity_refinery");
 		GameRegistry.registerTileEntity(TileEntityOilDuct.class, "tileentity_oil_duct");
+		GameRegistry.registerTileEntity(TileEntityFFOilDuct.class, "tileentity_ff_oil_duct");
 		GameRegistry.registerTileEntity(TileEntityOilDuctSolid.class, "tileentity_oil_duct_solid");
 		GameRegistry.registerTileEntity(TileEntityGasDuct.class, "tileentity_gas_duct");
 		GameRegistry.registerTileEntity(TileEntityGasDuctSolid.class, "tileentity_gas_duct_solid");

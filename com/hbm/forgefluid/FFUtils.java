@@ -2,11 +2,20 @@ package com.hbm.forgefluid;
 
 import java.util.List;
 
+import com.hbm.blocks.ModBlocks;
+import com.hbm.handler.FluidTypeHandler.FluidType;
+import com.hbm.interfaces.IFluidAcceptor;
+import com.hbm.interfaces.IFluidDuct;
+import com.hbm.interfaces.IFluidPipe;
+import com.hbm.interfaces.IFluidSource;
 import com.hbm.inventory.gui.GuiInfoContainer;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidHandler;
@@ -121,5 +130,17 @@ public class FFUtils {
 				gui.drawFluidInfo(new String[] {I18n.format("None"), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
 			}
 		}
+	}
+	
+	public static boolean checkFluidConnectables(World world, int x, int y, int z, Fluid type)
+	{
+		TileEntity tileentity = world.getTileEntity(x, y, z);
+		if(tileentity != null && tileentity instanceof IFluidPipe && ((IFluidPipe)tileentity).getType() == type)
+			return true;
+		if(tileentity != null && !(tileentity instanceof IFluidPipe) && tileentity instanceof IFluidHandler)
+		{
+			return true;
+		}
+		return false;
 	}
 }

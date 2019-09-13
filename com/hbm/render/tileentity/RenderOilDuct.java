@@ -3,6 +3,7 @@ package com.hbm.render.tileentity;
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.lib.RefStrings;
+import com.hbm.tileentity.conductor.TileEntityFFOilDuct;
 import com.hbm.tileentity.conductor.TileEntityOilDuct;
 
 import net.minecraft.client.renderer.Tessellator;
@@ -23,7 +24,7 @@ public class RenderOilDuct extends TileEntitySpecialRenderer {
 		GL11.glDisable(GL11.GL_LIGHTING);
 		this.bindTexture(texture);
 		drawCore(tileentity);
-		TileEntityOilDuct cable = (TileEntityOilDuct) tileentity;
+		TileEntityFFOilDuct cable = (TileEntityFFOilDuct) tileentity;
 		for(int i = 0; i < cable.connections.length; i++)
 		{
 			if(cable.connections[i] != null)
@@ -37,6 +38,7 @@ public class RenderOilDuct extends TileEntitySpecialRenderer {
 	}
 	
 	public void drawCore(TileEntity tileentity) {
+		//Drillgon200: Tesseract lol
 		Tessellator tesseract = Tessellator.instance;
 		tesseract.startDrawingQuads();
 			tesseract.addVertexWithUV(1 - 11 * pixel / 2, 11 * pixel / 2,  1 - 11 * pixel / 2, 5 * textureP, 5 * textureP);

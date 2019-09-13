@@ -3,6 +3,7 @@ package com.hbm.packet;
 import java.util.Map.Entry;
 
 import com.hbm.handler.FluidTypeHandler.FluidType;
+import com.hbm.interfaces.IFluidPipe;
 import com.hbm.tileentity.conductor.TileEntityFluidDuct;
 
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
@@ -57,17 +58,18 @@ public class TEFluidTypePacketTest implements IMessage {
 	}
 
 }
-	public static class Handler implements IMessageHandler<TEFluidPipePacket, IMessage> {
+	public static class Handler implements IMessageHandler<TEFluidTypePacketTest, IMessage> {
 		
 		@Override
-		public IMessage onMessage(TEFluidPipePacket m, MessageContext ctx) {
+		public IMessage onMessage(TEFluidTypePacketTest m, MessageContext ctx) {
 			try {
 				TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(m.x, m.y, m.z);
 
-				if (te != null && te instanceof TileEntityFluidDuct) {
+				if (te != null && te instanceof IFluidPipe) {
 					
-					TileEntityFluidDuct duct = (TileEntityFluidDuct) te;
-					duct.type = m.type;
+					IFluidPipe duct = (IFluidPipe) te;
+					
+					duct.setType(m.type);
 				}
 				return null;
 			} catch(Exception ex) {
