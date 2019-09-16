@@ -132,10 +132,10 @@ public class FFUtils {
 		}
 	}
 	
-	public static boolean checkFluidConnectables(World world, int x, int y, int z, Fluid type)
+	public static boolean checkFluidConnectables(World world, int x, int y, int z, FFPipeNetwork net)
 	{
 		TileEntity tileentity = world.getTileEntity(x, y, z);
-		if(tileentity != null && tileentity instanceof IFluidPipe && ((IFluidPipe)tileentity).getType() == type)
+		if(tileentity != null && tileentity instanceof IFluidPipe && ((IFluidPipe)tileentity).getNetwork() != null && ((IFluidPipe)tileentity).getNetwork() == net)
 			return true;
 		if(tileentity != null && !(tileentity instanceof IFluidPipe) && tileentity instanceof IFluidHandler)
 		{

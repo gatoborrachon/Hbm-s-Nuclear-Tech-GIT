@@ -28,6 +28,14 @@ public class FFPipeNetwork {
 	public int getSize() {
 		return pipes.size() + fillables.size();
 	}
+	
+	public List<IFluidHandler> getConsumers(){
+		return this.fillables;
+	}
+	
+	public List<IFluidPipe> getPipes(){
+		return this.pipes;
+	}
 
 	public static FFPipeNetwork mergeNetworks(FFPipeNetwork net, FFPipeNetwork merge) {
 		if (net != null && merge != null && net != merge) {
@@ -47,9 +55,10 @@ public class FFPipeNetwork {
 	}
 
 	public static FFPipeNetwork buildNewNetwork(TileEntity pipe) {
-		FFPipeNetwork net = new FFPipeNetwork();
+		FFPipeNetwork net = null;
 		if (pipe instanceof IFluidPipe) {
 			IFluidPipe fPipe = (IFluidPipe) pipe;
+			net = fPipe.getNetwork();
 			List[] netVars = iteratePipes(fPipe.getNetwork().pipes, fPipe.getNetwork().fillables, pipe);
 			net.pipes = netVars[0];
 			net.fillables = netVars[1];

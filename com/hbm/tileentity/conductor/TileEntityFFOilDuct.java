@@ -7,6 +7,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.IFluidHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,27 +42,30 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
 		this.updateConnections();
 		if(firstUpdate){
 			this.getNetwork();
+			this.checkOtherNetworks();
+			this.network.addPipe(this);
+			this.checkFluidHandlers();
 			firstUpdate = false;
 		}
 	}
 	
 	public void updateConnections() {
-		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord + 1, zCoord, type)) connections[0] = ForgeDirection.UP;
+		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord + 1, zCoord, getNetwork())) connections[0] = ForgeDirection.UP;
 		else connections[0] = null;
 		
-		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord - 1, zCoord, type)) connections[1] = ForgeDirection.DOWN;
+		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord - 1, zCoord, getNetwork())) connections[1] = ForgeDirection.DOWN;
 		else connections[1] = null;
 		
-		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord, zCoord - 1, type)) connections[2] = ForgeDirection.NORTH;
+		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord, zCoord - 1, getNetwork())) connections[2] = ForgeDirection.NORTH;
 		else connections[2] = null;
 		
-		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord + 1, yCoord, zCoord, type)) connections[3] = ForgeDirection.EAST;
+		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord + 1, yCoord, zCoord, getNetwork())) connections[3] = ForgeDirection.EAST;
 		else connections[3] = null;
 		
-		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord, zCoord + 1, type)) connections[4] = ForgeDirection.SOUTH;
+		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord, zCoord + 1, getNetwork())) connections[4] = ForgeDirection.SOUTH;
 		else connections[4] = null;
 		
-		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord - 1, yCoord, zCoord, type)) connections[5] = ForgeDirection.WEST;
+		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord - 1, yCoord, zCoord, getNetwork())) connections[5] = ForgeDirection.WEST;
 		else connections[5] = null;
 	}
 	
@@ -84,7 +88,8 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
 		if (this.network != null) {
 			return this.network;
 		} else {
-			this.checkOtherNetworks();
+			this.network = new FFPipeNetwork();
+			this.network.setType(this.getType());
 			return this.network;
 		}
 	}
@@ -96,6 +101,7 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
 	}
 
 	public void checkOtherNetworks() {
+
 		List<FFPipeNetwork> list = new ArrayList<FFPipeNetwork>();
 		TileEntity te;
 		FFPipeNetwork largeNet = null;
@@ -126,6 +132,10 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
     {
 		super.readFromNBT(nbt);
 		type = FluidRegistry.getFluid(nbt.getInteger("FluidType"));
+		if(this.network == null) {
+			FFPipeNetwork.buildNewNetwork(this);
+			System.out.println("Important");
+		}
     }
 
     @Override
@@ -142,6 +152,24 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
 		return 65536.0D;
 	}
 	
+	public void breakBlock() {
+		this.getNetwork().removePipe(this);
+	}
 
-
+	public void onNeighborBlockChange() {
+		this.checkFluidHandlers();
+	}
+	
+	public void checkFluidHandlers() {
+		for(int i = 0; i < 6;i++) {
+			TileEntity te = FFPipeNetwork.getTileEntityAround(this, i);
+			if(te != null && !(te instanceof IFluidPipe) && te instanceof IFluidHandler) {
+				if(!this.network.getConsumers().contains(te)) {
+					this.network.getConsumers().add((IFluidHandler) te);
+				}
+					
+			}
+		}
+	}
+	
 }

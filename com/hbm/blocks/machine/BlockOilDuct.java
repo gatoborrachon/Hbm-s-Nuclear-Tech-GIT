@@ -83,7 +83,17 @@ public class BlockOilDuct extends BlockContainer {
 	
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int whatever){
+		if(world.getTileEntity(x, y, z) != null && world.getTileEntity(x, y, z) instanceof TileEntityFFOilDuct) {
+			((TileEntityFFOilDuct)world.getTileEntity(x, y, z)).breakBlock();
+		}
 		super.breakBlock(world, x, y, z, block, whatever);
 		
+	}
+	
+	@Override
+	 public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {
+		if(world.getTileEntity(x, y, z) != null && world.getTileEntity(x, y, z) instanceof TileEntityFFOilDuct) {
+			((TileEntityFFOilDuct)world.getTileEntity(x, y, z)).onNeighborBlockChange();
+		}
 	}
 }
