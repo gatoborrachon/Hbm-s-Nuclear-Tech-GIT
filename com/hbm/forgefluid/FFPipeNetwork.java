@@ -118,10 +118,15 @@ public class FFPipeNetwork implements IFluidHandler {
 		FFPipeNetwork net = null;
 		if (pipe instanceof IFluidPipe) {
 			IFluidPipe fPipe = (IFluidPipe) pipe;
+			fPipe.getNetwork().Destroy();
 			net = fPipe.getNetwork();
-			List[] netVars = iteratePipes(fPipe.getNetwork().pipes, fPipe.getNetwork().fillables, pipe);
+			List[] netVars = iteratePipes(fPipe.getNetwork().pipes, fPipe.getNetwork().fillables, null, pipe, net.getType());
 			net.pipes = netVars[0];
 			net.fillables = netVars[1];
+			List<FFPipeNetwork> mergeList = netVars[2];
+			for(FFPipeNetwork network : mergeList){
+				mergeNetworks(net, network);
+			}
 			net.setType(fPipe.getType());
 		}
 		return net;
@@ -131,14 +136,18 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * Recursive function that goes through all the pipes and fluid handlers connected to each other and returns a list of both. Called when building a new network.
 	 * @param pipes - the list of pipes to add new pipes to
 	 * @param consumers - the list of consumers to add new consumers to
+	 * @param networks - this list of networks the currently iterating pipe network is connected to
 	 * @param te - the TileEntity you want to start the iteration from
+	 * @param type - the type of fluid the network hsa
 	 * @return A list array containing the pipes connected to the network and the fluid handlers connected to the network.
 	 */
-	public static List[] iteratePipes(List<IFluidPipe> pipes, List<IFluidHandler> consumers, TileEntity te) {
+	public static List[] iteratePipes(List<IFluidPipe> pipes, List<IFluidHandler> consumers, List<FFPipeNetwork> networks, TileEntity te, Fluid type) {
 		if(pipes == null)
 			pipes = new ArrayList<IFluidPipe>();
 		if(consumers == null)
 			consumers = new ArrayList<IFluidHandler>();
+		if(networks == null)
+			networks = new ArrayList<FFPipeNetwork>();
 		if (te == null)
 			return new List[]{pipes, consumers};
 		TileEntity next = null;
@@ -147,16 +156,20 @@ public class FFPipeNetwork implements IFluidHandler {
 				next = getTileEntityAround(te, i);
 				if (next instanceof IFluidHandler && next instanceof IFluidPipe) {
 					pipes.add((IFluidPipe) next);
-					List[] nextPipe = iteratePipes(pipes, consumers, te);
+					List[] nextPipe = iteratePipes(pipes, consumers, networks, te, type);
 					pipes.addAll(nextPipe[0]);
 					consumers.addAll(nextPipe[1]);
+				} else if(next instanceof IFluidHandler && next instanceof IFluidPipe && ((IFluidPipe)next).getNetwork() != null && ((IFluidPipe)next).getNetwork().getType() == type){
+					if(!networks.contains(((IFluidPipe)next).getNetwork()))
+							networks.add(((IFluidPipe)next).getNetwork());
 				} else if (next instanceof IFluidHandler) {
+				
 					consumers.add((IFluidHandler) next);
 				}
 			}
 
 		}
-		return new List[]{pipes, consumers};
+		return new List[]{pipes, consumers, networks};
 	}
 	/**
 	 * Should be self explanatory. Normally used in a for loop to get all the surrounding tile entities. No idea why I put it in this class.
@@ -227,8 +240,11 @@ public class FFPipeNetwork implements IFluidHandler {
 	}
 
 	public boolean removePipe(IFluidPipe pipe) {
+		TileEntity tePipe = (TileEntity)pipe;
 		if (pipes.contains(pipe)) {
 			pipes.remove(pipe);
+			
+		
 			return true;
 		}
 		return false;

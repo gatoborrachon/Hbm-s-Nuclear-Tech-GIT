@@ -124,12 +124,12 @@ public class ModEventHandler
 		/////
 		//try {
 		/////
-		
-		for(FFPipeNetwork net : MainRegistry.allPipeNetworks){
-			if(net != null)
-				net.updateTick();
+		if(!MainRegistry.allPipeNetworks.isEmpty()){
+			for(FFPipeNetwork net : MainRegistry.allPipeNetworks){
+			//	if(net != null)
+				//	net.updateTick();
+			}
 		}
-		
 		if(event.world != null && !event.world.isRemote && event.world.provider.isSurfaceWorld() && MainRegistry.enableMeteorStrikes) {
 			if(event.world.rand.nextInt(meteorShower > 0 ? MainRegistry.meteorShowerChance : MainRegistry.meteorStrikeChance) == 0) {
 				if(!event.world.playerEntities.isEmpty()) {

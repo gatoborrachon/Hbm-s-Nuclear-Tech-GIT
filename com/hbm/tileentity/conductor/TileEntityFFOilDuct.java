@@ -7,6 +7,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ import com.hbm.packet.TEFluidTypePacketTest;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
+public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFluidHandler {
 
 	public ForgeDirection[] connections = new ForgeDirection[6];
 	public Fluid type = ModForgeFluids.oil;
@@ -153,7 +155,13 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
 	}
 	
 	public void breakBlock() {
+		
 		this.getNetwork().removePipe(this);
+		for(int i = 0; i < 6; i++){
+			if(FFPipeNetwork.getTileEntityAround(this, i) instanceof IFluidPipe){
+				FFPipeNetwork.buildNewNetwork(this);
+			}
+		}
 	}
 
 	public void onNeighborBlockChange() {
@@ -170,6 +178,36 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe {
 					
 			}
 		}
+	}
+
+	@Override
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		return this.getNetwork().fill(from, resource, doFill);
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		return this.getNetwork().drain(from, resource, doDrain);
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		return this.getNetwork().drain(from, maxDrain, doDrain);
+	}
+
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		return this.getNetwork().canFill(from, fluid);
+	}
+
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		return this.getNetwork().canDrain(from, fluid);
+	}
+
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		return this.getNetwork().getTankInfo(from);
 	}
 	
 }
