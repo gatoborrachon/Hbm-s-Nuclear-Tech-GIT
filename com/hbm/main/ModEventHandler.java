@@ -9,6 +9,7 @@ import com.hbm.entity.missile.EntityMissileBaseAdvanced;
 import com.hbm.entity.mob.EntityNuclearCreeper;
 import com.hbm.entity.projectile.EntityBurningFOEQ;
 import com.hbm.entity.projectile.EntityMeteor;
+import com.hbm.forgefluid.FFPipeNetwork;
 import com.hbm.items.ModItems;
 import com.hbm.lib.Library;
 import com.hbm.lib.ModDamageSource;
@@ -123,6 +124,11 @@ public class ModEventHandler
 		/////
 		//try {
 		/////
+		
+		for(FFPipeNetwork net : MainRegistry.allPipeNetworks){
+			if(net != null)
+				net.updateTick();
+		}
 		
 		if(event.world != null && !event.world.isRemote && event.world.provider.isSurfaceWorld() && MainRegistry.enableMeteorStrikes) {
 			if(event.world.rand.nextInt(meteorShower > 0 ? MainRegistry.meteorShowerChance : MainRegistry.meteorStrikeChance) == 0) {

@@ -41,6 +41,7 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.Metadata;
 import cpw.mods.fml.common.ModMetadata;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,7 @@ import com.hbm.entity.missile.*;
 import com.hbm.entity.mob.*;
 import com.hbm.entity.particle.*;
 import com.hbm.entity.projectile.*;
+import com.hbm.forgefluid.FFPipeNetwork;
 import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.handler.*;
 import com.hbm.handler.FluidTypeHandler.FluidType;
@@ -99,6 +101,8 @@ public class MainRegistry
 	public static ModMetadata meta;
 	
 	public static Logger logger;
+	
+	public static List<FFPipeNetwork> allPipeNetworks = new ArrayList<FFPipeNetwork>();
 	
 	//Tool Materials
 	public static ToolMaterial enumToolMaterialSchrabidium = EnumHelper.addToolMaterial("SCHRABIDIUM", 3, 10000, 50.0F, 100.0F, 200);
