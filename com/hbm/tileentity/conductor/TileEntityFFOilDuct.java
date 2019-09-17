@@ -32,6 +32,8 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 	public Fluid type = ModForgeFluids.oil;
 	public FFPipeNetwork network = null;
 	
+	public boolean isValidForForming = true;
+	
 	public boolean firstUpdate = true;
 
 	public TileEntityFFOilDuct() {
@@ -92,6 +94,7 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 		} else {
 			this.network = new FFPipeNetwork();
 			this.network.setType(this.getType());
+			this.network.addPipe(this);
 			return this.network;
 		}
 	}
@@ -136,7 +139,6 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 		type = FluidRegistry.getFluid(nbt.getInteger("FluidType"));
 		if(this.network == null) {
 			FFPipeNetwork.buildNewNetwork(this);
-			System.out.println("Important");
 		}
     }
 
@@ -156,10 +158,12 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 	
 	public void breakBlock() {
 		
-		this.getNetwork().removePipe(this);
+		this.getNetwork().Destroy();
+		this.isValidForForming = false;
 		for(int i = 0; i < 6; i++){
-			if(FFPipeNetwork.getTileEntityAround(this, i) instanceof IFluidPipe){
-				FFPipeNetwork.buildNewNetwork(this);
+			TileEntity ent = FFPipeNetwork.getTileEntityAround(this, i);
+			if(ent != null && ent instanceof IFluidPipe){
+				FFPipeNetwork.buildNewNetwork(ent);
 			}
 		}
 	}
@@ -178,6 +182,11 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 					
 			}
 		}
+	}
+	
+	@Override
+	public boolean getIsValidForForming() {
+		return this.isValidForForming;
 	}
 
 	@Override

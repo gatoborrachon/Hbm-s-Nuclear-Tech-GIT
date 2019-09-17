@@ -9,6 +9,6 @@ public interface IFluidPipe {
 	public void setNetwork(FFPipeNetwork net);
 	public Fluid getType();
 	void setType(Fluid fluid);
-	
+	boolean getIsValidForForming();
 	
 }

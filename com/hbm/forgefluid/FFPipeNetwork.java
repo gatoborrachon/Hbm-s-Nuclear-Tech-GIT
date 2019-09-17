@@ -149,20 +149,18 @@ public class FFPipeNetwork implements IFluidHandler {
 		if(networks == null)
 			networks = new ArrayList<FFPipeNetwork>();
 		if (te == null)
-			return new List[]{pipes, consumers};
+			return new List[]{pipes, consumers, networks};
 		TileEntity next = null;
 		if (te.getWorldObj().getTileEntity(te.xCoord, te.yCoord, te.zCoord) != null) {
 			for (int i = 0; i < 6; i++) {
 				next = getTileEntityAround(te, i);
-				if (next instanceof IFluidHandler && next instanceof IFluidPipe) {
+				if (next instanceof IFluidHandler && next instanceof IFluidPipe && ((IFluidPipe)next).getIsValidForForming() && ((IFluidPipe)next).getNetwork() != null && ((IFluidPipe)next).getNetwork().getType() == type) {
 					pipes.add((IFluidPipe) next);
 					List[] nextPipe = iteratePipes(pipes, consumers, networks, te, type);
 					pipes.addAll(nextPipe[0]);
 					consumers.addAll(nextPipe[1]);
-				} else if(next instanceof IFluidHandler && next instanceof IFluidPipe && ((IFluidPipe)next).getNetwork() != null && ((IFluidPipe)next).getNetwork().getType() == type){
-					if(!networks.contains(((IFluidPipe)next).getNetwork()))
-							networks.add(((IFluidPipe)next).getNetwork());
-				} else if (next instanceof IFluidHandler) {
+					networks.addAll(nextPipe[2]);
+				} else if (next instanceof IFluidHandler && !(next instanceof IFluidPipe)) {
 				
 					consumers.add((IFluidHandler) next);
 				}
