@@ -98,11 +98,14 @@ public class FFPipeNetwork implements IFluidHandler {
 				net.pipes.add(pipe);
 				pipe.setNetwork(net);
 			}
+			merge.pipes.clear();
 			for (IFluidHandler fill : merge.fillables) {
 				net.fillables.add(fill);
 
 			}
 			merge.Destroy();
+			return net;
+		} else if(net != null) {
 			return net;
 		} else {
 			return null;
@@ -117,11 +120,19 @@ public class FFPipeNetwork implements IFluidHandler {
 	public static FFPipeNetwork buildNewNetwork(TileEntity pipe) {
 		FFPipeNetwork net = null;
 		if (pipe instanceof IFluidPipe) {
+			if(pipe.getWorldObj().isRemote)
+				return null;
 			IFluidPipe fPipe = (IFluidPipe) pipe;
 			fPipe.getNetwork().Destroy();
-			net = fPipe.getNetwork();
+			net = new FFPipeNetwork(fPipe.getType());
 			List[] netVars = iteratePipes(fPipe.getNetwork().pipes, fPipe.getNetwork().fillables, null, pipe, net.getType());
 			net.pipes = netVars[0];
+			System.out.println(netVars[0].size());
+			System.out.println(netVars[1].size());
+			System.out.println(netVars[2].size());
+			for(IFluidPipe setPipe : net.pipes){
+				setPipe.setNetwork(net);
+			}
 			net.fillables = netVars[1];
 			List<FFPipeNetwork> mergeList = netVars[2];
 			for(FFPipeNetwork network : mergeList){
@@ -142,6 +153,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * @return A list array containing the pipes connected to the network and the fluid handlers connected to the network.
 	 */
 	public static List[] iteratePipes(List<IFluidPipe> pipes, List<IFluidHandler> consumers, List<FFPipeNetwork> networks, TileEntity te, Fluid type) {
+		
 		if(pipes == null)
 			pipes = new ArrayList<IFluidPipe>();
 		if(consumers == null)
@@ -152,21 +164,30 @@ public class FFPipeNetwork implements IFluidHandler {
 			return new List[]{pipes, consumers, networks};
 		TileEntity next = null;
 		if (te.getWorldObj().getTileEntity(te.xCoord, te.yCoord, te.zCoord) != null) {
+			if(!pipes.contains((IFluidPipe) te))
+				pipes.add((IFluidPipe) te);
 			for (int i = 0; i < 6; i++) {
 				next = getTileEntityAround(te, i);
-				if (next instanceof IFluidHandler && next instanceof IFluidPipe && ((IFluidPipe)next).getIsValidForForming() && ((IFluidPipe)next).getNetwork() != null && ((IFluidPipe)next).getNetwork().getType() == type) {
-					pipes.add((IFluidPipe) next);
-					List[] nextPipe = iteratePipes(pipes, consumers, networks, te, type);
-					pipes.addAll(nextPipe[0]);
-					consumers.addAll(nextPipe[1]);
-					networks.addAll(nextPipe[2]);
+				if (next instanceof IFluidHandler && next instanceof IFluidPipe && ((IFluidPipe)next).getIsValidForForming() && !pipes.contains((IFluidPipe)next)) {
+
+					List[] nextPipe = iteratePipes(pipes, consumers, networks, next, type);
+					//So java really does pass by location and not by value. I feel dumb now.
+					
+					//System.out.println("pipes length 1: " + pipes.size());
+					//pipes.clear();
+					//pipes.addAll(nextPipe[0]);
+					//System.out.println("pipes length 2: " + pipes.size());
+					//consumers.addAll(nextPipe[1]);
+					//networks.addAll(nextPipe[2]);
 				} else if (next instanceof IFluidHandler && !(next instanceof IFluidPipe)) {
 				
 					consumers.add((IFluidHandler) next);
 				}
 			}
-
+			if(((IFluidPipe)te).getNetwork() != null && ((IFluidPipe)te).getNetwork().getType() == type && !networks.contains(((IFluidPipe)te).getNetwork()))
+				networks.add(((IFluidPipe)te).getNetwork());
 		}
+		
 		return new List[]{pipes, consumers, networks};
 	}
 	/**
@@ -201,6 +222,9 @@ public class FFPipeNetwork implements IFluidHandler {
 	 */
 	public void Destroy() {
 		this.fillables.clear();
+		for(IFluidPipe pipe : pipes){
+			pipe.setNetwork(null);
+		}
 		this.pipes.clear();
 		MainRegistry.allPipeNetworks.remove(this);
 	}
