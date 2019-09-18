@@ -95,7 +95,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	public static FFPipeNetwork mergeNetworks(FFPipeNetwork net, FFPipeNetwork merge) {
 		if (net != null && merge != null && net != merge) {
 			for (IFluidPipe pipe : merge.pipes) {
-				net.pipes.add(pipe);
+				net.addPipe(pipe);
 				pipe.setNetwork(net);
 			}
 			merge.pipes.clear();
@@ -120,20 +120,24 @@ public class FFPipeNetwork implements IFluidHandler {
 	public static FFPipeNetwork buildNewNetwork(TileEntity pipe) {
 		FFPipeNetwork net = null;
 		if (pipe instanceof IFluidPipe) {
-			if(pipe.getWorldObj().isRemote)
-				return null;
+//			if(!pipe.getWorldObj().isRemote)
+			//	return null;
 			IFluidPipe fPipe = (IFluidPipe) pipe;
 			fPipe.getNetwork().Destroy();
 			net = new FFPipeNetwork(fPipe.getType());
-			List[] netVars = iteratePipes(fPipe.getNetwork().pipes, fPipe.getNetwork().fillables, null, pipe, net.getType());
-			net.pipes = netVars[0];
+			List[] netVars = iteratePipes(null, null, null, pipe, net.getType());
+		//	net.pipes = netVars[0];
+			net.pipes.clear();
+			net.pipes.addAll(netVars[0]);
 			System.out.println(netVars[0].size());
 			System.out.println(netVars[1].size());
 			System.out.println(netVars[2].size());
 			for(IFluidPipe setPipe : net.pipes){
 				setPipe.setNetwork(net);
 			}
-			net.fillables = netVars[1];
+		//	net.fillables = netVars[1];
+			net.fillables.clear();
+			net.fillables.addAll(netVars[1]);
 			List<FFPipeNetwork> mergeList = netVars[2];
 			for(FFPipeNetwork network : mergeList){
 				mergeNetworks(net, network);
@@ -164,8 +168,10 @@ public class FFPipeNetwork implements IFluidHandler {
 			return new List[]{pipes, consumers, networks};
 		TileEntity next = null;
 		if (te.getWorldObj().getTileEntity(te.xCoord, te.yCoord, te.zCoord) != null) {
-			if(!pipes.contains((IFluidPipe) te))
+			if(!pipes.contains((IFluidPipe)te) && ((IFluidPipe)te).getIsValidForForming()){
 				pipes.add((IFluidPipe) te);
+				System.out.println("TE Coords: " + te.xCoord + " " + te.yCoord + " " + te.zCoord);
+			}
 			for (int i = 0; i < 6; i++) {
 				next = getTileEntityAround(te, i);
 				if (next instanceof IFluidHandler && next instanceof IFluidPipe && ((IFluidPipe)next).getIsValidForForming() && !pipes.contains((IFluidPipe)next)) {
@@ -184,8 +190,9 @@ public class FFPipeNetwork implements IFluidHandler {
 					consumers.add((IFluidHandler) next);
 				}
 			}
-			if(((IFluidPipe)te).getNetwork() != null && ((IFluidPipe)te).getNetwork().getType() == type && !networks.contains(((IFluidPipe)te).getNetwork()))
+			if(((IFluidPipe)te) != null && ((IFluidPipe)te).getIsValidForForming() && ((IFluidPipe)te).getNetwork().getType() == type && !networks.contains(((IFluidPipe)te).getNetwork())){
 				networks.add(((IFluidPipe)te).getNetwork());
+			}
 		}
 		
 		return new List[]{pipes, consumers, networks};

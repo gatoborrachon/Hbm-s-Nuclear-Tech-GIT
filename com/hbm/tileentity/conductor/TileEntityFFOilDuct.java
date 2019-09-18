@@ -159,7 +159,6 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 	public void breakBlock() {
 		
 		this.getNetwork().Destroy();
-		System.out.println(this.network);
 		this.isValidForForming = false;
 		for(int i = 0; i < 6; i++){
 			TileEntity ent = FFPipeNetwork.getTileEntityAround(this, i);
