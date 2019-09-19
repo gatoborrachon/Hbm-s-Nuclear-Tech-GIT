@@ -100,6 +100,10 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 	}
 
 	@Override
+	public FFPipeNetwork getNetworkTrue() {
+		return this.network;
+	}
+	@Override
 	public void setNetwork(FFPipeNetwork net) {
 		this.network = net;
 	}
@@ -157,7 +161,6 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 	}
 	
 	public void breakBlock() {
-		
 		this.getNetwork().Destroy();
 		this.isValidForForming = false;
 		for(int i = 0; i < 6; i++){

@@ -6,9 +6,10 @@ import net.minecraftforge.fluids.Fluid;
 
 public interface IFluidPipe {
 	public FFPipeNetwork getNetwork();
+	public FFPipeNetwork getNetworkTrue();
 	public void setNetwork(FFPipeNetwork net);
 	public Fluid getType();
-	void setType(Fluid fluid);
-	boolean getIsValidForForming();
+	public void setType(Fluid fluid);
+	public boolean getIsValidForForming();
 	
 }

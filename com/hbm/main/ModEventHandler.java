@@ -126,8 +126,8 @@ public class ModEventHandler
 		/////
 		if(!MainRegistry.allPipeNetworks.isEmpty()){
 			for(FFPipeNetwork net : MainRegistry.allPipeNetworks){
-			//	if(net != null)
-				//	net.updateTick();
+				if(net != null)
+					net.updateTick();
 			}
 		}
 		if(event.world != null && !event.world.isRemote && event.world.provider.isSurfaceWorld() && MainRegistry.enableMeteorStrikes) {

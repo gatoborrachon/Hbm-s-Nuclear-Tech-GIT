@@ -34,8 +34,7 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityMachineFluidTank extends TileEntity implements
-		ISidedInventory, IFluidHandler {
+public class TileEntityMachineFluidTank extends TileEntity implements ISidedInventory, IFluidHandler {
 
 	private ItemStack slots[];
 
@@ -47,7 +46,7 @@ public class TileEntityMachineFluidTank extends TileEntity implements
 	private static final int[] slots_side = new int[] { 0 };
 	public int age = 0;
 	public boolean needsUpdate = false;
-	
+
 	public List<IFluidHandler> list = new ArrayList();
 
 	private String customName;
@@ -88,8 +87,7 @@ public class TileEntityMachineFluidTank extends TileEntity implements
 
 	@Override
 	public String getInventoryName() {
-		return this.hasCustomInventoryName() ? this.customName
-				: "container.fluidtank";
+		return this.hasCustomInventoryName() ? this.customName : "container.fluidtank";
 	}
 
 	@Override
@@ -111,8 +109,7 @@ public class TileEntityMachineFluidTank extends TileEntity implements
 		if (worldObj.getTileEntity(xCoord, yCoord, zCoord) != this) {
 			return false;
 		} else {
-			return player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D,
-					zCoord + 0.5D) <= 64;
+			return player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64;
 		}
 	}
 
@@ -186,8 +183,7 @@ public class TileEntityMachineFluidTank extends TileEntity implements
 
 	@Override
 	public int[] getAccessibleSlotsFromSide(int p_94128_1_) {
-		return p_94128_1_ == 0 ? slots_bottom : (p_94128_1_ == 1 ? slots_top
-				: slots_side);
+		return p_94128_1_ == 0 ? slots_bottom : (p_94128_1_ == 1 ? slots_top : slots_side);
 	}
 
 	@Override
@@ -220,38 +216,25 @@ public class TileEntityMachineFluidTank extends TileEntity implements
 			if (slots[2] != null) {
 				if (slots[2].getItem() instanceof IFluidContainerItem) {
 
-					tank.fill(
-							((IFluidContainerItem) slots[2].getItem()).drain(
-									slots[2],
-									Math.min(
-											6000,
-											tank.getCapacity()
-													- tank.getFluidAmount()),
-									true), true);
+					tank.fill(((IFluidContainerItem) slots[2].getItem()).drain(slots[2],
+							Math.min(6000, tank.getCapacity() - tank.getFluidAmount()), true), true);
 					needsUpdate = true;
-					if (((IFluidContainerItem) slots[2].getItem())
-							.getFluid(slots[2]) == null && slots[3] == null) {
+					if (((IFluidContainerItem) slots[2].getItem()).getFluid(slots[2]) == null && slots[3] == null) {
 						MoveItems(2, 3);
 					}
 				} else if (FluidContainerRegistry.isContainer(slots[2])
 						&& !FluidContainerRegistry.isEmptyContainer(slots[2])) {
-					if (tank.getFluid() == null
-							|| (tank.getFluid().getFluid() == ((FluidContainerRegistry
-									.getFluidForFilledItem(slots[2]))
-									.getFluid()) && (tank.getCapacity() - tank
-									.getFluidAmount()) >= FluidContainerRegistry
+					if (tank.getFluid() == null || (tank.getFluid()
+							.getFluid() == ((FluidContainerRegistry.getFluidForFilledItem(slots[2])).getFluid())
+							&& (tank.getCapacity() - tank.getFluidAmount()) >= FluidContainerRegistry
 									.getContainerCapacity(slots[2]))) {
 						if (slots[3] == null
-								|| (slots[3].getItem() == FluidContainerRegistry
-										.drainFluidContainer(slots[2])
-										.getItem() && slots[3].stackSize < slots[3]
-										.getMaxStackSize())) {
-							tank.fill(FluidContainerRegistry
-									.getFluidForFilledItem(slots[2]), true);
+								|| (slots[3].getItem() == FluidContainerRegistry.drainFluidContainer(slots[2]).getItem()
+										&& slots[3].stackSize < slots[3].getMaxStackSize())) {
+							tank.fill(FluidContainerRegistry.getFluidForFilledItem(slots[2]), true);
 
 							if (slots[3] == null) {
-								slots[3] = FluidContainerRegistry
-										.drainFluidContainer(slots[2]);
+								slots[3] = FluidContainerRegistry.drainFluidContainer(slots[2]);
 							} else {
 								slots[3].stackSize++;
 							}
@@ -268,52 +251,38 @@ public class TileEntityMachineFluidTank extends TileEntity implements
 			}
 			if (slots[4] != null && tank.getFluid() != null) {
 				if (slots[4].getItem() instanceof IFluidContainerItem) {
-					tank.drain(((IFluidContainerItem) slots[4].getItem()).fill(
-							slots[4],
-							new FluidStack(tank.getFluid(), Math.min(6000,
-									tank.getFluidAmount())), true), true);
+					tank.drain(
+							((IFluidContainerItem) slots[4].getItem()).fill(slots[4],
+									new FluidStack(tank.getFluid(), Math.min(6000, tank.getFluidAmount())), true),
+							true);
 					// System.out.println(tank.getFluid().getFluid().getStillIcon());
 					needsUpdate = true;
-					if (((IFluidContainerItem) slots[4].getItem())
-							.getFluid(slots[4]) != null
-							&& ((IFluidContainerItem) slots[4].getItem())
-									.getFluid(slots[4]).amount == ((IFluidContainerItem) slots[4]
-									.getItem()).getCapacity(slots[4])
+					if (((IFluidContainerItem) slots[4].getItem()).getFluid(slots[4]) != null
+							&& ((IFluidContainerItem) slots[4].getItem()).getFluid(
+									slots[4]).amount == ((IFluidContainerItem) slots[4].getItem()).getCapacity(slots[4])
 							&& slots[5] == null) {
 						MoveItems(4, 5);
 					}
 				} else if (FluidContainerRegistry.isContainer(slots[4])
 						&& FluidContainerRegistry.isEmptyContainer(slots[4])) {
 					if (tank.getFluid() != null
-							&& tank.getFluidAmount() >= FluidContainerRegistry
-									.getContainerCapacity(slots[4])) {
-						if (slots[5] == null
-								|| (slots[5].getItem() == FluidContainerRegistry
-										.fillFluidContainer(tank.getFluid(),
-												slots[4]).getItem() && slots[5].stackSize < slots[5]
-										.getMaxStackSize())) {
-							if (FluidContainerRegistry.fillFluidContainer(
-									tank.getFluid(), slots[4]) != null) {
+							&& tank.getFluidAmount() >= FluidContainerRegistry.getContainerCapacity(slots[4])) {
+						if (slots[5] == null || (slots[5].getItem() == FluidContainerRegistry
+								.fillFluidContainer(tank.getFluid(), 
+										slots[4])
+								.getItem()
+								&& slots[5].stackSize < slots[5].getMaxStackSize())) {
+							if (FluidContainerRegistry.fillFluidContainer(tank.getFluid(), slots[4]) != null) {
 								if (slots[5] == null) {
-									slots[5] = FluidContainerRegistry
-											.fillFluidContainer(
-													tank.getFluid(), slots[4]);
-									tank.drain(
-											FluidContainerRegistry
-													.getContainerCapacity(FluidContainerRegistry
-															.fillFluidContainer(
-																	tank.getFluid(),
-																	slots[4])),
+									slots[5] = FluidContainerRegistry.fillFluidContainer(tank.getFluid(), slots[4]);
+									tank.drain(FluidContainerRegistry.getContainerCapacity(
+											FluidContainerRegistry.fillFluidContainer(tank.getFluid(), slots[4])),
 											true);
 
 								} else {
 									slots[5].stackSize++;
-									tank.drain(
-											FluidContainerRegistry
-													.getContainerCapacity(FluidContainerRegistry
-															.fillFluidContainer(
-																	tank.getFluid(),
-																	slots[4])),
+									tank.drain(FluidContainerRegistry.getContainerCapacity(
+											FluidContainerRegistry.fillFluidContainer(tank.getFluid(), slots[4])),
 											true);
 
 								}
@@ -340,8 +309,7 @@ public class TileEntityMachineFluidTank extends TileEntity implements
 				ItemStack temp = slots[slot1];
 				slots[slot1] = null;
 				slots[slot2] = temp;
-			} else if (slots[slot2].getItem() == slots[slot1].getItem()
-					&& slots[slot2].isStackable()
+			} else if (slots[slot2].getItem() == slots[slot1].getItem() && slots[slot2].isStackable()
 					&& slots[slot2].getMaxStackSize() > slots[slot2].stackSize) {
 				slots[slot1] = null;
 				slots[slot2].stackSize++;
@@ -373,26 +341,20 @@ public class TileEntityMachineFluidTank extends TileEntity implements
 		if (te != null && te instanceof IFluidHandler) {
 			if (te instanceof TileEntityDummy) {
 				TileEntityDummy ted = (TileEntityDummy) te;
-				if (this.worldObj.getTileEntity(ted.targetX, ted.targetY,
-						ted.targetZ) == this) {
+				if (this.worldObj.getTileEntity(ted.targetX, ted.targetY, ted.targetZ) == this) {
 					return;
 				}
 			}
 			IFluidHandler tef = (IFluidHandler) te;
-			tank.drain(tef.fill(
-					ForgeDirection.VALID_DIRECTIONS[1],
-					new FluidStack(tank.getFluid(), Math.min(6000,
-							tank.getFluidAmount())), true), true);
+			tank.drain(tef.fill(ForgeDirection.VALID_DIRECTIONS[1],
+					new FluidStack(tank.getFluid(), Math.min(6000, tank.getFluidAmount())), true), true);
 			needsUpdate = true;
 		}
 
-		
-		
 	}
 
 	public boolean dna() {
-		if (slots[6] != null
-				&& (slots[6].getItem() == ModItems.fuse || slots[6].getItem() == ModItems.screwdriver))
+		if (slots[6] != null && (slots[6].getItem() == ModItems.fuse || slots[6].getItem() == ModItems.screwdriver))
 			return true;
 		return false;
 	}
@@ -418,8 +380,7 @@ public class TileEntityMachineFluidTank extends TileEntity implements
 	}
 
 	@Override
-	public FluidStack drain(ForgeDirection from, FluidStack resource,
-			boolean doDrain) {
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
 
 		if (resource == null || !resource.isFluidEqual(tank.getFluid())) {
 			return null;
@@ -461,8 +422,6 @@ public class TileEntityMachineFluidTank extends TileEntity implements
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
 		return new FluidTankInfo[] { tank.getInfo() };
 	}
-	
-	
 
 	@Override
 	public Packet getDescriptionPacket() {
@@ -478,6 +437,5 @@ public class TileEntityMachineFluidTank extends TileEntity implements
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 		readFromNBT(pkt.func_148857_g());
 	}
-
 
 }
