@@ -47,6 +47,7 @@ import net.minecraftforge.event.entity.EntityEvent.EnteringChunk;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
+import net.minecraftforge.event.world.WorldEvent;
 
 public class ModEventHandler
 {	
@@ -79,6 +80,14 @@ public class ModEventHandler
 		if(event.entity.getUniqueID().toString().equals(Library.HbMinecraft)) {
 			
 		}
+	}
+	
+	@SubscribeEvent
+	public void worldUnload(WorldEvent.Unload event) {
+		for(FFPipeNetwork net : MainRegistry.allPipeNetworks) {
+			net.destroySoft();
+		}
+		MainRegistry.allPipeNetworks.clear();
 	}
 	
 	@SubscribeEvent

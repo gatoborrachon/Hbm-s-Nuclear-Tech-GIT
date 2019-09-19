@@ -44,7 +44,7 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 		if(!worldObj.isRemote)
 			PacketDispatcher.wrapper.sendToAll(new TEFluidTypePacketTest(xCoord, yCoord, zCoord, type));
 		this.updateConnections();
-		if(firstUpdate){
+		if(firstUpdate || this.network == null){
 			this.getNetwork();
 			this.checkOtherNetworks();
 			this.network.addPipe(this);

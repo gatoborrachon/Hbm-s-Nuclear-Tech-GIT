@@ -270,6 +270,14 @@ public class FFPipeNetwork implements IFluidHandler {
 		this.pipes.clear();
 		MainRegistry.allPipeNetworks.remove(this);
 	}
+	
+	public void destroySoft() {
+		this.fillables.clear();
+		for(IFluidPipe pipe : pipes){
+			pipe.setNetwork(null);
+		}
+		this.pipes.clear();
+	}
 
 	/**
 	 * Sets the network fluid type, because that's how HBM pipes work. Also sets every pipe in the network to be this type.
