@@ -84,6 +84,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	}
 	
 	public void fillFluidInit(){
+		System.out.println("here");
 		//Pretty much the same thing as the transfer fluid in Library.java
 		if(internalNetworkTank.getFluid() == null || internalNetworkTank.getFluidAmount() <= 0)
 			return;
@@ -176,6 +177,7 @@ public class FFPipeNetwork implements IFluidHandler {
 			}
 			
 		}
+		System.out.println("called2");
 		return net;
 	}
 
@@ -260,6 +262,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * Destroys the network and removes it from the registry.
 	 */
 	public void Destroy() {
+		System.out.println("caleed");
 		this.fillables.clear();
 		for(IFluidPipe pipe : pipes){
 			pipe.setNetwork(null);

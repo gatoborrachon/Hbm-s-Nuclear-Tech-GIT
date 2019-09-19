@@ -463,6 +463,7 @@ public class MainRegistry
 		GameRegistry.registerTileEntity(TileEntityFFOilDuct.class, "tileentity_ff_oil_duct");
 		GameRegistry.registerTileEntity(TileEntityOilDuctSolid.class, "tileentity_oil_duct_solid");
 		GameRegistry.registerTileEntity(TileEntityGasDuct.class, "tileentity_gas_duct");
+		GameRegistry.registerTileEntity(TileEntityFFGasDuct.class, "tileentity_ff_gas_duct");
 		GameRegistry.registerTileEntity(TileEntityGasDuctSolid.class, "tileentity_gas_duct_solid");
 		GameRegistry.registerTileEntity(TileEntityMachineRTG.class, "tileentity_machine_rtg");
 		GameRegistry.registerTileEntity(TileEntityPylonRedWire.class, "tileentity_pylon_redwire");

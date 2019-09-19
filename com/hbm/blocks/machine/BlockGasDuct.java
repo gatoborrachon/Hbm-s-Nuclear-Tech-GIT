@@ -1,9 +1,13 @@
 package com.hbm.blocks.machine;
 
+import com.hbm.tileentity.conductor.TileEntityFFGasDuct;
+import com.hbm.tileentity.conductor.TileEntityFFOilDuct;
 import com.hbm.tileentity.conductor.TileEntityGasDuct;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
@@ -20,8 +24,8 @@ public class BlockGasDuct extends BlockContainer {
 	
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
-		if(world.getTileEntity(x, y, z) instanceof TileEntityGasDuct) {
-		TileEntityGasDuct cable = (TileEntityGasDuct)world.getTileEntity(x, y, z);
+		if(world.getTileEntity(x, y, z) instanceof TileEntityFFGasDuct) {
+		TileEntityFFGasDuct cable = (TileEntityFFGasDuct)world.getTileEntity(x, y, z);
 
 		if(cable != null)
 		{
@@ -41,8 +45,8 @@ public class BlockGasDuct extends BlockContainer {
 	
 	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
-		if(world.getTileEntity(x, y, z) instanceof TileEntityGasDuct) {
-			TileEntityGasDuct cable = (TileEntityGasDuct)world.getTileEntity(x, y, z);
+		if(world.getTileEntity(x, y, z) instanceof TileEntityFFGasDuct) {
+			TileEntityFFGasDuct cable = (TileEntityFFGasDuct)world.getTileEntity(x, y, z);
 
 		if(cable != null)
 		{
@@ -61,7 +65,7 @@ public class BlockGasDuct extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
-		return new TileEntityGasDuct();
+		return new TileEntityFFGasDuct();
 	}
 	
 	@Override
@@ -78,4 +82,28 @@ public class BlockGasDuct extends BlockContainer {
 	public boolean renderAsNormalBlock() {
 		return false;
 	}
+	
+	@Override
+	public void breakBlock(World world, int x, int y, int z, Block block, int whatever){
+		if(world.getTileEntity(x, y, z) != null && world.getTileEntity(x, y, z) instanceof TileEntityFFGasDuct) {
+			((TileEntityFFGasDuct)world.getTileEntity(x, y, z)).breakBlock();
+		}
+		super.breakBlock(world, x, y, z, block, whatever);
+		
+	}
+	
+	@Override
+	 public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {
+		if(world.getTileEntity(x, y, z) != null && world.getTileEntity(x, y, z) instanceof TileEntityFFGasDuct) {
+			((TileEntityFFGasDuct)world.getTileEntity(x, y, z)).onNeighborBlockChange();
+		}
+	}
+	
+	@Override
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int p_149727_6_, float p_149727_7_, float p_149727_8_, float p_149727_9_)
+    {
+		if(!world.isRemote)
+			System.out.println(((TileEntityFFGasDuct)world.getTileEntity(x, y, z)).getNetwork());
+        return false;
+    }
 }

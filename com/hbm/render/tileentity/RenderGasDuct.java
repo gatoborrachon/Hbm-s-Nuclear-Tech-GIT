@@ -3,6 +3,7 @@ package com.hbm.render.tileentity;
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.lib.RefStrings;
+import com.hbm.tileentity.conductor.TileEntityFFGasDuct;
 import com.hbm.tileentity.conductor.TileEntityGasDuct;
 
 import net.minecraft.client.renderer.Tessellator;
@@ -23,7 +24,7 @@ public class RenderGasDuct extends TileEntitySpecialRenderer {
 		GL11.glDisable(GL11.GL_LIGHTING);
 		this.bindTexture(texture);
 		drawCore(tileentity);
-		TileEntityGasDuct cable = (TileEntityGasDuct) tileentity;
+		TileEntityFFGasDuct cable = (TileEntityFFGasDuct) tileentity;
 		for(int i = 0; i < cable.connections.length; i++)
 		{
 			if(cable.connections[i] != null)
