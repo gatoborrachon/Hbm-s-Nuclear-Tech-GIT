@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.interfaces.IHBMFluidHandler;
 import com.hbm.items.ModItems;
 
@@ -213,109 +214,16 @@ public class TileEntityMachineFluidTank extends TileEntity implements ISidedInve
 				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 				needsUpdate = false;
 			}
-			if (slots[2] != null) {
-				if (slots[2].getItem() instanceof IFluidContainerItem) {
 
-					tank.fill(((IFluidContainerItem) slots[2].getItem()).drain(slots[2],
-							Math.min(6000, tank.getCapacity() - tank.getFluidAmount()), true), true);
-					needsUpdate = true;
-					if (((IFluidContainerItem) slots[2].getItem()).getFluid(slots[2]) == null && slots[3] == null) {
-						MoveItems(2, 3);
-					}
-				} else if (FluidContainerRegistry.isContainer(slots[2])
-						&& !FluidContainerRegistry.isEmptyContainer(slots[2])) {
-					if (tank.getFluid() == null || (tank.getFluid()
-							.getFluid() == ((FluidContainerRegistry.getFluidForFilledItem(slots[2])).getFluid())
-							&& (tank.getCapacity() - tank.getFluidAmount()) >= FluidContainerRegistry
-									.getContainerCapacity(slots[2]))) {
-						if (slots[3] == null
-								|| (slots[3].getItem() == FluidContainerRegistry.drainFluidContainer(slots[2]).getItem()
-										&& slots[3].stackSize < slots[3].getMaxStackSize())) {
-							tank.fill(FluidContainerRegistry.getFluidForFilledItem(slots[2]), true);
-
-							if (slots[3] == null) {
-								slots[3] = FluidContainerRegistry.drainFluidContainer(slots[2]);
-							} else {
-								slots[3].stackSize++;
-							}
-							if (slots[2].stackSize > 1) {
-								slots[2].stackSize--;
-							} else {
-								slots[2] = null;
-							}
-							needsUpdate = true;
-						}
-
-					}
-				}
-			}
-			if (slots[4] != null && tank.getFluid() != null) {
-				if (slots[4].getItem() instanceof IFluidContainerItem) {
-					tank.drain(
-							((IFluidContainerItem) slots[4].getItem()).fill(slots[4],
-									new FluidStack(tank.getFluid(), Math.min(6000, tank.getFluidAmount())), true),
-							true);
-					// System.out.println(tank.getFluid().getFluid().getStillIcon());
-					needsUpdate = true;
-					if (((IFluidContainerItem) slots[4].getItem()).getFluid(slots[4]) != null
-							&& ((IFluidContainerItem) slots[4].getItem()).getFluid(
-									slots[4]).amount == ((IFluidContainerItem) slots[4].getItem()).getCapacity(slots[4])
-							&& slots[5] == null) {
-						MoveItems(4, 5);
-					}
-				} else if (FluidContainerRegistry.isContainer(slots[4])
-						&& FluidContainerRegistry.isEmptyContainer(slots[4])) {
-					if (tank.getFluid() != null
-							&& tank.getFluidAmount() >= FluidContainerRegistry.getContainerCapacity(slots[4])) {
-						if (slots[5] == null || (slots[5].getItem() == FluidContainerRegistry
-								.fillFluidContainer(tank.getFluid(), 
-										slots[4])
-								.getItem()
-								&& slots[5].stackSize < slots[5].getMaxStackSize())) {
-							if (FluidContainerRegistry.fillFluidContainer(tank.getFluid(), slots[4]) != null) {
-								if (slots[5] == null) {
-									slots[5] = FluidContainerRegistry.fillFluidContainer(tank.getFluid(), slots[4]);
-									tank.drain(FluidContainerRegistry.getContainerCapacity(
-											FluidContainerRegistry.fillFluidContainer(tank.getFluid(), slots[4])),
-											true);
-
-								} else {
-									slots[5].stackSize++;
-									tank.drain(FluidContainerRegistry.getContainerCapacity(
-											FluidContainerRegistry.fillFluidContainer(tank.getFluid(), slots[4])),
-											true);
-
-								}
-								if (slots[4].stackSize > 1) {
-									slots[4].stackSize--;
-								} else {
-									slots[4] = null;
-								}
-
-								needsUpdate = true;
-							}
-						}
-
-					}
-				}
-			}
+			if (FFUtils.fillFromFluidContainer(slots, tank, 2, 3))
+				needsUpdate = true;
+			if(FFUtils.fillFluidContainer(slots, tank, 4, 5))
+				needsUpdate = true;
 
 		}
 	}
 
-	private void MoveItems(int slot1, int slot2) {
-		if (slots[slot1] != null) {
-			if (slots[slot2] == null) {
-				ItemStack temp = slots[slot1];
-				slots[slot1] = null;
-				slots[slot2] = temp;
-			} else if (slots[slot2].getItem() == slots[slot1].getItem() && slots[slot2].isStackable()
-					&& slots[slot2].getMaxStackSize() > slots[slot2].stackSize) {
-				slots[slot1] = null;
-				slots[slot2].stackSize++;
-			}
-		}
-	}
+
 
 	private void fillFluidInit() {
 		if (tank.getFluid() != null) {

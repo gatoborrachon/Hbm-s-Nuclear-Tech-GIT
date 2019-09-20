@@ -12,12 +12,16 @@ import com.hbm.inventory.gui.GuiInfoContainer;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
 public class FFUtils {
@@ -114,6 +118,17 @@ public class FFUtils {
 
 	}
 
+	/**
+	 * Renders tank info, like fluid type and millibucket amount. Same as the hbm one, just centrallized to a utility file.
+	 * @param gui - the gui to render the fluid info on
+	 * @param mouseX - the cursor's x position
+	 * @param mouseY - the cursor's y position
+	 * @param x - the x left corner of where to render the info
+	 * @param y - the y top corner of where to render the info
+	 * @param width - how wide the area to render info inside is
+	 * @param height - how tall the area to render info inside is
+	 * @param fluidTank - the tank to render info of
+	 */
 	public static void renderTankInfo(GuiInfoContainer gui, int mouseX,
 			int mouseY, int x, int y, int width, int height, FluidTank fluidTank) {
 		if (x <= mouseX && x + width > mouseX && y < mouseY
@@ -140,6 +155,94 @@ public class FFUtils {
 		if(tileentity != null && !(tileentity instanceof IFluidPipe) && tileentity instanceof IFluidHandler)
 		{
 			return true;
+		}
+		return false;
+	}
+	
+	public static Slot[] transferFluidToItem(){
+		
+		return null;
+	}
+
+	/**
+	 * Fills a tank from a fluid handler item.
+	 * @param slots - the slot inventory
+	 * @param tank - the tank to be filled
+	 * @param slot1 - the slot with the full container
+	 * @param slot2 - the output slot
+	 */
+	public static boolean fillFluidContainer(ItemStack[] slots, FluidTank tank, int slot1, int slot2) {
+		if(slots == null || tank == null || tank.getFluid() == null || slots.length < slot1 || slots.length < slot2 || slots[slot1] == null){
+			return false;
+		}
+		if(slots[slot1].getItem() instanceof IFluidContainerItem){
+			
+		}
+		return false;
+	}
+	
+	/**
+	 * Fills a fluid handling item from a tank
+	 * @param slots - the slot inventory
+	 * @param tank - the tank to fill from
+	 * @param slot1 - the slot with an empty container
+	 * @param slot2 - the output slot.
+	 */
+	public static boolean fillFromFluidContainer(ItemStack[] slots, FluidTank tank, int slot1, int slot2){
+		
+		if(slots == null || tank == null || slots.length < slot1 || slots.length < slot2 || slots[slot1] == null){
+			return false;
+		}
+		if(slots[slot1].getItem() instanceof IFluidContainerItem){
+			
+			tank.fill(((IFluidContainerItem)slots[slot1].getItem()).drain(slots[slot1], Math.min(6000, tank.getCapacity() - tank.getFluidAmount()), true), true);
+			if(((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot2]) == null)
+				return moveItems(slots, slot2, slot2);
+				
+		} else if(FluidContainerRegistry.isFilledContainer(slots[slot1]) && FluidContainerRegistry.getFluidForFilledItem(slots[slot1]) != null){
+			if(tank.getCapacity() - tank.getFluidAmount() >= FluidContainerRegistry.getContainerCapacity(slots[slot1]) && (tank.getFluid() == null || tank.getFluid().getFluid() == FluidContainerRegistry.getFluidForFilledItem(slots[slot1]).getFluid())){
+				tank.fill(FluidContainerRegistry.getFluidForFilledItem(slots[slot1]), true);
+				System.out.println(tank.getFluidAmount());
+				return moveFullToEmpty(slots, slot1, slot2);
+			}
+		}
+		return false;
+	}
+
+	private static boolean moveFullToEmpty(ItemStack[] slots, int in, int out) {
+		if(slots[in] != null && FluidContainerRegistry.drainFluidContainer(slots[in]) != null){
+			if(slots[out] == null){
+				slots[out] = FluidContainerRegistry.drainFluidContainer(slots[in]);
+				slots[in].stackSize --;
+				if(slots[in].stackSize <= 0){
+					slots[in] = null;
+				}
+				return true;
+			} else if(slots[out] != null && slots[out].getItem() == FluidContainerRegistry.drainFluidContainer(slots[in]).getItem() && slots[out].stackSize < slots[out].getMaxStackSize()){
+				slots[in].stackSize--;
+				if(slots[in].stackSize <= 0)
+					slots[in] = null;
+				slots[out].stackSize++;
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private static boolean moveItems(ItemStack[] slots, int in, int out) {
+		if(slots[in] != null){
+			if(slots[out] == null){
+				slots[out] = slots[in];
+				slots[in] = null;
+				return true;
+			} else {
+				int amountToTransfer = Math.min(slots[out].getMaxStackSize() - slots[out].stackSize, slots[in].stackSize);
+				slots[in].stackSize -= amountToTransfer;
+				if(slots[in].stackSize <= 0)
+					slots[in] = null;
+				slots[out].stackSize =+ amountToTransfer;
+				return true;
+			}
 		}
 		return false;
 	}
