@@ -116,13 +116,13 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 		FFPipeNetwork largeNet = null;
 		for (int i = 0; i < 6; i++) {
 			te = FFPipeNetwork.getTileEntityAround(this, i);
-			if (te instanceof IFluidPipe && ((IFluidPipe) te).getNetwork() != null && ((IFluidPipe) te).getNetwork().getType() == this.getType()) {
-				if (!list.contains(((IFluidPipe) te).getNetwork())) {
-					list.add(((IFluidPipe) te).getNetwork());
+			if (te instanceof IFluidPipe && ((IFluidPipe) te).getNetworkTrue() != null && ((IFluidPipe) te).getNetworkTrue().getType() == this.getType()) {
+				if (!list.contains(((IFluidPipe) te).getNetworkTrue())) {
+					list.add(((IFluidPipe) te).getNetworkTrue());
 					if (largeNet == null
-							|| ((IFluidPipe) te).getNetwork().getSize() > largeNet
+							|| ((IFluidPipe) te).getNetworkTrue().getSize() > largeNet
 									.getSize())
-						largeNet = ((IFluidPipe) te).getNetwork();
+						largeNet = ((IFluidPipe) te).getNetworkTrue();
 				}
 			}
 		}
@@ -141,9 +141,9 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
     {
 		super.readFromNBT(nbt);
 		type = FluidRegistry.getFluid(nbt.getInteger("FluidType"));
-		if(this.network == null) {
-			FFPipeNetwork.buildNewNetwork(this);
-		}
+		//if(this.network == null) {
+		//	FFPipeNetwork.buildNewNetwork(this);
+		//}
     }
 
     @Override

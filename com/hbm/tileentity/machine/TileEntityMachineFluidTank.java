@@ -48,8 +48,6 @@ public class TileEntityMachineFluidTank extends TileEntity implements ISidedInve
 	public int age = 0;
 	public boolean needsUpdate = false;
 
-	public List<IFluidHandler> list = new ArrayList();
-
 	private String customName;
 
 	public TileEntityMachineFluidTank() {

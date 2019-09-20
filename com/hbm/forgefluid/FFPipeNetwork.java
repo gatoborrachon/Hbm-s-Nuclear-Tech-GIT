@@ -36,6 +36,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * @param fluid
 	 */
 	public FFPipeNetwork(Fluid fluid) {
+		new Exception().printStackTrace();
 		this.type = fluid;
 		MainRegistry.allPipeNetworks.add(this);
 	}
@@ -84,7 +85,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	}
 	
 	public void fillFluidInit(){
-		System.out.println("here");
+		System.out.println(this);
 		//Pretty much the same thing as the transfer fluid in Library.java
 		if(internalNetworkTank.getFluid() == null || internalNetworkTank.getFluidAmount() <= 0)
 			return;
@@ -148,6 +149,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * @return The newly built network
 	 */
 	public static FFPipeNetwork buildNewNetwork(TileEntity pipe) {
+		System.out.println("here");
 		FFPipeNetwork net = null;
 		if (pipe instanceof IFluidPipe) {
 //			if(!pipe.getWorldObj().isRemote)
@@ -177,7 +179,6 @@ public class FFPipeNetwork implements IFluidHandler {
 			}
 			
 		}
-		System.out.println("called2");
 		return net;
 	}
 
@@ -224,7 +225,7 @@ public class FFPipeNetwork implements IFluidHandler {
 					consumers.add((IFluidHandler) next);
 				}
 			}
-			if(((IFluidPipe)te).getNetworkTrue() != null && ((IFluidPipe)te).getIsValidForForming() && ((IFluidPipe)te).getNetwork().getType() == type && !networks.contains(((IFluidPipe)te).getNetwork())){
+			if(((IFluidPipe)te).getNetworkTrue() != null && ((IFluidPipe)te).getIsValidForForming() && ((IFluidPipe)te).getNetworkTrue().getType() == type && !networks.contains(((IFluidPipe)te).getNetwork())){
 				networks.add(((IFluidPipe)te).getNetwork());
 			}
 		}
@@ -262,7 +263,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * Destroys the network and removes it from the registry.
 	 */
 	public void Destroy() {
-		System.out.println("caleed");
+		System.out.println("Destroy");
 		this.fillables.clear();
 		for(IFluidPipe pipe : pipes){
 			pipe.setNetwork(null);
@@ -272,6 +273,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	}
 	
 	public void destroySoft() {
+		System.out.println("Soft d");
 		this.fillables.clear();
 		for(IFluidPipe pipe : pipes){
 			pipe.setNetwork(null);

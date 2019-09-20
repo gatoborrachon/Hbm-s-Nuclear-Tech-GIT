@@ -150,7 +150,7 @@ public class FFUtils {
 	public static boolean checkFluidConnectables(World world, int x, int y, int z, FFPipeNetwork net)
 	{
 		TileEntity tileentity = world.getTileEntity(x, y, z);
-		if(tileentity != null && tileentity instanceof IFluidPipe && ((IFluidPipe)tileentity).getNetwork() != null && ((IFluidPipe)tileentity).getNetwork() == net)
+		if(tileentity != null && tileentity instanceof IFluidPipe && ((IFluidPipe)tileentity).getNetworkTrue() != null && ((IFluidPipe)tileentity).getNetworkTrue() == net)
 			return true;
 		if(tileentity != null && !(tileentity instanceof IFluidPipe) && tileentity instanceof IFluidHandler)
 		{
@@ -210,8 +210,9 @@ public class FFUtils {
 				
 		} else if(FluidContainerRegistry.isFilledContainer(slots[slot1]) && FluidContainerRegistry.getFluidForFilledItem(slots[slot1]) != null){
 			if(tank.getCapacity() - tank.getFluidAmount() >= FluidContainerRegistry.getContainerCapacity(slots[slot1]) && (tank.getFluid() == null || tank.getFluid().getFluid() == FluidContainerRegistry.getFluidForFilledItem(slots[slot1]).getFluid())){
+				ItemStack temp = slots[slot1];
 				if(moveFullToEmpty(slots, slot1, slot2)) {
-					tank.fill(FluidContainerRegistry.getFluidForFilledItem(slots[slot1]), true);
+					tank.fill(FluidContainerRegistry.getFluidForFilledItem(temp), true);
 					return true;
 				}
 			}
