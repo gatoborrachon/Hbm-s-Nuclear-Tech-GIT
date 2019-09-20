@@ -36,7 +36,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * @param fluid
 	 */
 	public FFPipeNetwork(Fluid fluid) {
-		new Exception().printStackTrace();
+		//new Exception().printStackTrace();
 		this.type = fluid;
 		MainRegistry.allPipeNetworks.add(this);
 	}
@@ -85,7 +85,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	}
 	
 	public void fillFluidInit(){
-		System.out.println(this);
+		//System.out.println(this);
 		//Pretty much the same thing as the transfer fluid in Library.java
 		if(internalNetworkTank.getFluid() == null || internalNetworkTank.getFluidAmount() <= 0)
 			return;
@@ -99,8 +99,12 @@ public class FFPipeNetwork implements IFluidHandler {
 		if(size <= 0)
 			return;
 		int part = this.internalNetworkTank.getFluidAmount() / size;
+		int lastPart = part + this.internalNetworkTank.getFluidAmount() - part * size;
+		int i = 1;
 		for(IFluidHandler consume : consumers){
-			internalNetworkTank.drain(consume.fill(ForgeDirection.UNKNOWN, new FluidStack(internalNetworkTank.getFluid().getFluid(), part), true), true);
+			i++;
+			if(internalNetworkTank.getFluid() != null)
+				internalNetworkTank.drain(consume.fill(ForgeDirection.UNKNOWN, new FluidStack(internalNetworkTank.getFluid().getFluid(), i<consumers.size()?part:lastPart), true), true);
 		}
 	}
 
@@ -149,7 +153,6 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * @return The newly built network
 	 */
 	public static FFPipeNetwork buildNewNetwork(TileEntity pipe) {
-		System.out.println("here");
 		FFPipeNetwork net = null;
 		if (pipe instanceof IFluidPipe) {
 //			if(!pipe.getWorldObj().isRemote)
@@ -263,7 +266,6 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * Destroys the network and removes it from the registry.
 	 */
 	public void Destroy() {
-		System.out.println("Destroy");
 		this.fillables.clear();
 		for(IFluidPipe pipe : pipes){
 			pipe.setNetwork(null);
@@ -273,7 +275,6 @@ public class FFPipeNetwork implements IFluidHandler {
 	}
 	
 	public void destroySoft() {
-		System.out.println("Soft d");
 		this.fillables.clear();
 		for(IFluidPipe pipe : pipes){
 			pipe.setNetwork(null);

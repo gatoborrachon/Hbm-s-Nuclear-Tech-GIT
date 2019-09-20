@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL12;
 
 import com.hbm.render.misc.RenderItemStack;
 
+import codechicken.lib.render.CCRenderState;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
@@ -50,7 +51,13 @@ public class ItemRenderFluidTank implements IItemRenderer {
 	@Override
 	public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
 		GL11.glPushMatrix();
-
+		
+		
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glEnable(GL11.GL_ALPHA_TEST);
+		OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+		
+		
 		Tessellator tes = Tessellator.instance;
 		if (FluidContainerRegistry.isFilledContainer(item)) {
 			Fluid fluid = FluidContainerRegistry.getFluidForFilledItem(item).getFluid();
@@ -102,8 +109,7 @@ public class ItemRenderFluidTank implements IItemRenderer {
 					//GL11.glRotatef(180, 0, 1, 0);
 				}
 
-				ItemRenderer.renderItemIn2D(tes, iconMaxU2, iconMinV2, iconMinU2, iconMaxV2, itemIcon.getIconWidth(),
-						itemIcon.getIconHeight(), 0.0625F);
+				ItemRenderer.renderItemIn2D(tes, iconMaxU2, iconMinV2, iconMinU2, iconMaxV2, itemIcon.getIconWidth(), itemIcon.getIconHeight(), 0.0625F);
 				if (fluidIcon != null) {
 					float iconMaxU = fluidIcon.getInterpolatedU(9);
 					float iconMinU = fluidIcon.getInterpolatedU(7);
@@ -135,6 +141,8 @@ public class ItemRenderFluidTank implements IItemRenderer {
 				}
 			}
 		}
+
+		OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 		GL11.glPopMatrix();
 	}
 
