@@ -180,8 +180,10 @@ public class FFUtils {
 		} else if (FluidContainerRegistry.isEmptyContainer(slots[slot1])){
 			if(FluidContainerRegistry.fillFluidContainer(tank.getFluid(), slots[slot1]) != null) {
 				FluidStack fStack = tank.getFluid();
-				tank.drain(FluidContainerRegistry.getFluidForFilledItem(slots[slot1]).amount, true);
-				return fillEmpty(slots, slot1, slot2, fStack);
+				if(fillEmpty(slots, slot1, slot2, fStack)) {
+					tank.drain(FluidContainerRegistry.getFluidForFilledItem(slots[slot2]).amount, true);
+					return true;
+				}
 			}
 		}
 		return false;
@@ -203,12 +205,15 @@ public class FFUtils {
 			
 			tank.fill(((IFluidContainerItem)slots[slot1].getItem()).drain(slots[slot1], Math.min(6000, tank.getCapacity() - tank.getFluidAmount()), true), true);
 			if(((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot2]) == null)
-				return moveItems(slots, slot2, slot2);
+				moveItems(slots, slot2, slot2);
+			return true;
 				
 		} else if(FluidContainerRegistry.isFilledContainer(slots[slot1]) && FluidContainerRegistry.getFluidForFilledItem(slots[slot1]) != null){
 			if(tank.getCapacity() - tank.getFluidAmount() >= FluidContainerRegistry.getContainerCapacity(slots[slot1]) && (tank.getFluid() == null || tank.getFluid().getFluid() == FluidContainerRegistry.getFluidForFilledItem(slots[slot1]).getFluid())){
-				tank.fill(FluidContainerRegistry.getFluidForFilledItem(slots[slot1]), true);
-				return moveFullToEmpty(slots, slot1, slot2);
+				if(moveFullToEmpty(slots, slot1, slot2)) {
+					tank.fill(FluidContainerRegistry.getFluidForFilledItem(slots[slot1]), true);
+					return true;
+				}
 			}
 		}
 		return false;
@@ -235,15 +240,15 @@ public class FFUtils {
 	}
 	
 	private static boolean fillEmpty(ItemStack[] slots, int in, int out, FluidStack fStack) {
-		if(slots[in] != null && FluidContainerRegistry.drainFluidContainer(slots[in]) != null){
+		if(slots[in] != null && FluidContainerRegistry.fillFluidContainer(fStack, slots[in]) != null){
 			if(slots[out] == null){
-				slots[out] = FluidContainerRegistry.drainFluidContainer(slots[in]);
+				slots[out] = FluidContainerRegistry.fillFluidContainer(fStack, slots[in]);
 				slots[in].stackSize --;
 				if(slots[in].stackSize <= 0){
 					slots[in] = null;
 				}
 				return true;
-			} else if(slots[out] != null && slots[out].getItem() == FluidContainerRegistry.drainFluidContainer(slots[in]).getItem() && slots[out].stackSize < slots[out].getMaxStackSize()){
+			} else if(slots[out] != null && slots[out].getItem() == FluidContainerRegistry.fillFluidContainer(fStack, slots[in]).getItem() && slots[out].stackSize < slots[out].getMaxStackSize()){
 				slots[in].stackSize--;
 				if(slots[in].stackSize <= 0)
 					slots[in] = null;
