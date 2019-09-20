@@ -177,6 +177,9 @@ public class FFUtils {
 		}
 		if(slots[slot1].getItem() instanceof IFluidContainerItem){
 			
+		} else if (FluidContainerRegistry.isEmptyContainer(slots[slot1])){
+			if(FluidContainerRegistry.fillFluidContainer(tank.getFluid(), slots[slot1]) != null)
+				fillEmpty(slots, slot1, slot2);
 		}
 		return false;
 	}
@@ -202,7 +205,6 @@ public class FFUtils {
 		} else if(FluidContainerRegistry.isFilledContainer(slots[slot1]) && FluidContainerRegistry.getFluidForFilledItem(slots[slot1]) != null){
 			if(tank.getCapacity() - tank.getFluidAmount() >= FluidContainerRegistry.getContainerCapacity(slots[slot1]) && (tank.getFluid() == null || tank.getFluid().getFluid() == FluidContainerRegistry.getFluidForFilledItem(slots[slot1]).getFluid())){
 				tank.fill(FluidContainerRegistry.getFluidForFilledItem(slots[slot1]), true);
-				System.out.println(tank.getFluidAmount());
 				return moveFullToEmpty(slots, slot1, slot2);
 			}
 		}
@@ -210,6 +212,26 @@ public class FFUtils {
 	}
 
 	private static boolean moveFullToEmpty(ItemStack[] slots, int in, int out) {
+		if(slots[in] != null && FluidContainerRegistry.drainFluidContainer(slots[in]) != null){
+			if(slots[out] == null){
+				slots[out] = FluidContainerRegistry.drainFluidContainer(slots[in]);
+				slots[in].stackSize --;
+				if(slots[in].stackSize <= 0){
+					slots[in] = null;
+				}
+				return true;
+			} else if(slots[out] != null && slots[out].getItem() == FluidContainerRegistry.drainFluidContainer(slots[in]).getItem() && slots[out].stackSize < slots[out].getMaxStackSize()){
+				slots[in].stackSize--;
+				if(slots[in].stackSize <= 0)
+					slots[in] = null;
+				slots[out].stackSize++;
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private static boolean fillEmpty(ItemStack[] slots, int in, int out) {
 		if(slots[in] != null && FluidContainerRegistry.drainFluidContainer(slots[in]) != null){
 			if(slots[out] == null){
 				slots[out] = FluidContainerRegistry.drainFluidContainer(slots[in]);
