@@ -1,5 +1,7 @@
 package com.hbm.blocks.machine;
 
+import com.hbm.packet.PacketDispatcher;
+import com.hbm.packet.TEFFPipeDestructorPacket;
 import com.hbm.tileentity.conductor.TileEntityFFOilDuct;
 import com.hbm.tileentity.conductor.TileEntityOilDuct;
 
@@ -90,6 +92,7 @@ public class BlockOilDuct extends BlockContainer {
 		super.breakBlock(world, x, y, z, block, whatever);
 		
 	}
+	
 	
 	@Override
 	 public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {

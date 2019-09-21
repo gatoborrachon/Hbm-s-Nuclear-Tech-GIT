@@ -50,22 +50,22 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 	}
 	
 	public void updateConnections() {
-		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord + 1, zCoord, getNetwork())) connections[0] = ForgeDirection.UP;
+		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord + 1, zCoord, getNetworkTrue())) connections[0] = ForgeDirection.UP;
 		else connections[0] = null;
 		
-		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord - 1, zCoord, getNetwork())) connections[1] = ForgeDirection.DOWN;
+		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord - 1, zCoord, getNetworkTrue())) connections[1] = ForgeDirection.DOWN;
 		else connections[1] = null;
 		
-		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord, zCoord - 1, getNetwork())) connections[2] = ForgeDirection.NORTH;
+		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord, zCoord - 1, getNetworkTrue())) connections[2] = ForgeDirection.NORTH;
 		else connections[2] = null;
 		
-		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord + 1, yCoord, zCoord, getNetwork())) connections[3] = ForgeDirection.EAST;
+		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord + 1, yCoord, zCoord, getNetworkTrue())) connections[3] = ForgeDirection.EAST;
 		else connections[3] = null;
 		
-		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord, zCoord + 1, getNetwork())) connections[4] = ForgeDirection.SOUTH;
+		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord, yCoord, zCoord + 1, getNetworkTrue())) connections[4] = ForgeDirection.SOUTH;
 		else connections[4] = null;
 		
-		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord - 1, yCoord, zCoord, getNetwork())) connections[5] = ForgeDirection.WEST;
+		if(FFUtils.checkFluidConnectables(this.worldObj, xCoord - 1, yCoord, zCoord, getNetworkTrue())) connections[5] = ForgeDirection.WEST;
 		else connections[5] = null;
 	}
 	
@@ -156,6 +156,7 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 		return 65536.0D;
 	}
 	
+	@Override
 	public void breakBlock() {
 		this.getNetwork().Destroy();
 		this.isValidForForming = false;

@@ -6,6 +6,9 @@ import java.util.List;
 import com.hbm.interfaces.IFluidPipe;
 import com.hbm.main.MainRegistry;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -38,7 +41,8 @@ public class FFPipeNetwork implements IFluidHandler {
 	public FFPipeNetwork(Fluid fluid) {
 		//new Exception().printStackTrace();
 		this.type = fluid;
-		MainRegistry.allPipeNetworks.add(this);
+		if(FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
+			MainRegistry.allPipeNetworks.add(this);
 	}
 	
 	/**
@@ -65,10 +69,20 @@ public class FFPipeNetwork implements IFluidHandler {
 		return this.pipes;
 	}
 	
+	public World getNetworkWorld(){
+		for(IFluidPipe pipe : this.pipes){
+			if(pipe != null && ((TileEntity)pipe).getWorldObj() != null){
+				return ((TileEntity)pipe).getWorldObj();
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Called whenever the world ticks to fill any connected fluid handlers
 	 */
 	public void updateTick(){
+		System.out.println(this);
 		if(tickTimer < 20){
 			tickTimer ++;
 		} else {
@@ -79,6 +93,7 @@ public class FFPipeNetwork implements IFluidHandler {
 			//	this.Destroy();
 		//	cleanPipes();
 			//cleanConsumers();
+			
 			fillFluidInit();
 		}
 		
@@ -108,7 +123,7 @@ public class FFPipeNetwork implements IFluidHandler {
 		}
 	}
 
-/*	public void cleanPipes(){
+	/*public void cleanPipes(){
 		for(IFluidPipe pipe : pipes){
 			if(pipe == null)
 				pipes.remove(pipe);

@@ -1,6 +1,7 @@
 package com.hbm.main;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -84,10 +85,14 @@ public class ModEventHandler
 	
 	@SubscribeEvent
 	public void worldUnload(WorldEvent.Unload event) {
-		for(FFPipeNetwork net : MainRegistry.allPipeNetworks) {
-			net.destroySoft();
+		Iterator<FFPipeNetwork> itr = MainRegistry.allPipeNetworks.iterator();
+		while(itr.hasNext()){
+			FFPipeNetwork net = itr.next();
+			if(net.getNetworkWorld() == event.world){
+				net.destroySoft();
+				itr.remove();
+			}
 		}
-		MainRegistry.allPipeNetworks.clear();
 	}
 	
 	@SubscribeEvent

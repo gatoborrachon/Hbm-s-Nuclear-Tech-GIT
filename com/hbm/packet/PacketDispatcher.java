@@ -89,6 +89,8 @@ public class PacketDispatcher {
 		wrapper.registerMessage(ItemBobmazonPacket.Handler.class, ItemBobmazonPacket.class, i++, Side.SERVER);
 		//Packet to send missile multipart information to TEs
 		wrapper.registerMessage(TEMissileMultipartPacket.Handler.class, TEMissileMultipartPacket.class, i++, Side.CLIENT);
+		//Packet to destroy a pipe the right way so empty networks don't keep ticking
+		wrapper.registerMessage(TEFFPipeDestructorPacket.Handler.class, TEFFPipeDestructorPacket.class, i++, Side.CLIENT);
 	}
 	
 }

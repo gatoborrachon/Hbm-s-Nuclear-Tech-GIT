@@ -21,6 +21,7 @@ import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.interfaces.IFluidPipe;
 import com.hbm.lib.Library;
 import com.hbm.packet.PacketDispatcher;
+import com.hbm.packet.TEFFPipeDestructorPacket;
 import com.hbm.packet.TEFluidTypePacketTest;
 
 import cpw.mods.fml.relauncher.Side;
@@ -84,7 +85,7 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 	}
 
 	public FFPipeNetwork createNewNetwork() {
-		return new FFPipeNetwork(this.type);
+			return new FFPipeNetwork(this.type);
 	}
 
 	@Override
@@ -110,7 +111,6 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 	
 
 	public void checkOtherNetworks() {
-
 		List<FFPipeNetwork> list = new ArrayList<FFPipeNetwork>();
 		list.add(this.getNetworkTrue());
 		TileEntity te;
@@ -163,7 +163,10 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 		return 65536.0D;
 	}
 	
+	@Override
 	public void breakBlock() {
+	//	if(!this.worldObj.isRemote)
+		//	PacketDispatcher.wrapper.sendToAll(new TEFFPipeDestructorPacket(this.xCoord, this.yCoord, this.zCoord));
 		this.getNetwork().Destroy();
 		this.isValidForForming = false;
 		for(int i = 0; i < 6; i++){
@@ -173,6 +176,7 @@ public class TileEntityFFOilDuct extends TileEntity implements IFluidPipe, IFlui
 			}
 		}
 	}
+	
 
 	public void onNeighborBlockChange() {
 		this.checkFluidHandlers();

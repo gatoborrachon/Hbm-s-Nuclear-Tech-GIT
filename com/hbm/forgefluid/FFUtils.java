@@ -150,7 +150,7 @@ public class FFUtils {
 	public static boolean checkFluidConnectables(World world, int x, int y, int z, FFPipeNetwork net)
 	{
 		TileEntity tileentity = world.getTileEntity(x, y, z);
-		if(tileentity != null && tileentity instanceof IFluidPipe && ((IFluidPipe)tileentity).getNetworkTrue() != null && ((IFluidPipe)tileentity).getNetworkTrue() == net)
+		if(tileentity != null && tileentity instanceof IFluidPipe && ((IFluidPipe)tileentity).getNetworkTrue() == net)
 			return true;
 		if(tileentity != null && !(tileentity instanceof IFluidPipe) && tileentity instanceof IFluidHandler)
 		{
@@ -176,7 +176,15 @@ public class FFUtils {
 			return false;
 		}
 		if(slots[slot1].getItem() instanceof IFluidContainerItem){
-			
+			boolean returnValue = false;
+			if(((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]) == null || ((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]).getFluid() == tank.getFluid().getFluid()){
+				tank.drain(((IFluidContainerItem) slots[slot1].getItem()).fill(slots[slot1], new FluidStack(tank.getFluid(), Math.min(6000, tank.getFluidAmount())), true), true);
+				returnValue = true;
+			}
+			if(((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]) != null && (tank.getFluid() == null || ((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]).getFluid() != tank.getFluid().getFluid() || ((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]).amount >= ((IFluidContainerItem)slots[slot1].getItem()).getCapacity(slots[slot1]))){
+				moveItems(slots, slot1, slot2);
+			}
+			return returnValue;
 		} else if (FluidContainerRegistry.isEmptyContainer(slots[slot1])){
 			if(FluidContainerRegistry.fillFluidContainer(tank.getFluid(), slots[slot1]) != null) {
 				FluidStack fStack = tank.getFluid();
@@ -202,12 +210,14 @@ public class FFUtils {
 			return false;
 		}
 		if(slots[slot1].getItem() instanceof IFluidContainerItem){
-			
-			tank.fill(((IFluidContainerItem)slots[slot1].getItem()).drain(slots[slot1], Math.min(6000, tank.getCapacity() - tank.getFluidAmount()), true), true);
-			if(((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot2]) == null)
-				moveItems(slots, slot2, slot2);
-			return true;
-				
+			boolean returnValue = false;
+			if(((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]) != null && (tank.getFluid() == null || ((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]).getFluid() == tank.getFluid().getFluid())){
+				tank.fill(((IFluidContainerItem)slots[slot1].getItem()).drain(slots[slot1], Math.min(6000, tank.getCapacity() - tank.getFluidAmount()), true), true);
+				returnValue = true;
+			}
+			if(((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]) == null)
+				moveItems(slots, slot1, slot2);
+			return returnValue;
 		} else if(FluidContainerRegistry.isFilledContainer(slots[slot1]) && FluidContainerRegistry.getFluidForFilledItem(slots[slot1]) != null){
 			if(tank.getCapacity() - tank.getFluidAmount() >= FluidContainerRegistry.getContainerCapacity(slots[slot1]) && (tank.getFluid() == null || tank.getFluid().getFluid() == FluidContainerRegistry.getFluidForFilledItem(slots[slot1]).getFluid())){
 				ItemStack temp = slots[slot1];
@@ -262,7 +272,9 @@ public class FFUtils {
 	
 	private static boolean moveItems(ItemStack[] slots, int in, int out) {
 		if(slots[in] != null){
+			
 			if(slots[out] == null){
+				
 				slots[out] = slots[in];
 				slots[in] = null;
 				return true;
@@ -271,7 +283,7 @@ public class FFUtils {
 				slots[in].stackSize -= amountToTransfer;
 				if(slots[in].stackSize <= 0)
 					slots[in] = null;
-				slots[out].stackSize =+ amountToTransfer;
+				slots[out].stackSize += amountToTransfer;
 				return true;
 			}
 		}
