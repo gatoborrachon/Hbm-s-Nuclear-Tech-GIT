@@ -82,7 +82,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * Called whenever the world ticks to fill any connected fluid handlers
 	 */
 	public void updateTick(){
-		System.out.println(this);
+		//System.out.println(this);
 		if(tickTimer < 20){
 			tickTimer ++;
 		} else {
@@ -93,7 +93,6 @@ public class FFPipeNetwork implements IFluidHandler {
 			//	this.Destroy();
 		//	cleanPipes();
 			//cleanConsumers();
-			
 			fillFluidInit();
 		}
 		
@@ -227,7 +226,7 @@ public class FFPipeNetwork implements IFluidHandler {
 			}
 			for (int i = 0; i < 6; i++) {
 				next = getTileEntityAround(te, i);
-				if (next instanceof IFluidHandler && next instanceof IFluidPipe && ((IFluidPipe)next).getIsValidForForming() && !pipes.contains((IFluidPipe)next)) {
+				if (next instanceof IFluidHandler && next instanceof IFluidPipe && ((IFluidPipe)next).getIsValidForForming() && ((IFluidPipe)next).getType() == type && !pipes.contains((IFluidPipe)next)) {
 
 					List[] nextPipe = iteratePipes(pipes, consumers, networks, next, type);
 					//So java really does pass by location and not by value. I feel dumb now.

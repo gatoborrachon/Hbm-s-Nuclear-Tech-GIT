@@ -1,7 +1,10 @@
 package com.hbm.blocks.machine;
 
+import com.hbm.tileentity.conductor.TileEntityFFDuctBase;
+import com.hbm.tileentity.conductor.TileEntityFFFluidDuct;
 import com.hbm.tileentity.conductor.TileEntityFluidDuct;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
@@ -20,8 +23,8 @@ public class BlockFluidDuct extends BlockContainer {
 	
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
-		if(world.getTileEntity(x, y, z) instanceof TileEntityFluidDuct) {
-			TileEntityFluidDuct cable = (TileEntityFluidDuct)world.getTileEntity(x, y, z);
+		if(world.getTileEntity(x, y, z) instanceof TileEntityFFFluidDuct) {
+			TileEntityFFFluidDuct cable = (TileEntityFFFluidDuct)world.getTileEntity(x, y, z);
 
 		if(cable != null)
 		{
@@ -41,8 +44,8 @@ public class BlockFluidDuct extends BlockContainer {
 	
 	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
-		if(world.getTileEntity(x, y, z) instanceof TileEntityFluidDuct) {
-			TileEntityFluidDuct cable = (TileEntityFluidDuct)world.getTileEntity(x, y, z);
+		if(world.getTileEntity(x, y, z) instanceof TileEntityFFFluidDuct) {
+			TileEntityFFFluidDuct cable = (TileEntityFFFluidDuct)world.getTileEntity(x, y, z);
 
 		if(cable != null)
 		{
@@ -61,7 +64,7 @@ public class BlockFluidDuct extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
-		return new TileEntityFluidDuct();
+		return new TileEntityFFFluidDuct();
 	}
 	
 	@Override
@@ -77,6 +80,22 @@ public class BlockFluidDuct extends BlockContainer {
 	@Override
 	public boolean renderAsNormalBlock() {
 		return false;
+	}
+	
+	@Override
+	public void breakBlock(World world, int x, int y, int z, Block block, int whatever){
+		if(world.getTileEntity(x, y, z) != null && world.getTileEntity(x, y, z) instanceof TileEntityFFDuctBase) {
+			((TileEntityFFDuctBase)world.getTileEntity(x, y, z)).breakBlock();
+		}
+		super.breakBlock(world, x, y, z, block, whatever);
+		
+	}
+	
+	@Override
+	 public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {
+		if(world.getTileEntity(x, y, z) != null && world.getTileEntity(x, y, z) instanceof TileEntityFFDuctBase) {
+			((TileEntityFFDuctBase)world.getTileEntity(x, y, z)).onNeighborBlockChange();
+		}
 	}
 
 }

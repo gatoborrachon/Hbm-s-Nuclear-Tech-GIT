@@ -95,10 +95,12 @@ import com.hbm.items.tool.ItemDesingator;
 import com.hbm.items.tool.ItemDesingatorManual;
 import com.hbm.items.tool.ItemDesingatorRange;
 import com.hbm.items.tool.ItemDetonator;
+import com.hbm.items.tool.ItemFFFluidDuct;
 import com.hbm.items.tool.ItemFluidDuct;
 import com.hbm.items.tool.ItemFluidIcon;
 import com.hbm.items.tool.ItemFluidIdentifier;
 import com.hbm.items.tool.ItemFluidTank;
+import com.hbm.items.tool.ItemForgeFluidIdentifier;
 import com.hbm.items.tool.ItemGeigerCounter;
 import com.hbm.items.tool.ItemKey;
 import com.hbm.items.tool.ItemLaserDetonator;
@@ -942,9 +944,11 @@ public class ModItems {
 	public static Item chemistry_template;
 	public static Item chemistry_icon;
 	public static Item fluid_identifier;
+	public static Item forge_fluid_identifier;
 	public static Item fluid_icon;
 	public static Item siren_track;
 	public static Item fluid_duct;
+	public static Item ff_fluid_duct;
 
 	public static Item bobmazon_materials;
 	public static Item bobmazon_machines;
@@ -3262,6 +3266,7 @@ public class ModItems {
 		chemistry_template = new ItemChemistryTemplate().setUnlocalizedName("chemistry_template").setMaxStackSize(1).setCreativeTab(MainRegistry.templateTab).setTextureName(RefStrings.MODID + ":chemistry_template");
 		chemistry_icon = new ItemChemistryIcon().setUnlocalizedName("chemistry_icon").setMaxStackSize(1).setCreativeTab(null);
 		fluid_identifier = new ItemFluidIdentifier().setUnlocalizedName("fluid_identifier").setMaxStackSize(1).setCreativeTab(MainRegistry.templateTab).setTextureName(RefStrings.MODID + ":fluid_identifier");
+		forge_fluid_identifier = new ItemForgeFluidIdentifier().setUnlocalizedName("forge_fluid_identifier").setMaxStackSize(1).setCreativeTab(MainRegistry.templateTab).setTextureName(RefStrings.MODID + ":fluid_identifier");
 		fluid_icon = new ItemFluidIcon().setUnlocalizedName("fluid_icon").setCreativeTab(null).setTextureName(RefStrings.MODID + ":fluid_icon");
 		fluid_tank_full = new ItemFluidTank().setUnlocalizedName("fluid_tank_full").setContainerItem(ModItems.fluid_tank_empty).setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":fluid_tank");
 		fluid_tank_empty = new Item().setUnlocalizedName("fluid_tank_empty").setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":fluid_tank");
@@ -3270,6 +3275,7 @@ public class ModItems {
 		fluid_barrel_infinite = new Item().setUnlocalizedName("fluid_barrel_infinite").setMaxStackSize(1).setCreativeTab(MainRegistry.controlTab).setTextureName(RefStrings.MODID + ":fluid_barrel_infinite");
 		siren_track = new ItemCassette().setUnlocalizedName("siren_track").setMaxStackSize(1).setCreativeTab(MainRegistry.templateTab).setTextureName(RefStrings.MODID + ":cassette");
 		fluid_duct = new ItemFluidDuct().setUnlocalizedName("fluid_duct").setCreativeTab(MainRegistry.templateTab).setTextureName(RefStrings.MODID + ":duct");
+		ff_fluid_duct = new ItemFFFluidDuct().setUnlocalizedName("ff_fluid_duct").setCreativeTab(MainRegistry.templateTab).setTextureName(RefStrings.MODID + ":duct");
 
 		bobmazon_materials = new ItemCatalog().setUnlocalizedName("bobmazon_materials").setMaxStackSize(1).setCreativeTab(MainRegistry.templateTab).setTextureName(RefStrings.MODID + ":bobmazon_materials");
 		bobmazon_machines = new ItemCatalog().setUnlocalizedName("bobmazon_machines").setMaxStackSize(1).setCreativeTab(MainRegistry.templateTab).setTextureName(RefStrings.MODID + ":bobmazon_machines");
@@ -4196,8 +4202,10 @@ public class ModItems {
 		//Machine Templates
 		GameRegistry.registerItem(siren_track, siren_track.getUnlocalizedName());
 		GameRegistry.registerItem(fluid_identifier, fluid_identifier.getUnlocalizedName());
+		GameRegistry.registerItem(forge_fluid_identifier, forge_fluid_identifier.getUnlocalizedName());
 		GameRegistry.registerItem(fluid_icon, fluid_icon.getUnlocalizedName());
 		GameRegistry.registerItem(fluid_duct, fluid_duct.getUnlocalizedName());
+		GameRegistry.registerItem(ff_fluid_duct, ff_fluid_duct.getUnlocalizedName());
 		GameRegistry.registerItem(assembly_template, assembly_template.getUnlocalizedName());
 		GameRegistry.registerItem(chemistry_template, chemistry_template.getUnlocalizedName());
 		GameRegistry.registerItem(chemistry_icon, chemistry_icon.getUnlocalizedName());

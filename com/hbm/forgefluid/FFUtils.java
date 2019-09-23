@@ -1,21 +1,29 @@
 package com.hbm.forgefluid;
 
-import java.util.List;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 
-import com.hbm.blocks.ModBlocks;
-import com.hbm.handler.FluidTypeHandler.FluidType;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidDuct;
+import javax.imageio.ImageIO;
+
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+
 import com.hbm.interfaces.IFluidPipe;
-import com.hbm.interfaces.IFluidSource;
 import com.hbm.inventory.gui.GuiInfoContainer;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
@@ -25,10 +33,6 @@ import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
 public class FFUtils {
-	public int sendFluid(FluidStack fluid, boolean doFill, List<IFluidHandler> list) {
-		
-		return 0;
-	}
 	
 	public static void drawLiquid(FluidTank tank, int guiLeft, int guiTop,
 			float zLevel, int sizeX, int sizeY, int offsetX, int offsetY) {

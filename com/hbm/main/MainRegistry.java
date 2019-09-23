@@ -460,10 +460,10 @@ public class MainRegistry
 		GameRegistry.registerTileEntity(TileEntityMachineGasFlare.class, "tileentity_gasflare");
 		GameRegistry.registerTileEntity(TileEntityMachineRefinery.class, "tileentity_refinery");
 		GameRegistry.registerTileEntity(TileEntityOilDuct.class, "tileentity_oil_duct");
-		GameRegistry.registerTileEntity(TileEntityFFOilDuct.class, "tileentity_ff_oil_duct");
+	
 		GameRegistry.registerTileEntity(TileEntityOilDuctSolid.class, "tileentity_oil_duct_solid");
 		GameRegistry.registerTileEntity(TileEntityGasDuct.class, "tileentity_gas_duct");
-		GameRegistry.registerTileEntity(TileEntityFFGasDuct.class, "tileentity_ff_gas_duct");
+
 		GameRegistry.registerTileEntity(TileEntityGasDuctSolid.class, "tileentity_gas_duct_solid");
 		GameRegistry.registerTileEntity(TileEntityMachineRTG.class, "tileentity_machine_rtg");
 		GameRegistry.registerTileEntity(TileEntityPylonRedWire.class, "tileentity_pylon_redwire");
@@ -545,6 +545,12 @@ public class MainRegistry
 		GameRegistry.registerTileEntity(TileEntityMultiblock.class, "tileentity_multi_core");
 		GameRegistry.registerTileEntity(TileEntityChlorineSeal.class, "tileentity_chlorine_seal");
 		GameRegistry.registerTileEntity(TileEntityCableSwitch.class, "tileentity_he_switch");
+		//Forge fluid pipe tile entities.
+		GameRegistry.registerTileEntity(TileEntityFFOilDuct.class, "tileentity_ff_oil_duct");
+		GameRegistry.registerTileEntity(TileEntityFFGasDuct.class, "tileentity_ff_gas_duct");
+		GameRegistry.registerTileEntity(TileEntityFFOilDuctSolid.class, "tileentity_ff_oil_duct_solid");
+		GameRegistry.registerTileEntity(TileEntityFFGasDuctSolid.class, "tileentity_ff_gas_duct_solid");
+		GameRegistry.registerTileEntity(TileEntityFFFluidDuct.class, "tileentity_ff_fluid_duct");
 
 	    EntityRegistry.registerModEntity(EntityRocket.class, "entity_rocket", 0, this, 250, 1, true);
 	    EntityRegistry.registerModEntity(EntityNukeExplosion.class, "entity_nuke_explosion", 1, this, 250, 1, true);

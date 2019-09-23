@@ -1,5 +1,7 @@
 package com.hbm.tileentity.conductor;
 
-public class TileEntityFFFluidDuct {
+import net.minecraftforge.fluids.Fluid;
+
+public class TileEntityFFFluidDuct extends TileEntityFFDuctBase {
 
 }

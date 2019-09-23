@@ -2,6 +2,7 @@ package com.hbm.blocks.machine;
 
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.packet.TEFFPipeDestructorPacket;
+import com.hbm.tileentity.conductor.TileEntityFFDuctBase;
 import com.hbm.tileentity.conductor.TileEntityFFOilDuct;
 import com.hbm.tileentity.conductor.TileEntityOilDuct;
 
@@ -86,26 +87,25 @@ public class BlockOilDuct extends BlockContainer {
 	
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int whatever){
-		if(world.getTileEntity(x, y, z) != null && world.getTileEntity(x, y, z) instanceof TileEntityFFOilDuct) {
-			((TileEntityFFOilDuct)world.getTileEntity(x, y, z)).breakBlock();
+		if(world.getTileEntity(x, y, z) != null && world.getTileEntity(x, y, z) instanceof TileEntityFFDuctBase) {
+			((TileEntityFFDuctBase)world.getTileEntity(x, y, z)).breakBlock();
 		}
 		super.breakBlock(world, x, y, z, block, whatever);
 		
 	}
 	
-	
 	@Override
 	 public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {
-		if(world.getTileEntity(x, y, z) != null && world.getTileEntity(x, y, z) instanceof TileEntityFFOilDuct) {
-			((TileEntityFFOilDuct)world.getTileEntity(x, y, z)).onNeighborBlockChange();
+		if(world.getTileEntity(x, y, z) != null && world.getTileEntity(x, y, z) instanceof TileEntityFFDuctBase) {
+			((TileEntityFFDuctBase)world.getTileEntity(x, y, z)).onNeighborBlockChange();
 		}
 	}
 	
 	@Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int p_149727_6_, float p_149727_7_, float p_149727_8_, float p_149727_9_)
     {
-		if(!world.isRemote)
-			System.out.println(((TileEntityFFOilDuct)world.getTileEntity(x, y, z)).getNetwork());
+	//	if(!world.isRemote)
+	//		System.out.println(((TileEntityFFOilDuct)world.getTileEntity(x, y, z)).getNetwork());
         return false;
     }
 }

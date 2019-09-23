@@ -25,7 +25,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFluidHandler {
 
 	public ForgeDirection[] connections = new ForgeDirection[6];
-	public Fluid type;
+	public Fluid type = null;
 	public FFPipeNetwork network = null;
 	
 	public boolean isValidForForming = true;
@@ -37,10 +37,10 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 	
 	@Override
 	public void updateEntity(){
-		if(!worldObj.isRemote)
+		if(!worldObj.isRemote && type != null)
 			PacketDispatcher.wrapper.sendToAll(new TEFluidTypePacketTest(xCoord, yCoord, zCoord, type));
 		this.updateConnections();
-		if(firstUpdate){
+		if(firstUpdate && this.network == null){
 			this.getNetwork();
 			this.checkOtherNetworks();
 			this.network.addPipe(this);
@@ -76,7 +76,8 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 	
 	@Override
 	public void setType(Fluid fluid) {
-		this.type = ModForgeFluids.oil;
+		this.type = fluid;
+		this.typeChanged();
 	}
 
 	public FFPipeNetwork createNewNetwork() {
@@ -106,19 +107,19 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 	
 
 	public void checkOtherNetworks() {
-
 		List<FFPipeNetwork> list = new ArrayList<FFPipeNetwork>();
+		list.add(this.getNetworkTrue());
 		TileEntity te;
 		FFPipeNetwork largeNet = null;
 		for (int i = 0; i < 6; i++) {
 			te = FFPipeNetwork.getTileEntityAround(this, i);
-			if (te instanceof IFluidPipe && ((IFluidPipe) te).getNetwork() != null && ((IFluidPipe) te).getNetwork().getType() == this.getType()) {
-				if (!list.contains(((IFluidPipe) te).getNetwork())) {
-					list.add(((IFluidPipe) te).getNetwork());
+			if (te instanceof IFluidPipe && ((IFluidPipe) te).getNetworkTrue() != null && ((IFluidPipe) te).getNetworkTrue().getType() == this.getType()) {
+				if (!list.contains(((IFluidPipe) te).getNetworkTrue())) {
+					list.add(((IFluidPipe) te).getNetworkTrue());
 					if (largeNet == null
-							|| ((IFluidPipe) te).getNetwork().getSize() > largeNet
+							|| ((IFluidPipe) te).getNetworkTrue().getSize() > largeNet
 									.getSize())
-						largeNet = ((IFluidPipe) te).getNetwork();
+						largeNet = ((IFluidPipe) te).getNetworkTrue();
 				}
 			}
 		}
@@ -128,6 +129,7 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 			}
 			this.network = largeNet;
 		} else {
+			this.getNetwork().Destroy();
 			this.network = this.createNewNetwork();
 		}
 	}
@@ -137,16 +139,17 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
     {
 		super.readFromNBT(nbt);
 		type = FluidRegistry.getFluid(nbt.getInteger("FluidType"));
-		if(this.network == null) {
-			FFPipeNetwork.buildNewNetwork(this);
-		}
+		//if(this.network == null) {
+		//	FFPipeNetwork.buildNewNetwork(this);
+		//}
     }
 
     @Override
 	public void writeToNBT(NBTTagCompound nbt)
     {
 		super.writeToNBT(nbt);
-		nbt.setInteger("FluidType", this.type.getID());
+		if(this.type != null)
+			nbt.setInteger("FluidType", this.type.getID());
     }
     
 	@Override
@@ -158,8 +161,20 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 	
 	@Override
 	public void breakBlock() {
+	//	if(!this.worldObj.isRemote)
+		//	PacketDispatcher.wrapper.sendToAll(new TEFFPipeDestructorPacket(this.xCoord, this.yCoord, this.zCoord));
 		this.getNetwork().Destroy();
 		this.isValidForForming = false;
+		for(int i = 0; i < 6; i++){
+			TileEntity ent = FFPipeNetwork.getTileEntityAround(this, i);
+			if(ent != null && ent instanceof IFluidPipe){
+				FFPipeNetwork.buildNewNetwork(ent);
+			}
+		}
+	}
+	
+	public void typeChanged(){
+		this.getNetwork().Destroy();
 		for(int i = 0; i < 6; i++){
 			TileEntity ent = FFPipeNetwork.getTileEntityAround(this, i);
 			if(ent != null && ent instanceof IFluidPipe){

@@ -437,6 +437,7 @@ container.chemplant=Chemical Plant
 tile.fluid_duct.name=Universal Fluid Duct
 tile.machine_fluidtank.name=Tank
 item.fluid_duct.name=Fluid Duct:
+item.ff_fluid_duct.name=Fluid Duck:
 container.fluidtank=Tank
 tile.machine_turbofan.name=Turbofan
 container.machineTurbofan=Turbofan
@@ -553,6 +554,7 @@ tile.dfc_injector.name=[WIP]
 
 item.template_folder.name=Machine Template Folder
 item.fluid_identifier.name=Fluid Identifier
+item.forge_fluid_identifier.name=Fluid Identifier
 item.assembly_template.name=Assembly Template:
 item.chemistry_template.name=Chemistry Template:
 item.siren_track.name=Siren Track

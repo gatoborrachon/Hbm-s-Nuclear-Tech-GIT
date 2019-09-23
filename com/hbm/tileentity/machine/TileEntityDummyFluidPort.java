@@ -18,37 +18,49 @@ public class TileEntityDummyFluidPort extends TileEntityDummy implements IFluidH
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
 		tetarget = (TileEntityMachineFluidTank) worldObj.getTileEntity(targetX, targetY, targetZ);
-		return tetarget.fill(from, resource, doFill);
+		if(tetarget != null)
+			return tetarget.fill(from, resource, doFill);
+		return 0;
 	}
 
 	@Override
 	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
 		tetarget = (TileEntityMachineFluidTank) worldObj.getTileEntity(targetX, targetY, targetZ);
-		return tetarget.drain(from, resource, doDrain);
+		if(tetarget != null)
+			return tetarget.drain(from, resource, doDrain);
+		return null;
 	}
 
 	@Override
 	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
 		tetarget = (TileEntityMachineFluidTank) worldObj.getTileEntity(targetX, targetY, targetZ);
-		return tetarget.drain(from, maxDrain, doDrain);
+		if(tetarget != null)
+			return tetarget.drain(from, maxDrain, doDrain);
+		return null;
 	}
 
 	@Override
 	public boolean canFill(ForgeDirection from, Fluid fluid) {
 		tetarget = (TileEntityMachineFluidTank) worldObj.getTileEntity(targetX, targetY, targetZ);
-		return tetarget.canFill(from, fluid);
+		if(tetarget != null )
+			return tetarget.canFill(from, fluid);
+		return false;
 	}
 
 	@Override
 	public boolean canDrain(ForgeDirection from, Fluid fluid) {
 		tetarget = (TileEntityMachineFluidTank) worldObj.getTileEntity(targetX, targetY, targetZ);
-		return tetarget.canDrain(from, fluid);
+		if(tetarget != null)
+			return tetarget.canDrain(from, fluid);
+		return false;
 	}
 
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
 		tetarget = (TileEntityMachineFluidTank) worldObj.getTileEntity(targetX, targetY, targetZ);
-		return tetarget.getTankInfo(from);
+		if(tetarget != null)
+			return tetarget.getTankInfo(from);
+		return null;
 	}
 	
 	@Override
