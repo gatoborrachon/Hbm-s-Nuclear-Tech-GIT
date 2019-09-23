@@ -358,7 +358,7 @@ public class MainRegistry
 		
 		ModBlocks.mainRegistry();
 		ModItems.mainRegistry();
-		CraftingManager.mainRegistry();
+		ModForgeFluids.PreInit();
 		proxy.registerRenderInfo();
 		HbmWorld.mainRegistry();
 		GameRegistry.registerFuelHandler(new FuelHandler());
@@ -701,7 +701,7 @@ public class MainRegistry
 	    EntityRegistry.registerGlobalEntityID(EntityHunterChopper.class, "entity_mob_hunter_chopper", EntityRegistry.findGlobalUniqueEntityId(), 0x000020, 0x2D2D72);
 	    EntityRegistry.registerGlobalEntityID(EntityCyberCrab.class, "entity_cyber_crab", EntityRegistry.findGlobalUniqueEntityId(), 0xAAAAAA, 0x444444);
 	
-	    ModForgeFluids.PreInit();
+	   
 	    
 		ForgeChunkManager.setForcedChunkLoadingCallback(this, new LoadingCallback() {
 			
@@ -1288,6 +1288,8 @@ public class MainRegistry
 	@EventHandler
 	public static void PostLoad(FMLPostInitializationEvent PostEvent)
 	{
+		CraftingManager.mainRegistry();
+		
 		ShredderRecipe recipes = new MachineRecipes().new ShredderRecipe();
 		
 		recipes.registerEverythingImSrs();

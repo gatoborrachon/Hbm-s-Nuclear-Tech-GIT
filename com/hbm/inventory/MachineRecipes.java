@@ -4915,7 +4915,7 @@ public class MachineRecipes {
 				in.stackTagCompound = new NBTTagCompound();
 				in.stackTagCompound.setInteger("fill", (Integer) outs[2]);
 				
-				ItemStack out = new ItemStack(ModItems.fluid_icon, 1, ((FluidType)outs[0]).getID());
+				ItemStack out = new ItemStack(ModItems.fluid_icon, 1, ((Fluid)outs[0]).getID());
 				out.stackTagCompound = new NBTTagCompound();
 				out.stackTagCompound.setInteger("fill", (Integer) outs[1]);
 				
