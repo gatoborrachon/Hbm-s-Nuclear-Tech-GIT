@@ -3,6 +3,7 @@ package com.hbm.inventory.gui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.lwjgl.opengl.GL11;
 
@@ -14,6 +15,7 @@ import com.hbm.items.tool.ItemCassette;
 import com.hbm.items.tool.ItemCassette.TrackType;
 import com.hbm.items.tool.ItemChemistryTemplate;
 import com.hbm.items.tool.ItemFluidIdentifier;
+import com.hbm.items.tool.ItemForgeFluidIdentifier;
 import com.hbm.lib.RefStrings;
 import com.hbm.packet.ItemFolderPacket;
 import com.hbm.packet.PacketDispatcher;
@@ -29,6 +31,8 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 
 public class GUIScreenTemplateFolder extends GuiScreen {
 	
@@ -57,8 +61,8 @@ public class GUIScreenTemplateFolder extends GuiScreen {
     	for(int i = 1; i < ItemCassette.TrackType.values().length; i++)
     		stacks.add(new ItemStack(ModItems.siren_track, 1, i));
     	//Fluid IDs
-    	for(int i = 1; i < FluidType.values().length; i++)
-    		stacks.add(new ItemStack(ModItems.fluid_identifier, 1, i));
+    	for(Entry<Fluid, Integer> entry : FluidRegistry.getRegisteredFluidIDsByFluid().entrySet())
+    		stacks.add(new ItemStack(ModItems.forge_fluid_identifier, 1, entry.getValue()));
     	//Assembly Templates
     	for(int i = 0; i < EnumAssemblyTemplate.values().length; i++)
     		stacks.add(new ItemStack(ModItems.assembly_template, 1, i));
@@ -213,8 +217,8 @@ public class GUIScreenTemplateFolder extends GuiScreen {
 			
 			String s = info;
 			if(stack != null) {
-				if(stack.getItem() instanceof ItemFluidIdentifier)
-					s += (": " + I18n.format(FluidType.getEnum(stack.getItemDamage()).getUnlocalizedName()));
+				if(stack.getItem() instanceof ItemForgeFluidIdentifier)
+					s += (": " + I18n.format(FluidRegistry.getFluid(stack.getItemDamage()).getUnlocalizedName()));
 				else if(stack.getItem() instanceof ItemCassette)
 					s = TrackType.getEnum(stack.getItemDamage()).getTrackTitle();
 			}

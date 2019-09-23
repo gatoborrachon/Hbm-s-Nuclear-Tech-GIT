@@ -139,12 +139,7 @@ public class FFUtils {
 				&& y + height >= mouseY) {
 			if (fluidTank.getFluid() != null) {
 				gui.drawFluidInfo(
-						new String[] {
-								I18n.format(fluidTank.getFluid().getFluid()
-										.getUnlocalizedName()),
-								fluidTank.getFluidAmount() + "/"
-										+ fluidTank.getCapacity() + "mB" },
-						mouseX, mouseY);
+						new String[] {I18n.format(fluidTank.getFluid().getFluid().getUnlocalizedName()), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
 			} else {
 				gui.drawFluidInfo(new String[] {I18n.format("None"), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
 			}
@@ -161,11 +156,6 @@ public class FFUtils {
 			return true;
 		}
 		return false;
-	}
-	
-	public static Slot[] transferFluidToItem(){
-		
-		return null;
 	}
 
 	/**

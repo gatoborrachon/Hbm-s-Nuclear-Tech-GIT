@@ -7,6 +7,7 @@ import com.hbm.items.tool.ItemAssemblyTemplate;
 import com.hbm.items.tool.ItemCassette;
 import com.hbm.items.tool.ItemChemistryTemplate;
 import com.hbm.items.tool.ItemFluidIdentifier;
+import com.hbm.items.tool.ItemForgeFluidIdentifier;
 import com.hbm.tileentity.machine.TileEntityMachineAssembler;
 
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
@@ -62,7 +63,7 @@ public class ItemFolderPacket implements IMessage {
 						return null;
 					}
 
-					if(stack.getItem() instanceof ItemFluidIdentifier) {
+					if(stack.getItem() instanceof ItemForgeFluidIdentifier) {
 						if(p.inventory.hasItem(ModItems.plate_iron) && p.inventory.hasItem(Items.dye)) {
 							p.inventory.consumeInventoryItem(ModItems.plate_iron);
 							p.inventory.consumeInventoryItem(Items.dye);
