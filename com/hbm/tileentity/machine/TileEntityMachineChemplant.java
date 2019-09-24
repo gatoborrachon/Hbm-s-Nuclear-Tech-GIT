@@ -535,10 +535,10 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 			FluidStack[] inputs = MachineRecipes.getFluidInputFromTempate(slots[4]);
 			FluidStack[] outputs = MachineRecipes.getFluidOutputFromTempate(slots[4]);
 
-			tanks[0].setTankType(inputs[0] == null ? FluidType.NONE : inputs[0].type);
-			tanks[1].setTankType(inputs[1] == null ? FluidType.NONE : inputs[1].type);
-			tanks[2].setTankType(outputs[0] == null ? FluidType.NONE : outputs[0].type);
-			tanks[3].setTankType(outputs[1] == null ? FluidType.NONE : outputs[1].type);
+			tanks[0].setFluid(inputs[0] == null ? null : inputs[0]);
+			tanks[1].setFluid(inputs[1] == null ? null : inputs[1]);
+			tanks[2].setFluid(outputs[0] == null ? null : outputs[0]);
+			tanks[3].setFluid(outputs[1] == null ? null : outputs[1]);
 		}
 	}
 	
@@ -546,8 +546,8 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		if(Library.isArrayEmpty(fluids))
 			return true;
 		
-		if((fluids[0] == null || fluids[0] != null && tanks[0].drain(fluids[0].amount, false) != null && tanks[0].drain(fluids[0].amount, false).amount <= 0) && 
-				(fluids[1] == null || fluids[1] != null && fluids[1].fill <= tanks[1].getFill()))
+		if((fluids[0] == null || fluids[0] != null && fluids[0].amount <= tanks[0].getFluidAmount()) && 
+				(fluids[1] == null || fluids[1] != null && fluids[1].amount <= tanks[1].getFluidAmount()))
 			return true;
 		
 		return false;
