@@ -224,39 +224,19 @@ public class TileEntityMachineFluidTank extends TileEntity implements ISidedInve
 
 
 	private void fillFluidInit() {
+		boolean update = false || needsUpdate;
+		
 		if (tank.getFluid() != null) {
-			fillFluid(this.xCoord + 2, this.yCoord, this.zCoord - 1);
-			fillFluid(this.xCoord + 2, this.yCoord, this.zCoord + 1);
-			fillFluid(this.xCoord - 2, this.yCoord, this.zCoord - 1);
-			fillFluid(this.xCoord - 2, this.yCoord, this.zCoord + 1);
-			fillFluid(this.xCoord - 1, this.yCoord, this.zCoord + 2);
-			fillFluid(this.xCoord + 1, this.yCoord, this.zCoord + 2);
-			fillFluid(this.xCoord - 1, this.yCoord, this.zCoord - 2);
-			fillFluid(this.xCoord + 1, this.yCoord, this.zCoord - 2);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord - 1, 6000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord + 1, 6000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord - 1, 6000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord + 1, 6000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord + 2, 6000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord + 2, 6000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord - 2, 6000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord - 2, 6000);
 		}
-
-	}
-
-	private void fillFluid(int i, int j, int k) {
-		if (tank.getFluidAmount() <= 0) {
-			return;
-		}
-
-		TileEntity te = this.worldObj.getTileEntity(i, j, k);
-
-		if (te != null && te instanceof IFluidHandler) {
-			if (te instanceof TileEntityDummy) {
-				TileEntityDummy ted = (TileEntityDummy) te;
-				if (this.worldObj.getTileEntity(ted.targetX, ted.targetY, ted.targetZ) == this) {
-					return;
-				}
-			}
-			IFluidHandler tef = (IFluidHandler) te;
-			tank.drain(tef.fill(ForgeDirection.VALID_DIRECTIONS[1],
-					new FluidStack(tank.getFluid(), Math.min(6000, tank.getFluidAmount())), true), true);
-			needsUpdate = true;
-		}
-
+		needsUpdate = update;
 	}
 
 	public boolean dna() {

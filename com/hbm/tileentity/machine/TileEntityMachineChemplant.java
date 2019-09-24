@@ -5,13 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.hbm.entity.particle.EntityGasFlameFX;
-import com.hbm.handler.FluidTypeHandler.FluidType;
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
-import com.hbm.interfaces.IFluidSource;
-import com.hbm.inventory.FluidStack;
-import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.MachineRecipes;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemBattery;
@@ -38,9 +33,15 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class TileEntityMachineChemplant extends TileEntity implements ISidedInventory, IConsumer, IFluidContainer, IFluidAcceptor, IFluidSource {
+public class TileEntityMachineChemplant extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler {
 
 	private ItemStack slots[];
 
@@ -49,12 +50,11 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 	public int progress;
 	public int maxProgress = 100;
 	public boolean isProgressing;
+	public boolean needsUpdate = false;
 	int age = 0;
 	int consumption = 100;
 	int speed = 100;
 	public FluidTank[] tanks;
-	public List<IFluidAcceptor> list1 = new ArrayList();
-	public List<IFluidAcceptor> list2 = new ArrayList();
 	
 	Random rand = new Random();
 	
@@ -63,10 +63,10 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 	public TileEntityMachineChemplant() {
 		slots = new ItemStack[21];
 		tanks = new FluidTank[4];
-		tanks[0] = new FluidTank(FluidType.NONE, 16000, 0);
-		tanks[1] = new FluidTank(FluidType.NONE, 16000, 1);
-		tanks[2] = new FluidTank(FluidType.NONE, 16000, 2);
-		tanks[3] = new FluidTank(FluidType.NONE, 16000, 3);
+		tanks[0] = new FluidTank(1600);
+		tanks[1] = new FluidTank(1600);
+		tanks[2] = new FluidTank(1600);
+		tanks[3] = new FluidTank(1600);
 	}
 
 	@Override
@@ -926,77 +926,73 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 			return 0;
 	}
 
-	@Override
-	public void fillFluidInit(FluidType type) {
+	public void fillFluidInit(FluidTank tank) {
 		int meta = worldObj.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord);
+		boolean update = false || needsUpdate;
 		if(meta == 5) {
-			fillFluid(this.xCoord - 2, this.yCoord, this.zCoord, getTact(), type);
-			fillFluid(this.xCoord - 2, this.yCoord, this.zCoord + 1, getTact(), type);
-			fillFluid(this.xCoord + 3, this.yCoord, this.zCoord, getTact(), type);
-			fillFluid(this.xCoord + 3, this.yCoord, this.zCoord + 1, getTact(), type);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord, 2000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord + 1, 2000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 3, this.yCoord, this.zCoord, 2000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 3, this.yCoord, this.zCoord + 1, 2000);
 		}
 		
 		if(meta == 3) {
-			fillFluid(this.xCoord, this.yCoord, this.zCoord - 2, getTact(), type);
-			fillFluid(this.xCoord - 1, this.yCoord, this.zCoord - 2, getTact(), type);
-			fillFluid(this.xCoord, this.yCoord, this.zCoord + 3, getTact(), type);
-			fillFluid(this.xCoord - 1, this.yCoord, this.zCoord + 3, getTact(), type);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord - 2, 2000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord - 2, 2000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord + 3, 2000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord + 3, 2000);
 		}
 		
 		if(meta == 2) {
-			fillFluid(this.xCoord, this.yCoord, this.zCoord + 2, getTact(), type);
-			fillFluid(this.xCoord + 1, this.yCoord, this.zCoord + 2, getTact(), type);
-			fillFluid(this.xCoord, this.yCoord, this.zCoord - 3, getTact(), type);
-			fillFluid(this.xCoord + 1, this.yCoord, this.zCoord - 3, getTact(), type);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord + 2, 2000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord + 2, 2000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord - 3, 2000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord - 3, 2000);
 		}
 		
 		if(meta == 4) {
-			fillFluid(this.xCoord + 2, this.yCoord, this.zCoord, getTact(), type);
-			fillFluid(this.xCoord + 2, this.yCoord, this.zCoord - 1, getTact(), type);
-			fillFluid(this.xCoord - 3, this.yCoord, this.zCoord, getTact(), type);
-			fillFluid(this.xCoord - 3, this.yCoord, this.zCoord - 1, getTact(), type);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord, 2000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord - 1, 2000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 3, this.yCoord, this.zCoord, 2000);
+			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 3, this.yCoord, this.zCoord - 1, 2000);
 		}
 	}
 
 	@Override
-	public void fillFluid(int x, int y, int z, boolean newTact, FluidType type) {
-		Library.transmitFluid(x, y, z, newTact, this, worldObj, type);
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
-	public boolean getTact() {
-		if (age >= 0 && age < 10) {
-			return true;
-		}
+	public FluidStack drain(ForgeDirection from, FluidStack resource,
+			boolean doDrain) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public List<IFluidAcceptor> getFluidList(FluidType type) {
-		if(type.name().equals(tanks[2].getTankType().name()))
-			return list1;
-		if(type.name().equals(tanks[3].getTankType().name()))
-			return list2;
-		return new ArrayList<IFluidAcceptor>();
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public void clearFluidList(FluidType type) {
-		if(type.name().equals(tanks[2].getTankType().name()))
-			list1.clear();
-		if(type.name().equals(tanks[3].getTankType().name()))
-			list2.clear();
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tanks[0]);
-		list.add(tanks[1]);
-		list.add(tanks[2]);
-		list.add(tanks[3]);
-		
-		return list;
-	}
 }

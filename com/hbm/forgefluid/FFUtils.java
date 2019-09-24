@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.hbm.interfaces.IFluidPipe;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.tileentity.machine.TileEntityDummy;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
@@ -25,6 +26,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -153,6 +155,39 @@ public class FFUtils {
 			return true;
 		if(tileentity != null && !(tileentity instanceof IFluidPipe) && tileentity instanceof IFluidHandler)
 		{
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Replacement method for the old method of transferring fluids out of a machine
+	 * @param tileEntity - the tile entity it is filling from
+	 * @param tank - the fluid tank to fill from
+	 * @param world - the world the filling is taking place in
+	 * @param i - x coord of place to fill
+	 * @param j - y coord of place to fill
+	 * @param k - z coord of place to fill
+	 * @param maxDrain - the maximum amount that can be drained from the tank at a time
+	 * @return Whether something was actually filled or not, or whether it needs an update
+	 */
+	public static boolean fillFluid(TileEntity tileEntity,FluidTank tank, World world, int i, int j, int k, int maxDrain) {
+		if (tank.getFluidAmount() <= 0 || tank.getFluid() == null) {
+			return false;
+		}
+
+		TileEntity te = world.getTileEntity(i, j, k);
+
+		if (te != null && te instanceof IFluidHandler) {
+			if (te instanceof TileEntityDummy) {
+				TileEntityDummy ted = (TileEntityDummy) te;
+				if (world.getTileEntity(ted.targetX, ted.targetY, ted.targetZ) == tileEntity) {
+					return false;
+				}
+			}
+			IFluidHandler tef = (IFluidHandler) te;
+			tank.drain(tef.fill(ForgeDirection.UNKNOWN,
+					new FluidStack(tank.getFluid(), Math.min(maxDrain, tank.getFluidAmount())), true), true);
 			return true;
 		}
 		return false;
