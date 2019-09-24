@@ -177,10 +177,10 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		this.power = nbt.getLong("powerTime");
 		slots = new ItemStack[getSizeInventory()];
 
-		tanks[0].readFromNBT(nbt, "input1");
-		tanks[1].readFromNBT(nbt, "input2");
-		tanks[2].readFromNBT(nbt, "output1");
-		tanks[3].readFromNBT(nbt, "output2");
+		tanks[0].readFromNBT((NBTTagCompound) nbt.getTag("input1"));
+		tanks[1].readFromNBT((NBTTagCompound) nbt.getTag("input2"));
+		tanks[2].readFromNBT((NBTTagCompound) nbt.getTag("output1"));
+		tanks[3].readFromNBT((NBTTagCompound) nbt.getTag("output2"));
 		
 		for(int i = 0; i < list.tagCount(); i++)
 		{
@@ -199,10 +199,20 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		nbt.setLong("powerTime", power);
 		NBTTagList list = new NBTTagList();
 
-		tanks[0].writeToNBT(nbt, "input1");
-		tanks[1].writeToNBT(nbt, "input2");
-		tanks[2].writeToNBT(nbt, "output1");
-		tanks[3].writeToNBT(nbt, "output2");
+		NBTTagCompound input1 = new NBTTagCompound();
+		NBTTagCompound input2 = new NBTTagCompound();
+		NBTTagCompound output1 = new NBTTagCompound();
+		NBTTagCompound output2 = new NBTTagCompound();
+		
+		tanks[0].writeToNBT(input1);
+		tanks[1].writeToNBT(input2);
+		tanks[2].writeToNBT(output1);
+		tanks[3].writeToNBT(output2);
+		
+		nbt.setTag("input1", input1);
+		nbt.setTag("input2", input2);
+		nbt.setTag("output1", output1);
+		nbt.setTag("output2", output2);
 		
 		for(int i = 0; i < slots.length; i++)
 		{
@@ -296,22 +306,19 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 			}
 			
 			if(age == 9 || age == 19) {
-				fillFluidInit(tanks[2].getTankType());
-				fillFluidInit(tanks[3].getTankType());
+				fillFluidInit(tanks[2]);
+				fillFluidInit(tanks[3]);
 			}
 			
 			setContainers();
 			
 			power = Library.chargeTEFromItems(slots, 0, power, maxPower);
 			
-			tanks[0].loadTank(17, 19, slots);
-			tanks[1].loadTank(18, 20, slots);
-			tanks[2].unloadTank(9, 11, slots);
-			tanks[3].unloadTank(10, 12, slots);
+			FFUtils.fillFromFluidContainer(slots, tanks[0], 17, 19);
+			FFUtils.fillFromFluidContainer(slots, tanks[1], 18, 20);
+			FFUtils.fillFluidContainer(slots, tanks[2], 9, 11);
+			FFUtils.fillFluidContainer(slots, tanks[3], 10, 12);
 			
-			for(int i = 0; i < 4; i++) {
-				tanks[i].updateTank(xCoord, yCoord, zCoord);
-			}
 
 			FluidStack[] inputs = MachineRecipes.getFluidInputFromTempate(slots[4]);
 			FluidStack[] outputs = MachineRecipes.getFluidOutputFromTempate(slots[4]);
@@ -539,7 +546,7 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		if(Library.isArrayEmpty(fluids))
 			return true;
 		
-		if((fluids[0] == null || fluids[0] != null && fluids[0].fill <= tanks[0].getFill()) && 
+		if((fluids[0] == null || fluids[0] != null && tanks[0].drain(fluids[0].amount, false) != null && tanks[0].drain(fluids[0].amount, false).amount <= 0) && 
 				(fluids[1] == null || fluids[1] != null && fluids[1].fill <= tanks[1].getFill()))
 			return true;
 		
@@ -550,8 +557,8 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		if(Library.isArrayEmpty(fluids))
 			return true;
 		
-		if((fluids[0] == null || fluids[0] != null && tanks[2].getFill() + fluids[0].fill <= tanks[2].getMaxFill()) && 
-				(fluids[1] == null || fluids[1] != null && tanks[3].getFill() + fluids[1].fill <= tanks[3].getMaxFill()))
+		if(((fluids[0] == null || fluids[0] != null && tanks[2].fill(fluids[0], false) <= 0) && 
+				(fluids[1] == null || fluids[1] != null && tanks[3].fill(fluids[1], false) <= 0)))
 			return true;
 		
 		return false;
@@ -562,9 +569,9 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 			return;
 
 		if(fluids[0] != null)
-			tanks[0].setFill(tanks[0].getFill() - fluids[0].fill);
+			tanks[0].drain(fluids[0].amount, true);
 		if(fluids[1] != null)
-			tanks[1].setFill(tanks[1].getFill() - fluids[1].fill);
+			tanks[1].drain(fluids[1].amount, true);
 	}
 	
 	public boolean hasSpaceForItems(ItemStack[] stacks) {
@@ -631,9 +638,9 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 	
 	public void addFluids(FluidStack[] stacks) {
 		if(stacks[0] != null)
-			tanks[2].setFill(tanks[2].getFill() + stacks[0].fill);
+			tanks[2].fill(stacks[1], true);
 		if(stacks[1] != null)
-			tanks[3].setFill(tanks[3].getFill() + stacks[1].fill);
+			tanks[3].fill(stacks[1], true);
 	}
 	
 	//I can't believe that worked.
@@ -876,54 +883,6 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 	public double getMaxRenderDistanceSquared()
 	{
 		return 65536.0D;
-	}
-
-	@Override
-	public void setFillstate(int fill, int index) {
-		if(index < 4 && tanks[index] != null)
-			tanks[index].setFill(fill);
-	}
-
-	@Override
-	public void setType(FluidType type, int index) {
-		if(index < 4 && tanks[index] != null)
-			tanks[index].setTankType(type);
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			tanks[0].setFill(i);
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			tanks[1].setFill(i);
-		else if(type.name().equals(tanks[2].getTankType().name()))
-			tanks[2].setFill(i);
-		else if(type.name().equals(tanks[3].getTankType().name()))
-			tanks[3].setFill(i);
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getFill();
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getFill();
-		else if(type.name().equals(tanks[2].getTankType().name()))
-			return tanks[2].getFill();
-		else if(type.name().equals(tanks[3].getTankType().name()))
-			return tanks[3].getFill();
-		
-		return 0;
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getMaxFill();
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getMaxFill();
-		else
-			return 0;
 	}
 
 	public void fillFluidInit(FluidTank tank) {
