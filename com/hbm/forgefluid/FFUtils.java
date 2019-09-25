@@ -25,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -141,7 +142,7 @@ public class FFUtils {
 				&& y + height >= mouseY) {
 			if (fluidTank.getFluid() != null) {
 				gui.drawFluidInfo(
-						new String[] {I18n.format(fluidTank.getFluid().getFluid().getUnlocalizedName()), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
+						new String[] {"" + (StatCollector.translateToLocal(fluidTank.getFluid().getFluid().getUnlocalizedName())).trim(), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
 			} else {
 				gui.drawFluidInfo(new String[] {I18n.format("None"), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
 			}
@@ -154,7 +155,7 @@ public class FFUtils {
 				&& y + height >= mouseY) {
 			if (fluid != null) {
 				gui.drawFluidInfo(
-						new String[] {fluid.getUnlocalizedName(), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
+						new String[] {"" + (StatCollector.translateToLocal(fluid.getUnlocalizedName())).trim(), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
 			} else {
 				gui.drawFluidInfo(new String[] {I18n.format("None"), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
 			}
