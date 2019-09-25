@@ -2,8 +2,6 @@ package com.hbm.items.tool;
 
 import java.util.List;
 
-import com.hbm.handler.FluidTypeHandler.FluidType;
-import com.hbm.inventory.FluidStack;
 import com.hbm.inventory.MachineRecipes;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -13,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
+import net.minecraftforge.fluids.FluidStack;
 
 public class ItemChemistryTemplate extends Item {
 	
@@ -278,7 +277,7 @@ public class ItemChemistryTemplate extends Item {
     		
     		for(int i = 0; i < 2; i++)
     			if(outF[i] != null)
-    				list.add(outF[i].fill + "mB " + I18n.format(outF[i].type.getUnlocalizedName()));
+    				list.add(outF[i].amount + "mB " + I18n.format(outF[i].getFluid().getUnlocalizedName()));
     		
     		list.add("Inputs:");
     		
@@ -288,7 +287,7 @@ public class ItemChemistryTemplate extends Item {
     		
     		for(int i = 0; i < 2; i++)
     			if(inF[i] != null)
-    				list.add(inF[i].fill + "mB " + I18n.format(inF[i].type.getUnlocalizedName()));
+    				list.add(inF[i].amount + "mB " + I18n.format(inF[i].getFluid().getUnlocalizedName()));
     		
     		list.add("Production time:");
         	list.add(Math.floor((float)(getProcessTime(stack)) / 20 * 100) / 100 + " seconds");

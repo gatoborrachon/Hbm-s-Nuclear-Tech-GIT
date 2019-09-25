@@ -38,7 +38,7 @@ public class GUIMachineBoiler extends GuiInfoContainer {
 		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 62,
 				guiTop + 69 - 52, 16, 52, diFurnace.tanks[0]);
 
- FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 69 - 52, 16, 52, diFurnace.tanks[1]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 69 - 52, 16, 52, diFurnace.tanks[1]);
 
 		this.drawCustomInfoStat(
 				mouseX,
@@ -126,8 +126,7 @@ public class GUIMachineBoiler extends GuiInfoContainer {
 			this.drawInfoPanel(guiLeft - 16, guiTop + 36 + 32, 16, 16, 6);
 		}*/
 
-		Minecraft.getMinecraft().getTextureManager()
-				.bindTexture(TextureMap.locationBlocksTexture);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 		// diFurnace.tanks[0].renderTank(this, guiLeft + 62, guiTop + 69,
 		// diFurnace.tanks[0].getTankType().textureX() * FluidTank.x,
 		// diFurnace.tanks[0].getTankType().textureY() * FluidTank.y, 16, 52);
@@ -136,11 +135,9 @@ public class GUIMachineBoiler extends GuiInfoContainer {
 		
 
 		//sizeX and sizeY doesn't do anything, no need for it.
-		FFUtils.drawLiquid(diFurnace.tanks[0], guiLeft, guiTop, this.zLevel,
-				16, 32, 62, 69);
+		FFUtils.drawLiquid(diFurnace.tanks[0], guiLeft, guiTop, this.zLevel, 16, 32, 62, 69);
 
-		FFUtils.drawLiquid(diFurnace.tanks[1], guiLeft, guiTop, this.zLevel,
-				16, 32, 134, 69);
+		FFUtils.drawLiquid(diFurnace.tanks[1], guiLeft, guiTop, this.zLevel, 16, 32, 134, 69);
 		// Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tanks[1].getSheet());
 		// diFurnace.tanks[1].renderTank(this, guiLeft + 134, guiTop + 69,
 		// diFurnace.tanks[1].getTankType().textureX() * FluidTank.x,

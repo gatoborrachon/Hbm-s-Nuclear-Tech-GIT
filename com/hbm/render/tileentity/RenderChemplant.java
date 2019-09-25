@@ -98,7 +98,7 @@ public class RenderChemplant extends TileEntitySpecialRenderer {
         GL11.glPushMatrix();
 		GL11.glTranslated(-0.625, 0, 0.625);
 		
-		if(!chem.tanks[0].getTankType().name().equals(FluidType.NONE.name()) && chem.isProgressing)
+		if(chem.tanks[0].getFluid() != null && chem.isProgressing)
 			GL11.glRotatef(-rotation, 0F, 1F, 0F);
 		else
 			GL11.glRotatef(-45, 0F, 1F, 0F);
@@ -109,7 +109,7 @@ public class RenderChemplant extends TileEntitySpecialRenderer {
         GL11.glPushMatrix();
 		GL11.glTranslated(0.625, 0, 0.625);
 		
-		if(!chem.tanks[1].getTankType().name().equals(FluidType.NONE.name()) && chem.isProgressing)
+		if(chem.tanks[1].getFluid() != null && chem.isProgressing)
 			GL11.glRotatef(rotation, 0F, 1F, 0F);
 		else
 			GL11.glRotatef(45, 0F, 1F, 0F);
@@ -132,10 +132,16 @@ public class RenderChemplant extends TileEntitySpecialRenderer {
         GL11.glPopMatrix();
 
         bindTexture(fluidTexture);
-        int color = 0;
 
         GL11.glDisable(GL11.GL_LIGHTING);
-        if(!chem.tanks[0].getTankType().name().equals(FluidType.NONE.name())) {
+        if(chem.tanks[0].getFluid() != null) {
+        	String s = chem.tanks[0].getFluid().getFluid().getStillIcon().getIconName();
+        	String textureBase = "textures/blocks/";
+        	String[] test1 = s.split(":");
+        	String location = test1[0] + ":" + textureBase + test1[1] + ".png";
+        	ResourceLocation test = new ResourceLocation(location);
+        	
+        	bindTexture(test);
             GL11.glPushMatrix();
 	        
 	        if(chem.isProgressing)
@@ -143,11 +149,11 @@ public class RenderChemplant extends TileEntitySpecialRenderer {
 	        else
 	        	HmfController.setMod(50000D, -50000D);
 	        
-	        color = chem.tanks[0].getTankType().getColor();
-			GL11.glColor3ub((byte)((color & 0xFF0000) >> 16), (byte)((color & 0x00FF00) >> 8), (byte)((color & 0x0000FF) >> 0));
+	       // color = chem.tanks[0].getTankType().getColor();
+			//GL11.glColor3ub((byte)((color & 0xFF0000) >> 16), (byte)((color & 0x00FF00) >> 8), (byte)((color & 0x0000FF) >> 0));
 			GL11.glTranslated(-0.625, 0, 0.625);
 	        
-			int count = chem.tanks[0].getFill() / 1000;
+			int count = chem.tanks[0].getFluidAmount() / 1000;
 	        for(int i = 0; i < count; i++) {
 	        	
 	        	if(i < count - 1)
@@ -159,7 +165,17 @@ public class RenderChemplant extends TileEntitySpecialRenderer {
 	        GL11.glPopMatrix();
         }
 
-        if(!chem.tanks[1].getTankType().name().equals(FluidType.NONE.name())) {
+        if(chem.tanks[1].getFluid() != null) {
+        	String s = chem.tanks[1].getFluid().getFluid().getStillIcon().getIconName();
+        	String textureBase = "textures/blocks/";
+        	String[] test1 = s.split(":");
+        	String location;
+        	if(test1.length > 1)
+        		location = test1[0] + ":" + textureBase + test1[1] + ".png";
+        	else
+        		location = "minecraft:textures/blocks/" + test1[0] + ".png";
+        	ResourceLocation test = new ResourceLocation(location);
+        	bindTexture(test);
 	        GL11.glPushMatrix();
 	        
 	        if(chem.isProgressing)
@@ -167,11 +183,11 @@ public class RenderChemplant extends TileEntitySpecialRenderer {
 	        else
 	        	HmfController.setMod(50000D, 50000D);
 	        
-	        color = chem.tanks[1].getTankType().getColor();
-			GL11.glColor3ub((byte)((color & 0xFF0000) >> 16), (byte)((color & 0x00FF00) >> 8), (byte)((color & 0x0000FF) >> 0));
+	     //   color = chem.tanks[1].getTankType().getColor();
+			//GL11.glColor3ub((byte)((color & 0xFF0000) >> 16), (byte)((color & 0x00FF00) >> 8), (byte)((color & 0x0000FF) >> 0));
 			GL11.glTranslated(0.625, 0, 0.625);
 
-			int count = chem.tanks[1].getFill() / 1000;
+			int count = chem.tanks[1].getFluidAmount() / 1000;
 	        for(int i = 0; i < count; i++) {
 	        	
 	        	if(i < count - 1)

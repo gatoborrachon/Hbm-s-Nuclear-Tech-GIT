@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.machine.MachineBoiler;
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.interfaces.IFluidAcceptor;
@@ -42,7 +43,6 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 	public int heat = 2000;
 	public static final int maxHeat = 50000;
 	public int age = 0;
-	public List<IFluidHandler> list = new ArrayList();
 	public FluidTank[] tanks;
 
 	private static final int[] slots_top = new int[] { 4 };
@@ -252,8 +252,11 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 			} else {
 				outs = MachineRecipes.getBoilerOutput(null);
 			}
-			fillFromContainer(0);
-			fillContianer(1);
+			if(FFUtils.fillFromFluidContainer(slots, tanks[0], 2, 3))
+				needsUpdate = true;
+
+			if(FFUtils.fillFluidContainer(slots, tanks[1], 4, 5))
+				needsUpdate = true;
 
 			if (needsUpdate) {
 				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
@@ -328,110 +331,6 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 
 		if (mark) {
 			this.markDirty();
-		}
-	}
-
-	private void fillFromContainer(int t) {
-		if (slots[2] != null) {
-			if (slots[2].getItem() instanceof IFluidContainerItem) {
-
-				tanks[t].fill(((IFluidContainerItem) slots[2].getItem()).drain(slots[2],
-						Math.min(6000, tanks[t].getCapacity() - tanks[t].getFluidAmount()), true), true);
-				needsUpdate = true;
-				if (((IFluidContainerItem) slots[2].getItem()).getFluid(slots[2]) == null && slots[3] == null) {
-					MoveItems(2, 3);
-				}
-			} else if (FluidContainerRegistry.isContainer(slots[2])
-					&& !FluidContainerRegistry.isEmptyContainer(slots[2])) {
-				if (tanks[t].getFluid() == null || (tanks[t].getFluid()
-						.getFluid() == ((FluidContainerRegistry.getFluidForFilledItem(slots[2])).getFluid())
-						&& (tanks[t].getCapacity() - tanks[t].getFluidAmount()) >= FluidContainerRegistry
-								.getContainerCapacity(slots[2]))) {
-					if (slots[3] == null
-							|| (slots[3].getItem() == FluidContainerRegistry.drainFluidContainer(slots[2]).getItem()
-									&& slots[3].stackSize < slots[3].getMaxStackSize())) {
-						tanks[t].fill(FluidContainerRegistry.getFluidForFilledItem(slots[2]), true);
-
-						if (slots[3] == null) {
-							slots[3] = FluidContainerRegistry.drainFluidContainer(slots[2]);
-						} else {
-							slots[3].stackSize++;
-						}
-						if (slots[2].stackSize > 1) {
-							slots[2].stackSize--;
-						} else {
-							slots[2] = null;
-						}
-						needsUpdate = true;
-					}
-
-				}
-			}
-		}
-	}
-
-	private void fillContianer(int t) {
-		if (slots[4] != null && tanks[t].getFluid() != null) {
-			if (slots[4].getItem() instanceof IFluidContainerItem) {
-				tanks[t].drain(
-						((IFluidContainerItem) slots[4].getItem()).fill(slots[4],
-								new FluidStack(tanks[t].getFluid(), Math.min(6000, tanks[t].getFluidAmount())), true),
-						true);
-				// System.out.println(tank.getFluid().getFluid().getStillIcon());
-				needsUpdate = true;
-				if (((IFluidContainerItem) slots[4].getItem()).getFluid(slots[4]) != null
-						&& ((IFluidContainerItem) slots[4].getItem()).getFluid(
-								slots[4]).amount == ((IFluidContainerItem) slots[4].getItem()).getCapacity(slots[4])
-						&& slots[5] == null) {
-					MoveItems(4, 5);
-				}
-			} else if (FluidContainerRegistry.isContainer(slots[4])
-					&& FluidContainerRegistry.isEmptyContainer(slots[4])) {
-				if (tanks[t].getFluid() != null
-						&& tanks[t].getFluidAmount() >= FluidContainerRegistry.getContainerCapacity(slots[4])) {
-					if (slots[5] == null || (slots[5].getItem() == FluidContainerRegistry
-							.fillFluidContainer(tanks[t].getFluid(), slots[4]).getItem()
-							&& slots[5].stackSize < slots[5].getMaxStackSize())) {
-						if (FluidContainerRegistry.fillFluidContainer(tanks[t].getFluid(), slots[4]) != null) {
-							if (slots[5] == null) {
-								slots[5] = FluidContainerRegistry.fillFluidContainer(tanks[t].getFluid(), slots[4]);
-								tanks[t].drain(FluidContainerRegistry.getContainerCapacity(
-										FluidContainerRegistry.fillFluidContainer(tanks[t].getFluid(), slots[4])),
-										true);
-
-							} else {
-								slots[5].stackSize++;
-								tanks[t].drain(FluidContainerRegistry.getContainerCapacity(
-										FluidContainerRegistry.fillFluidContainer(tanks[t].getFluid(), slots[4])),
-										true);
-
-							}
-							if (slots[4].stackSize > 1) {
-								slots[4].stackSize--;
-							} else {
-								slots[4] = null;
-							}
-
-							needsUpdate = true;
-						}
-					}
-
-				}
-			}
-		}
-	}
-
-	private void MoveItems(int slot1, int slot2) {
-		if (slots[slot1] != null) {
-			if (slots[slot2] == null) {
-				ItemStack temp = slots[slot1];
-				slots[slot1] = null;
-				slots[slot2] = temp;
-			} else if (slots[slot2].getItem() == slots[slot1].getItem() && slots[slot2].isStackable()
-					&& slots[slot2].getMaxStackSize() > slots[slot2].stackSize) {
-				slots[slot1] = null;
-				slots[slot2].stackSize++;
-			}
 		}
 	}
 
@@ -519,47 +418,6 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 
 		readFromNBT(pkt.func_148857_g());
 	}
-
-	public void fillFluidFromContainer(int inSlot, int outSlot) {
-
-		if (slots[2] != null) {
-			if (slots[2].getItem() instanceof IFluidContainerItem) {
-
-				tanks[0].fill(((IFluidContainerItem) slots[2].getItem()).drain(slots[2],
-						Math.min(6000, tanks[0].getCapacity() - tanks[0].getFluidAmount()), true), true);
-				needsUpdate = true;
-				if (((IFluidContainerItem) slots[2].getItem()).getFluid(slots[2]) == null && slots[3] == null) {
-					MoveItems(2, 3);
-				}
-			} else if (FluidContainerRegistry.isContainer(slots[2])
-					&& !FluidContainerRegistry.isEmptyContainer(slots[2])) {
-				if (tanks[0].getFluid() == null || (tanks[0].getFluid()
-						.getFluid() == ((FluidContainerRegistry.getFluidForFilledItem(slots[2])).getFluid())
-						&& (tanks[0].getCapacity() - tanks[0].getFluidAmount()) >= FluidContainerRegistry
-								.getContainerCapacity(slots[2]))) {
-					if (slots[3] == null
-							|| (slots[3].getItem() == FluidContainerRegistry.drainFluidContainer(slots[2]).getItem()
-									&& slots[3].stackSize < slots[3].getMaxStackSize())) {
-						tanks[0].fill(FluidContainerRegistry.getFluidForFilledItem(slots[2]), true);
-
-						if (slots[3] == null) {
-							slots[3] = FluidContainerRegistry.drainFluidContainer(slots[2]);
-						} else {
-							slots[3].stackSize++;
-						}
-						if (slots[2].stackSize > 1) {
-							slots[2].stackSize--;
-						} else {
-							slots[2] = null;
-						}
-						needsUpdate = true;
-					}
-
-				}
-			}
-		}
-	}
-
 
 
 }

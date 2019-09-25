@@ -2,6 +2,7 @@ package com.hbm.inventory.gui;
 
 import org.lwjgl.opengl.GL11;
 
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.container.ContainerMachineAssembler;
 import com.hbm.inventory.container.ContainerMachineChemplant;
@@ -12,6 +13,7 @@ import com.hbm.tileentity.machine.TileEntityMachineChemplant;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -32,11 +34,12 @@ public class GUIMachineChemplant extends GuiInfoContainer {
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
-
-		chemplant.tanks[0].renderTankInfo(this, mouseX, mouseY, guiLeft + 8, guiTop + 52 - 34, 16, 34);
-		chemplant.tanks[1].renderTankInfo(this, mouseX, mouseY, guiLeft + 26, guiTop + 52 - 34, 16, 34);
-		chemplant.tanks[2].renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 52 - 34, 16, 34);
-		chemplant.tanks[3].renderTankInfo(this, mouseX, mouseY, guiLeft + 152, guiTop + 52 - 34, 16, 34);
+		
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 8, guiTop + 52 - 34, 16, 34, chemplant.tanks[0]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 26, guiTop + 52 - 34, 16, 34, chemplant.tanks[1]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 52 - 34, 16, 34, chemplant.tanks[2]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 152, guiTop + 52 - 34, 16, 34, chemplant.tanks[3]);
+		
 		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 44, guiTop + 70 - 52, 16, 52, chemplant.power, chemplant.maxPower);
 		
 		if(chemplant.getStackInSlot(4) == null || chemplant.getStackInSlot(4).getItem()!= ModItems.chemistry_template) {
@@ -83,16 +86,11 @@ public class GUIMachineChemplant extends GuiInfoContainer {
 			this.drawInfoPanel(guiLeft - 16, guiTop + 36, 16, 16, 6);
 		}
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(chemplant.tanks[0].getSheet());
-		chemplant.tanks[0].renderTank(this, guiLeft + 8, guiTop + 52, chemplant.tanks[0].getTankType().textureX() * FluidTank.x, chemplant.tanks[0].getTankType().textureY() * FluidTank.y, 16, 34);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(chemplant.tanks[1].getSheet());
-		chemplant.tanks[1].renderTank(this, guiLeft + 26, guiTop + 52, chemplant.tanks[1].getTankType().textureX() * FluidTank.x, chemplant.tanks[1].getTankType().textureY() * FluidTank.y, 16, 34);
-		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(chemplant.tanks[2].getSheet());
-		chemplant.tanks[2].renderTank(this, guiLeft + 134, guiTop + 52, chemplant.tanks[2].getTankType().textureX() * FluidTank.x, chemplant.tanks[2].getTankType().textureY() * FluidTank.y, 16, 34);
-		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(chemplant.tanks[3].getSheet());
-		chemplant.tanks[3].renderTank(this, guiLeft + 152, guiTop + 52, chemplant.tanks[3].getTankType().textureX() * FluidTank.x, chemplant.tanks[3].getTankType().textureY() * FluidTank.y, 16, 34);
+		FFUtils.drawLiquid(chemplant.tanks[0], guiLeft, guiTop, zLevel, 16, 34, 8, 52);
+		FFUtils.drawLiquid(chemplant.tanks[1], guiLeft, guiTop, zLevel, 16, 34, 26, 52);
+		FFUtils.drawLiquid(chemplant.tanks[2], guiLeft, guiTop, zLevel, 16, 32, 8, 34);
+		FFUtils.drawLiquid(chemplant.tanks[3], guiLeft, guiTop, zLevel, 16, 32, 52, 34);
 	}
 }

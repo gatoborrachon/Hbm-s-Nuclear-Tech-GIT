@@ -29,15 +29,20 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -55,6 +60,7 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 	int consumption = 100;
 	int speed = 100;
 	public FluidTank[] tanks;
+	public Fluid[] tankTypes;
 	
 	Random rand = new Random();
 	
@@ -63,10 +69,11 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 	public TileEntityMachineChemplant() {
 		slots = new ItemStack[21];
 		tanks = new FluidTank[4];
-		tanks[0] = new FluidTank(1600);
-		tanks[1] = new FluidTank(1600);
-		tanks[2] = new FluidTank(1600);
-		tanks[3] = new FluidTank(1600);
+		tanks[0] = new FluidTank(16000);
+		tanks[1] = new FluidTank(16000);
+		tanks[2] = new FluidTank(16000);
+		tanks[3] = new FluidTank(16000);
+		tankTypes = new Fluid[]{null, null, null, null};
 	}
 
 	@Override
@@ -288,6 +295,11 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 			}
 		}
 		
+		if(needsUpdate){
+			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+			needsUpdate = false;
+		}
+		
 		if(speed < 25)
 			speed = 25;
 		if(consumption < 10)
@@ -296,7 +308,6 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		if(!worldObj.isRemote)
 		{
 			int meta = worldObj.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord);
-			
 			isProgressing = false;
 			
 			age++;
@@ -313,11 +324,16 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 			setContainers();
 			
 			power = Library.chargeTEFromItems(slots, 0, power, maxPower);
-			
-			FFUtils.fillFromFluidContainer(slots, tanks[0], 17, 19);
-			FFUtils.fillFromFluidContainer(slots, tanks[1], 18, 20);
-			FFUtils.fillFluidContainer(slots, tanks[2], 9, 11);
-			FFUtils.fillFluidContainer(slots, tanks[3], 10, 12);
+			if(inputValidForTank(0, 17))
+				if(FFUtils.fillFromFluidContainer(slots, tanks[0], 17, 19))
+					needsUpdate = true;
+			if(inputValidForTank(1, 18))
+				if(FFUtils.fillFromFluidContainer(slots, tanks[1], 18, 20))
+					needsUpdate = true;
+			if(FFUtils.fillFluidContainer(slots, tanks[2], 9, 11))
+				needsUpdate = true;
+			if(FFUtils.fillFluidContainer(slots, tanks[3], 10, 12))
+				needsUpdate = true;
 			
 
 			FluidStack[] inputs = MachineRecipes.getFluidInputFromTempate(slots[4]);
@@ -532,14 +548,46 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		
 		if(slots[4] == null || (slots[4] != null && !(slots[4].getItem() instanceof ItemChemistryTemplate))) {
 		} else {
+			
 			FluidStack[] inputs = MachineRecipes.getFluidInputFromTempate(slots[4]);
 			FluidStack[] outputs = MachineRecipes.getFluidOutputFromTempate(slots[4]);
 
-			tanks[0].setFluid(inputs[0] == null ? null : inputs[0]);
-			tanks[1].setFluid(inputs[1] == null ? null : inputs[1]);
-			tanks[2].setFluid(outputs[0] == null ? null : outputs[0]);
-			tanks[3].setFluid(outputs[1] == null ? null : outputs[1]);
+			tankTypes[0] = inputs[0] == null ? null : inputs[0].getFluid();
+			tankTypes[1] = inputs[1] == null ? null : inputs[1].getFluid();
+			tankTypes[2] = outputs[0] == null ? null : outputs[0].getFluid();
+			tankTypes[3] = outputs[1] == null ? null : outputs[1].getFluid();
+			
+			if(tanks[0].getFluid() != null && tanks[0].getFluid().getFluid() != tankTypes[0]){
+				tanks[0].setFluid(null);
+				needsUpdate = true;
+			}
+			
+			if(tanks[1].getFluid() != null && tanks[1].getFluid().getFluid() != tankTypes[1]){
+				tanks[1].setFluid(null);
+				needsUpdate = true;
+			}
+			if(tanks[2].getFluid() != null && tanks[2].getFluid().getFluid() != tankTypes[2]){
+				tanks[2].setFluid(null);
+				needsUpdate = true;
+			}
+			if(tanks[3].getFluid() != null && tanks[3].getFluid().getFluid() != tankTypes[3]){
+				tanks[3].setFluid(null);
+				needsUpdate = true;
+			}
 		}
+	}
+	
+	protected boolean inputValidForTank(int tank, int slot){
+		
+		if(slots[slot] != null && tankTypes[tank] != null){
+			if(slots[slot].getItem() instanceof IFluidContainerItem && ((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]) != null){
+				return ((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]).getFluid() == tankTypes[tank];
+			}
+			if(FluidContainerRegistry.isFilledContainer(slots[slot]) && FluidContainerRegistry.getFluidForFilledItem(slots[slot]).getFluid() != null){
+				return FluidContainerRegistry.getFluidForFilledItem(slots[slot]).getFluid() == tankTypes[tank];
+			}
+		}
+		return false;
 	}
 	
 	public boolean hasFluidsStored(FluidStack[] fluids) {
@@ -567,11 +615,14 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 	public void removeFluids(FluidStack[] fluids) {
 		if(Library.isArrayEmpty(fluids))
 			return;
-
-		if(fluids[0] != null)
+		if(fluids[0] != null){
 			tanks[0].drain(fluids[0].amount, true);
-		if(fluids[1] != null)
+			this.needsUpdate = true;
+		}
+		if(fluids[1] != null){
 			tanks[1].drain(fluids[1].amount, true);
+			this.needsUpdate = true;
+		}
 	}
 	
 	public boolean hasSpaceForItems(ItemStack[] stacks) {
@@ -656,7 +707,7 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		return stack;
 	}
 	
-	//Unloads output into chests
+	/**Unloads output into chests*/
 	public boolean tryFillContainer(IInventory inventory, int slot) {
 		
 		int size = inventory.getSizeInventory();
@@ -710,7 +761,7 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		return false;
 	}
 	
-	//Loads assembler's input queue from chests
+	/**Loads assembler's input queue from chests*/
 	public boolean tryFillAssembler(IInventory inventory, int slot) {
 
 		FluidStack[] inputs = MachineRecipes.getFluidInputFromTempate(slots[4]);
@@ -789,7 +840,7 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		return false;
 	}
 	
-	//boolean true: remove items, boolean false: simulation mode
+	/**boolean true: remove items, boolean false: simulation mode*/
 	public boolean removeItems(List<ItemStack> stack, ItemStack[] array) {
 		
 		if(stack == null || stack.isEmpty())
@@ -915,6 +966,7 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 3, this.yCoord, this.zCoord, 2000);
 			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 3, this.yCoord, this.zCoord - 1, 2000);
 		}
+		needsUpdate = update;
 	}
 
 	@Override
@@ -952,6 +1004,22 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public Packet getDescriptionPacket() {
+
+		NBTTagCompound tag = new NBTTagCompound();
+		writeToNBT(tag);
+
+		return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag);
+
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+
+		readFromNBT(pkt.func_148857_g());
 	}
 
 }

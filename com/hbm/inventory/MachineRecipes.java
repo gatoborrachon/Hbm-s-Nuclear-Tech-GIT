@@ -4841,19 +4841,20 @@ public class MachineRecipes {
         				inputs[j + 2] = listIn.get(j).copy();
         	
         	FluidStack[] fluidIn = MachineRecipes.getFluidInputFromTempate(inputs[6]);
-        	for(int j = 0; j < fluidIn.length; j++)
+        	/*for(int j = 0; j < fluidIn.length; j++)
         		if(fluidIn[j] != null)
         			inputs[j] = ItemFluidIcon.addQuantity(new ItemStack(ModItems.fluid_icon, 1, Arrays.asList(FluidType.values()).indexOf(fluidIn[j].type)), fluidIn[j].fill);
-        	
+        	*/
         	ItemStack[] listOut = MachineRecipes.getChemOutputFromTempate(inputs[6]);
         	for(int j = 0; j < listOut.length; j++)
         		if(listOut[j] != null)
         			outputs[j + 2] = listOut[j].copy();
         	
         	FluidStack[] fluidOut = MachineRecipes.getFluidOutputFromTempate(inputs[6]);
-        	for(int j = 0; j < fluidOut.length; j++)
-        		if(fluidOut[j] != null)
-        			outputs[j] = ItemFluidIcon.addQuantity(new ItemStack(ModItems.fluid_icon, 1, Arrays.asList(FluidType.values()).indexOf(fluidOut[j].type)), fluidOut[j].fill);
+        	//TODO Find a way to do this later
+        //	for(int j = 0; j < fluidOut.length; j++)
+        	//	if(fluidOut[j] != null)
+        	//		outputs[j] = ItemFluidIcon.addQuantity(new ItemStack(ModItems.fluid_icon, 1, Arrays.asList(FluidType.values()).indexOf(fluidOut[j].type)), fluidOut[j].fill);
         	
         	for(int j = 0; j < inputs.length; j++)
         		if(inputs[j] == null)
@@ -5061,179 +5062,179 @@ public class MachineRecipes {
 		
 		switch(ItemChemistryTemplate.EnumChemistryTemplate.getEnum(stack.getItemDamage())) {
         case FP_HEAVYOIL:
-			input[0] = new FluidStack(1000, FluidType.HEAVYOIL);
+			input[0] = new FluidStack(ModForgeFluids.heavyoil, 1000);
 			break;
         case FP_SMEAR:
-			input[0] = new FluidStack(1000, FluidType.SMEAR);
+			input[0] = new FluidStack(ModForgeFluids.smear, 1000);
 			break;
         case FP_NAPHTHA:
-			input[0] = new FluidStack(1000, FluidType.NAPHTHA);
+			input[0] = new FluidStack(ModForgeFluids.napatha, 1000);
 			break;
         case FP_LIGHTOIL:
-			input[0] = new FluidStack(1000, FluidType.LIGHTOIL);
+			input[0] = new FluidStack(ModForgeFluids.lightoil, 1000);
 			break;
         case FR_REOIL:
-			input[0] = new FluidStack(1000, FluidType.SMEAR);
+			input[0] = new FluidStack(ModForgeFluids.smear, 1000);
 			break;
         case FR_PETROIL:
-			input[0] = new FluidStack(800, FluidType.RECLAIMED);
-			input[1] = new FluidStack(200, FluidType.LUBRICANT);
+			input[0] = new FluidStack(ModForgeFluids.reclaimed, 800);
+			input[1] = new FluidStack(ModForgeFluids.lubricant, 200);
 			break;
         case FC_BITUMEN:
-			input[0] = new FluidStack(1200, FluidType.BITUMEN);
-			input[1] = new FluidStack(2400, FluidType.STEAM);
+			input[0] = new FluidStack(ModForgeFluids.bitumen, 1200);
+			input[1] = new FluidStack(ModForgeFluids.steam, 2400);
 			break;
         case FC_I_NAPHTHA:
-			input[0] = new FluidStack(1400, FluidType.SMEAR);
-			input[1] = new FluidStack(800, FluidType.WATER);
+			input[0] = new FluidStack(ModForgeFluids.smear, 1400);
+			input[1] = new FluidStack(FluidRegistry.WATER, 800);
 			break;
         case FC_GAS_PETROLEUM:
-			input[0] = new FluidStack(1800, FluidType.GAS);
-			input[1] = new FluidStack(1200, FluidType.WATER);
+			input[0] = new FluidStack(ModForgeFluids.gas, 1800);
+			input[1] = new FluidStack(FluidRegistry.WATER, 1200);
 			break;
         case FC_DIESEL_KEROSENE:
-			input[0] = new FluidStack(1200, FluidType.DIESEL);
-			input[1] = new FluidStack(2000, FluidType.STEAM);
+			input[0] = new FluidStack(ModForgeFluids.diesel, 1200);
+			input[1] = new FluidStack(ModForgeFluids.steam, 2000);
 			break;
         case FC_KEROSENE_PETROLEUM:
-			input[0] = new FluidStack(1400, FluidType.KEROSENE);
-			input[1] = new FluidStack(2000, FluidType.STEAM);
+			input[0] = new FluidStack(ModForgeFluids.kerosene, 1400);
+			input[1] = new FluidStack(ModForgeFluids.steam, 2000);
 			break;
         case CC_I:
-			input[0] = new FluidStack(800, FluidType.SMEAR);
-			input[1] = new FluidStack(1800, FluidType.WATER);
+			input[0] = new FluidStack(ModForgeFluids.smear, 800);
+			input[1] = new FluidStack(FluidRegistry.WATER, 1800);
 			break;
         case CC_OIL:
-			input[0] = new FluidStack(600, FluidType.OIL);
-			input[1] = new FluidStack(1400, FluidType.STEAM);
+			input[0] = new FluidStack(ModForgeFluids.oil, 600);
+			input[1] = new FluidStack(ModForgeFluids.steam, 1400);
 			break;
         case CC_HEATING:
-			input[0] = new FluidStack(800, FluidType.HEATINGOIL);
-			input[1] = new FluidStack(2000, FluidType.STEAM);
+			input[0] = new FluidStack(ModForgeFluids.heatingoil, 800);
+			input[1] = new FluidStack(ModForgeFluids.steam, 2000);
 			break;
         case CC_HEAVY:
-			input[0] = new FluidStack(600, FluidType.HEAVYOIL);
-			input[1] = new FluidStack(1400, FluidType.WATER);
+			input[0] = new FluidStack(ModForgeFluids.heavyoil, 600);
+			input[1] = new FluidStack(FluidRegistry.WATER, 1400);
 			break;
         case CC_NAPHTHA:
-			input[0] = new FluidStack(1200, FluidType.NAPHTHA);
-			input[1] = new FluidStack(2400, FluidType.STEAM);
+			input[0] = new FluidStack(ModForgeFluids.napatha, 1200);
+			input[1] = new FluidStack(ModForgeFluids.steam, 2400);
 			break;
         case ASPHALT:
-			input[0] = new FluidStack(8000, FluidType.BITUMEN);
+			input[0] = new FluidStack(ModForgeFluids.bitumen, 8000);
 			break;
         case CONCRETE:
-			input[0] = new FluidStack(2000, FluidType.WATER);
+			input[0] = new FluidStack(FluidRegistry.WATER, 2000);
 			break;
         case COOLANT:
-			input[0] = new FluidStack(1800, FluidType.WATER);
+			input[0] = new FluidStack(FluidRegistry.WATER, 1800);
 			break;
         case CRYOGEL:
-			input[0] = new FluidStack(1800, FluidType.COOLANT);
+			input[0] = new FluidStack(ModForgeFluids.coolant, 1800);
 			break;
         case DESH:
-			input[0] = new FluidStack(800, FluidType.ACID);
-			input[1] = new FluidStack(200, FluidType.LIGHTOIL);
+			input[0] = new FluidStack(ModForgeFluids.acid, 800);
+			input[1] = new FluidStack(ModForgeFluids.lightoil, 200);
 			break;
         case PEROXIDE:
-			input[0] = new FluidStack(1000, FluidType.WATER);
+			input[0] = new FluidStack(FluidRegistry.WATER, 1000);
         	break;
         case CIRCUIT_4:
-			input[0] = new FluidStack(400, FluidType.ACID);
+			input[0] = new FluidStack(ModForgeFluids.acid, 400);
         	break;
         case CIRCUIT_5:
-			input[0] = new FluidStack(800, FluidType.ACID);
-			input[1] = new FluidStack(400, FluidType.PETROLEUM);
+			input[0] = new FluidStack(ModForgeFluids.acid, 800);
+			input[1] = new FluidStack(ModForgeFluids.petroleum, 400);
         	break;
         case SF_OIL:
-			input[0] = new FluidStack(350, FluidType.OIL);
+			input[0] = new FluidStack(ModForgeFluids.oil, 350);
         	break;
         case SF_HEAVYOIL:
-			input[0] = new FluidStack(250, FluidType.HEAVYOIL);
+			input[0] = new FluidStack(ModForgeFluids.heavyoil, 250);
         	break;
         case SF_SMEAR:
-			input[0] = new FluidStack(200, FluidType.SMEAR);
+			input[0] = new FluidStack(ModForgeFluids.smear, 200);
         	break;
         case SF_HEATINGOIL:
-			input[0] = new FluidStack(100, FluidType.HEATINGOIL);
+			input[0] = new FluidStack(ModForgeFluids.heatingoil, 100);
         	break;
         case SF_RECLAIMED:
-			input[0] = new FluidStack(200, FluidType.RECLAIMED);
+			input[0] = new FluidStack(ModForgeFluids.reclaimed, 200);
         	break;
         case SF_PETROIL:
-			input[0] = new FluidStack(250, FluidType.PETROIL);
+			input[0] = new FluidStack(ModForgeFluids.petroil, 250);
         	break;
     	case SF_LUBRICANT:
-			input[0] = new FluidStack(250, FluidType.LUBRICANT);
+			input[0] = new FluidStack(ModForgeFluids.lubricant, 250);
         	break;
     	case SF_NAPHTHA:
-			input[0] = new FluidStack(300, FluidType.NAPHTHA);
+			input[0] = new FluidStack(ModForgeFluids.napatha, 300);
         	break;
     	case SF_DIESEL:
-			input[0] = new FluidStack(400, FluidType.DIESEL);
+			input[0] = new FluidStack(ModForgeFluids.diesel, 400);
         	break;
     	case SF_LIGHTOIL:
-			input[0] = new FluidStack(450, FluidType.LIGHTOIL);
+			input[0] = new FluidStack(ModForgeFluids.lightoil, 450);
         	break;
     	case SF_KEROSENE:
-			input[0] = new FluidStack(550, FluidType.KEROSENE);
+			input[0] = new FluidStack(ModForgeFluids.kerosene, 550);
         	break;
     	case SF_GAS:
-			input[0] = new FluidStack(750, FluidType.GAS);
+			input[0] = new FluidStack(ModForgeFluids.gas, 750);
         	break;
     	case SF_PETROLEUM:
-			input[0] = new FluidStack(600, FluidType.PETROLEUM);
+			input[0] = new FluidStack(ModForgeFluids.petroleum, 600);
         	break;
     	case SF_BIOGAS:
-			input[0] = new FluidStack(400, FluidType.BIOGAS);
+			input[0] = new FluidStack(ModForgeFluids.biogas, 400);
         	break;
     	case SF_BIOFUEL:
-			input[0] = new FluidStack(300, FluidType.BIOFUEL);
+			input[0] = new FluidStack(ModForgeFluids.biofuel, 300);
         	break;
         case POLYMER:
-			input[0] = new FluidStack(600, FluidType.PETROLEUM);
+			input[0] = new FluidStack(ModForgeFluids.petroleum, 600);
         	break;
         case DEUTERIUM:
-			input[0] = new FluidStack(4000, FluidType.WATER);
+			input[0] = new FluidStack(FluidRegistry.WATER, 4000);
         	break;
         case STEAM:
-			input[0] = new FluidStack(1000, FluidType.WATER);
+			input[0] = new FluidStack(FluidRegistry.WATER, 1000);
         	break;
         case BP_BIOFUEL:
-			input[0] = new FluidStack(2000, FluidType.BIOGAS);
+			input[0] = new FluidStack(ModForgeFluids.biogas, 2000);
         	break;
         case YELLOWCAKE:
-			input[0] = new FluidStack(500, FluidType.ACID);
+			input[0] = new FluidStack(ModForgeFluids.acid, 500);
         	break;
         case UF6:
-			input[0] = new FluidStack(1000, FluidType.WATER);
+			input[0] = new FluidStack(FluidRegistry.WATER, 1000);
         	break;
         case PUF6:
-			input[0] = new FluidStack(1000, FluidType.WATER);
+			input[0] = new FluidStack(FluidRegistry.WATER, 1000);
         	break;
         case SAS3:
-			input[0] = new FluidStack(2000, FluidType.ACID);
+			input[0] = new FluidStack(ModForgeFluids.acid, 2000);
         	break;
         case NITAN:
-			input[0] = new FluidStack(600, FluidType.KEROSENE);
+			input[0] = new FluidStack(ModForgeFluids.kerosene, 600);
         	break;
         case OIL_SAND:
-			input[0] = new FluidStack(400, FluidType.BITUMEN);
+			input[0] = new FluidStack(ModForgeFluids.bitumen, 400);
         	break;
         case CORDITE:
-			input[0] = new FluidStack(200, FluidType.HEATINGOIL);
+			input[0] = new FluidStack(ModForgeFluids.heatingoil, 200);
         	break;
         case KEVLAR:
-			input[0] = new FluidStack(100, FluidType.PETROLEUM);
+			input[0] = new FluidStack(ModForgeFluids.petroleum, 100);
         	break;
         case SOLID_FUEL:
-			input[0] = new FluidStack(200, FluidType.PETROLEUM);
+			input[0] = new FluidStack(ModForgeFluids.petroleum, 200);
         	break;
     	case ELECTROLYSIS:
-			input[0] = new FluidStack(8000, FluidType.WATER);
+			input[0] = new FluidStack(FluidRegistry.WATER, 8000);
         	break;
     	case XENON:
-			input[0] = new FluidStack(0, FluidType.NONE);
+			//input[0] = null;
         	break;
 		default:
 			break;
@@ -5371,109 +5372,109 @@ public class MachineRecipes {
 		
 		switch(ItemChemistryTemplate.EnumChemistryTemplate.getEnum(stack.getItemDamage())) {
         case FP_HEAVYOIL:
-			output[0] = new FluidStack(300, FluidType.BITUMEN);
-			output[1] = new FluidStack(700, FluidType.SMEAR);
+			output[0] = new FluidStack(ModForgeFluids.bitumen, 300);
+			output[1] = new FluidStack(ModForgeFluids.smear, 700);
 			break;
         case FP_SMEAR:
-			output[0] = new FluidStack(600, FluidType.HEATINGOIL);
-			output[1] = new FluidStack(400, FluidType.LUBRICANT);
+			output[0] = new FluidStack(ModForgeFluids.heatingoil, 600);
+			output[1] = new FluidStack(ModForgeFluids.lubricant, 400);
 			break;
         case FP_NAPHTHA:
-			output[0] = new FluidStack(400, FluidType.HEATINGOIL);
-			output[1] = new FluidStack(600, FluidType.DIESEL);
+			output[0] = new FluidStack(ModForgeFluids.heatingoil, 400);
+			output[1] = new FluidStack(ModForgeFluids.diesel, 600);
 			break;
         case FP_LIGHTOIL:
-			output[0] = new FluidStack(400, FluidType.DIESEL);
-			output[1] = new FluidStack(600, FluidType.KEROSENE);
+			output[0] = new FluidStack(ModForgeFluids.diesel, 400);
+			output[1] = new FluidStack(ModForgeFluids.kerosene, 600);
 			break;
         case FR_REOIL:
-			output[0] = new FluidStack(800, FluidType.RECLAIMED);
+			output[0] = new FluidStack(ModForgeFluids.reclaimed, 800);
 			break;
         case FR_PETROIL:
-			output[0] = new FluidStack(1000, FluidType.PETROIL);
+			output[0] = new FluidStack(ModForgeFluids.petroil, 1000);
 			break;
         case FC_BITUMEN:
-			output[0] = new FluidStack(1000, FluidType.OIL);
-			output[1] = new FluidStack(200, FluidType.PETROLEUM);
+			output[0] = new FluidStack(ModForgeFluids.oil, 1000);
+			output[1] = new FluidStack(ModForgeFluids.petroleum, 200);
 			break;
         case FC_I_NAPHTHA:
-			output[0] = new FluidStack(800, FluidType.NAPHTHA);
+			output[0] = new FluidStack(ModForgeFluids.napatha, 800);
 			break;
         case FC_GAS_PETROLEUM:
-			output[0] = new FluidStack(800, FluidType.PETROLEUM);
+			output[0] = new FluidStack(ModForgeFluids.petroleum, 800);
 			break;
         case FC_DIESEL_KEROSENE:
-			output[0] = new FluidStack(400, FluidType.KEROSENE);
+			output[0] = new FluidStack(ModForgeFluids.kerosene, 400);
 			break;
         case FC_KEROSENE_PETROLEUM:
-			output[0] = new FluidStack(800, FluidType.PETROLEUM);
+			output[0] = new FluidStack(ModForgeFluids.petroleum, 800);
 			break;
         case CC_OIL:
-			output[0] = new FluidStack(2000, FluidType.OIL);
+			output[0] = new FluidStack(ModForgeFluids.oil, 2000);
 			break;
         case CC_I:
-			output[0] = new FluidStack(1600, FluidType.SMEAR);
+			output[0] = new FluidStack(ModForgeFluids.smear, 1600);
 			break;
         case CC_HEATING:
-			output[0] = new FluidStack(1800, FluidType.HEATINGOIL);
+			output[0] = new FluidStack(ModForgeFluids.heatingoil, 1800);
 			break;
         case CC_HEAVY:
-			output[0] = new FluidStack(1800, FluidType.HEAVYOIL);
+			output[0] = new FluidStack(ModForgeFluids.heavyoil, 1800);
 			break;
         case CC_NAPHTHA:
-			output[0] = new FluidStack(2000, FluidType.NAPHTHA);
+			output[0] = new FluidStack(ModForgeFluids.napatha, 2000);
 			break;
         case COOLANT:
-			output[0] = new FluidStack(2000, FluidType.COOLANT);
+			output[0] = new FluidStack(ModForgeFluids.coolant, 2000);
 			break;
         case CRYOGEL:
-			output[0] = new FluidStack(2000, FluidType.CRYOGEL);
+			output[0] = new FluidStack(ModForgeFluids.cryogel, 2000);
 			break;
         case PEROXIDE:
-			output[0] = new FluidStack(800, FluidType.ACID);
+			output[0] = new FluidStack(ModForgeFluids.acid, 800);
 			break;
         case DEUTERIUM:
-			output[0] = new FluidStack(500, FluidType.DEUTERIUM);
+			output[0] = new FluidStack(ModForgeFluids.deuterium, 500);
         	break;
         case STEAM:
-			output[0] = new FluidStack(1000, FluidType.STEAM);
+			output[0] = new FluidStack(ModForgeFluids.steam, 1000);
         	break;
         case BP_BIOGAS:
-			output[0] = new FluidStack(4000, FluidType.BIOGAS);
+			output[0] = new FluidStack(ModForgeFluids.biogas, 4000);
         	break;
         case BP_BIOFUEL:
-			output[0] = new FluidStack(1000, FluidType.BIOFUEL);
+			output[0] = new FluidStack(ModForgeFluids.biofuel, 1000);
         	break;
         case UF6:
-			output[0] = new FluidStack(1000, FluidType.UF6);
+			output[0] = new FluidStack(ModForgeFluids.uf6, 1000);
         	break;
         case PUF6:
-			output[0] = new FluidStack(1000, FluidType.PUF6);
+			output[0] = new FluidStack(ModForgeFluids.puf6, 1000);
         	break;
         case SAS3:
-			output[0] = new FluidStack(1000, FluidType.SAS3);
+			output[0] = new FluidStack(ModForgeFluids.sas3, 1000);
         	break;
         case NITAN:
-			output[0] = new FluidStack(1000, FluidType.NITAN);
+			output[0] = new FluidStack(ModForgeFluids.nitan, 1000);
         	break;
         case OIL_SAND:
-			output[0] = new FluidStack(1000, FluidType.BITUMEN);
+			output[0] = new FluidStack(ModForgeFluids.bitumen, 1000);
         	break;
         case DYN_SCHRAB:
-			output[0] = new FluidStack(50, FluidType.WATZ);
+			output[0] = new FluidStack(ModForgeFluids.watz, 50);
         	break;
         case DYN_EUPH:
-			output[0] = new FluidStack(100, FluidType.WATZ);
+			output[0] = new FluidStack(ModForgeFluids.watz, 100);
         	break;
         case DYN_DNT:
-			output[0] = new FluidStack(150, FluidType.WATZ);
+			output[0] = new FluidStack(ModForgeFluids.watz, 150);
         	break;
         case ELECTROLYSIS:
-			output[0] = new FluidStack(400, FluidType.HYDROGEN);
-			output[1] = new FluidStack(400, FluidType.OXYGEN);
+			output[0] = new FluidStack(ModForgeFluids.hydrogen, 400);
+			output[1] = new FluidStack(ModForgeFluids.oxygen, 400);
         	break;
         case XENON:
-			output[0] = new FluidStack(50, FluidType.XENON);
+			output[0] = new FluidStack(ModForgeFluids.xenon, 50);
         	break;
 		default:
 			break;

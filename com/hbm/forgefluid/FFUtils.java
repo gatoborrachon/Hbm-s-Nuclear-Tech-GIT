@@ -43,7 +43,7 @@ public class FFUtils {
 			
 			if (liquidIcon != null) {
 				int level = (int) (((double) tank.getFluidAmount() / (double) tank
-						.getCapacity()) * 52.0D);
+						.getCapacity()) * sizeY);
 
 				drawFull(tank, guiLeft, guiTop, zLevel, liquidIcon, level,
 						sizeX, sizeY, offsetX, offsetY);
