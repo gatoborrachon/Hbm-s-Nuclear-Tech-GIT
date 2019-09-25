@@ -148,6 +148,19 @@ public class FFUtils {
 		}
 	}
 	
+	public static void renderTankInfo(GuiInfoContainer gui, int mouseX,
+			int mouseY, int x, int y, int width, int height, FluidTank fluidTank, Fluid fluid) {
+		if (x <= mouseX && x + width > mouseX && y < mouseY
+				&& y + height >= mouseY) {
+			if (fluid != null) {
+				gui.drawFluidInfo(
+						new String[] {fluid.getUnlocalizedName(), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
+			} else {
+				gui.drawFluidInfo(new String[] {I18n.format("None"), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
+			}
+		}
+	}
+	
 	public static boolean checkFluidConnectables(World world, int x, int y, int z, FFPipeNetwork net)
 	{
 		TileEntity tileentity = world.getTileEntity(x, y, z);
