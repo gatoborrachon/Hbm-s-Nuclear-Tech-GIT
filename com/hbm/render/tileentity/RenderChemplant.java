@@ -13,6 +13,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
+import net.minecraftforge.fluids.FluidRegistry;
 
 public class RenderChemplant extends TileEntitySpecialRenderer {
 
@@ -134,13 +135,18 @@ public class RenderChemplant extends TileEntitySpecialRenderer {
         bindTexture(fluidTexture);
 
         GL11.glDisable(GL11.GL_LIGHTING);
+     //   System.out.println(FluidRegistry.LAVA.getUnlocalizedName().substring(11));
         if(chem.tanks[0].getFluid() != null) {
+        	ResourceLocation test;
+        	if(chem.tanks[0].getFluid().getFluid() == FluidRegistry.LAVA || chem.tanks[0].getFluid().getFluid() == FluidRegistry.WATER){
+        		test = new ResourceLocation(RefStrings.MODID, "textures/blocks/forgefluid/" + chem.tanks[0].getFluid().getFluid().getUnlocalizedName().substring(11) + "_chemplant.png");
+        	} else {
         	String s = chem.tanks[0].getFluid().getFluid().getStillIcon().getIconName();
         	String textureBase = "textures/blocks/";
         	String[] test1 = s.split(":");
         	String location = test1[0] + ":" + textureBase + test1[1] + ".png";
-        	ResourceLocation test = new ResourceLocation(location);
-        	
+        	test = new ResourceLocation(location);
+        	}
         	bindTexture(test);
             GL11.glPushMatrix();
 	        

@@ -39,6 +39,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
@@ -180,6 +181,7 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
 		NBTTagList list = nbt.getTagList("items", 10);
+		int[] types;
 		
 		this.power = nbt.getLong("powerTime");
 		slots = new ItemStack[getSizeInventory()];
@@ -188,6 +190,29 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		tanks[1].readFromNBT((NBTTagCompound) nbt.getTag("input2"));
 		tanks[2].readFromNBT((NBTTagCompound) nbt.getTag("output1"));
 		tanks[3].readFromNBT((NBTTagCompound) nbt.getTag("output2"));
+		
+		types = nbt.getIntArray("types");
+		
+		if(types[0] != -1){
+			tankTypes[0] = FluidRegistry.getFluid(types[0]);
+		} else {
+			tankTypes[0] = null;
+		}
+		if(types[1] != -1){
+			tankTypes[1] = FluidRegistry.getFluid(types[1]);
+		} else {
+			tankTypes[1] = null;
+		}
+		if(types[2] != -1){
+			tankTypes[2] = FluidRegistry.getFluid(types[2]);
+		} else {
+			tankTypes[2] = null;
+		}
+		if(types[3] != -1){
+			tankTypes[3] = FluidRegistry.getFluid(types[3]);
+		} else {
+			tankTypes[3] = null;
+		}
 		
 		for(int i = 0; i < list.tagCount(); i++)
 		{
@@ -205,6 +230,7 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		super.writeToNBT(nbt);
 		nbt.setLong("powerTime", power);
 		NBTTagList list = new NBTTagList();
+		int[] types = new int[]{tankTypes[0] != null ? tankTypes[0].getID() : -1, tankTypes[1] != null ? tankTypes[1].getID() : -1, tankTypes[2] != null ? tankTypes[2].getID() : -1, tankTypes[3] != null ? tankTypes[3].getID() : -1};
 
 		NBTTagCompound input1 = new NBTTagCompound();
 		NBTTagCompound input2 = new NBTTagCompound();
@@ -220,6 +246,8 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		nbt.setTag("input2", input2);
 		nbt.setTag("output1", output1);
 		nbt.setTag("output2", output2);
+		
+		nbt.setIntArray("types", types);
 		
 		for(int i = 0; i < slots.length; i++)
 		{
@@ -557,20 +585,20 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 			tankTypes[2] = outputs[0] == null ? null : outputs[0].getFluid();
 			tankTypes[3] = outputs[1] == null ? null : outputs[1].getFluid();
 			
-			if(tanks[0].getFluid() != null && tanks[0].getFluid().getFluid() != tankTypes[0]){
+			if((inputs[0] != null && tanks[0].getFluid() == null) || tanks[0].getFluid() != null && tanks[0].getFluid().getFluid() != tankTypes[0]){
 				tanks[0].setFluid(null);
 				needsUpdate = true;
 			}
 			
-			if(tanks[1].getFluid() != null && tanks[1].getFluid().getFluid() != tankTypes[1]){
+			if((inputs[1] != null && tanks[1].getFluid() == null) || tanks[1].getFluid() != null && tanks[1].getFluid().getFluid() != tankTypes[1]){
 				tanks[1].setFluid(null);
 				needsUpdate = true;
 			}
-			if(tanks[2].getFluid() != null && tanks[2].getFluid().getFluid() != tankTypes[2]){
+			if((outputs[0] != null && tanks[2].getFluid() == null) || tanks[2].getFluid() != null && tanks[2].getFluid().getFluid() != tankTypes[2]){
 				tanks[2].setFluid(null);
 				needsUpdate = true;
 			}
-			if(tanks[3].getFluid() != null && tanks[3].getFluid().getFluid() != tankTypes[3]){
+			if((outputs[1] != null && tanks[3].getFluid() == null) || tanks[3].getFluid() != null && tanks[3].getFluid().getFluid() != tankTypes[3]){
 				tanks[3].setFluid(null);
 				needsUpdate = true;
 			}
@@ -993,7 +1021,7 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
 	@Override
 	public boolean canDrain(ForgeDirection from, Fluid fluid) {
 		// TODO Auto-generated method stub
