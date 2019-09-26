@@ -36,25 +36,22 @@ import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
 public class FFUtils {
-	
-	public static void drawLiquid(FluidTank tank, int guiLeft, int guiTop,
-			float zLevel, int sizeX, int sizeY, int offsetX, int offsetY) {
+
+	public static void drawLiquid(FluidTank tank, int guiLeft, int guiTop, float zLevel, int sizeX, int sizeY,
+			int offsetX, int offsetY) {
 		if (tank.getFluid() != null) {
 			IIcon liquidIcon = tank.getFluid().getFluid().getStillIcon();
-			
-			if (liquidIcon != null) {
-				int level = (int) (((double) tank.getFluidAmount() / (double) tank
-						.getCapacity()) * sizeY);
 
-				drawFull(tank, guiLeft, guiTop, zLevel, liquidIcon, level,
-						sizeX, sizeY, offsetX, offsetY);
+			if (liquidIcon != null) {
+				int level = (int) (((double) tank.getFluidAmount() / (double) tank.getCapacity()) * sizeY);
+
+				drawFull(tank, guiLeft, guiTop, zLevel, liquidIcon, level, sizeX, sizeY, offsetX, offsetY);
 			}
 		}
 	}
 
-	public static void drawFull(FluidTank tank, int guiLeft, int guiTop,
-			float zLevel, IIcon liquidIcon, int level, int sizeX, int sizeY,
-			int offsetX, int offsetY) {
+	public static void drawFull(FluidTank tank, int guiLeft, int guiTop, float zLevel, IIcon liquidIcon, int level,
+			int sizeX, int sizeY, int offsetX, int offsetY) {
 		int color = tank.getFluid().getFluid().getColor();
 
 		float left = liquidIcon.getMinU();
@@ -64,61 +61,54 @@ public class FFUtils {
 		float right2 = liquidIcon.getInterpolatedU(2);
 		float up2 = liquidIcon.getInterpolatedV(16 - (level % 16));
 		int number = Math.floorDiv(level, 16);
+		int thick = Math.floorDiv(sizeX, 16);
 
 		Tessellator tes = Tessellator.instance;
 		tes.startDrawingQuads();
 		tes.setColorOpaque_I(color);
 		// pixels 17 to 69 (-52)
+		for (int j = 0; j < thick; j++) {
+			for (int i = 0; i < number; i++) {
+				tes.addVertexWithUV(guiLeft + offsetX, guiTop + offsetY - 16 - (i * 16), zLevel, left, up);
+				tes.addVertexWithUV(guiLeft + offsetX, guiTop + offsetY - (i * 16), zLevel, left, down);
+				tes.addVertexWithUV(guiLeft + offsetX + 16, guiTop + offsetY - (i * 16), zLevel, right, down);
+				tes.addVertexWithUV(guiLeft + offsetX + 16, guiTop + offsetY - 16 - (i * 16), zLevel, right, up);
 
-		for (int i = 0; i < number; i++) {
-			tes.addVertexWithUV(guiLeft + offsetX, guiTop + offsetY - 16
-					- (i * 16), zLevel, left, up);
-			tes.addVertexWithUV(guiLeft + offsetX, guiTop + offsetY - (i * 16),
-					zLevel, left, down);
-			tes.addVertexWithUV(guiLeft + offsetX + 16, guiTop + offsetY
-					- (i * 16), zLevel, right, down);
-			tes.addVertexWithUV(guiLeft + offsetX + 16, guiTop + offsetY - 16
-					- (i * 16), zLevel, right, up);
-
-			/*
-			 * tes.addVertexWithUV(guiLeft + 71 + 16, guiTop + 69 - 16 - (i *
-			 * 16), zLevel, left, up); tes.addVertexWithUV(guiLeft + 71 + 16,
-			 * guiTop + 69 - (i * 16), zLevel, left, down);
-			 * tes.addVertexWithUV(guiLeft + 71 + 32, guiTop + 69 - (i * 16),
-			 * zLevel, right, down); tes.addVertexWithUV(guiLeft + 71 + 32,
-			 * guiTop + 69 - 16 - (i * 16), zLevel, right, up);
-			 * 
-			 * tes.addVertexWithUV(guiLeft + 71 + 32, guiTop + 69 - 16 - (i *
-			 * 16), zLevel, left, up); tes.addVertexWithUV(guiLeft + 71 + 32,
-			 * guiTop + 69 - (i * 16), zLevel, left, down);
-			 * tes.addVertexWithUV(guiLeft + 71 + 34, guiTop + 69 - (i * 16),
-			 * zLevel, right2, down); tes.addVertexWithUV(guiLeft + 71 + 34,
-			 * guiTop + 69 - 16 - (i * 16), zLevel, right2, up);
-			 */
+				/*
+				 * tes.addVertexWithUV(guiLeft + 71 + 16, guiTop + 69 - 16 - (i * 16), zLevel,
+				 * left, up); tes.addVertexWithUV(guiLeft + 71 + 16, guiTop + 69 - (i * 16),
+				 * zLevel, left, down); tes.addVertexWithUV(guiLeft + 71 + 32, guiTop + 69 - (i
+				 * * 16), zLevel, right, down); tes.addVertexWithUV(guiLeft + 71 + 32, guiTop +
+				 * 69 - 16 - (i * 16), zLevel, right, up);
+				 * 
+				 * tes.addVertexWithUV(guiLeft + 71 + 32, guiTop + 69 - 16 - (i * 16), zLevel,
+				 * left, up); tes.addVertexWithUV(guiLeft + 71 + 32, guiTop + 69 - (i * 16),
+				 * zLevel, left, down); tes.addVertexWithUV(guiLeft + 71 + 34, guiTop + 69 - (i
+				 * * 16), zLevel, right2, down); tes.addVertexWithUV(guiLeft + 71 + 34, guiTop +
+				 * 69 - 16 - (i * 16), zLevel, right2, up);
+				 */
+			}
 		}
-		tes.addVertexWithUV(guiLeft + offsetX, guiTop + offsetY - (number * 16)
-				- (level % 16), zLevel, left, up2);
-		tes.addVertexWithUV(guiLeft + offsetX,
-				guiTop + offsetY - (number * 16), zLevel, left, down);
-		tes.addVertexWithUV(guiLeft + offsetX + 16, guiTop + offsetY
-				- (number * 16), zLevel, right, down);
-		tes.addVertexWithUV(guiLeft + offsetX + 16, guiTop + offsetY
-				- (number * 16) - (level % 16), zLevel, right, up2);
+		tes.addVertexWithUV(guiLeft + offsetX, guiTop + offsetY - (number * 16) - (level % 16), zLevel, left, up2);
+		tes.addVertexWithUV(guiLeft + offsetX, guiTop + offsetY - (number * 16), zLevel, left, down);
+		tes.addVertexWithUV(guiLeft + offsetX + 16, guiTop + offsetY - (number * 16), zLevel, right, down);
+		tes.addVertexWithUV(guiLeft + offsetX + 16, guiTop + offsetY - (number * 16) - (level % 16), zLevel, right,
+				up2);
 
 		/*
-		 * tes.addVertexWithUV(guiLeft + 71 + 16, guiTop + 69 - (number * 16) -
-		 * (level % 16), zLevel, left, up2); tes.addVertexWithUV(guiLeft + 71 +
-		 * 16, guiTop + 69 - (number * 16), zLevel, left, down);
-		 * tes.addVertexWithUV(guiLeft + 71 + 32, guiTop + 69 - (number * 16),
-		 * zLevel, right, down); tes.addVertexWithUV(guiLeft + 71 + 32, guiTop +
-		 * 69 - (number * 16) - (level % 16), zLevel, right, up2);
+		 * tes.addVertexWithUV(guiLeft + 71 + 16, guiTop + 69 - (number * 16) - (level %
+		 * 16), zLevel, left, up2); tes.addVertexWithUV(guiLeft + 71 + 16, guiTop + 69 -
+		 * (number * 16), zLevel, left, down); tes.addVertexWithUV(guiLeft + 71 + 32,
+		 * guiTop + 69 - (number * 16), zLevel, right, down);
+		 * tes.addVertexWithUV(guiLeft + 71 + 32, guiTop + 69 - (number * 16) - (level %
+		 * 16), zLevel, right, up2);
 		 * 
-		 * tes.addVertexWithUV(guiLeft + 71 + 32, guiTop + 69 - (number * 16) -
-		 * (level % 16), zLevel, left, up2); tes.addVertexWithUV(guiLeft + 71 +
-		 * 32, guiTop + 69 - (number * 16), zLevel, left, down);
-		 * tes.addVertexWithUV(guiLeft + 71 + 34, guiTop + 69 - (number * 16),
-		 * zLevel, right2, down); tes.addVertexWithUV(guiLeft + 71 + 34, guiTop
-		 * + 69 - (number * 16) - (level % 16), zLevel, right2, up2);
+		 * tes.addVertexWithUV(guiLeft + 71 + 32, guiTop + 69 - (number * 16) - (level %
+		 * 16), zLevel, left, up2); tes.addVertexWithUV(guiLeft + 71 + 32, guiTop + 69 -
+		 * (number * 16), zLevel, left, down); tes.addVertexWithUV(guiLeft + 71 + 34,
+		 * guiTop + 69 - (number * 16), zLevel, right2, down);
+		 * tes.addVertexWithUV(guiLeft + 71 + 34, guiTop + 69 - (number * 16) - (level %
+		 * 16), zLevel, right2, up2);
 		 */
 
 		tes.draw();
@@ -126,66 +116,73 @@ public class FFUtils {
 	}
 
 	/**
-	 * Renders tank info, like fluid type and millibucket amount. Same as the hbm one, just centrallized to a utility file.
-	 * @param gui - the gui to render the fluid info on
-	 * @param mouseX - the cursor's x position
-	 * @param mouseY - the cursor's y position
-	 * @param x - the x left corner of where to render the info
-	 * @param y - the y top corner of where to render the info
-	 * @param width - how wide the area to render info inside is
-	 * @param height - how tall the area to render info inside is
+	 * Renders tank info, like fluid type and millibucket amount. Same as the hbm
+	 * one, just centrallized to a utility file.
+	 * 
+	 * @param gui       - the gui to render the fluid info on
+	 * @param mouseX    - the cursor's x position
+	 * @param mouseY    - the cursor's y position
+	 * @param x         - the x left corner of where to render the info
+	 * @param y         - the y top corner of where to render the info
+	 * @param width     - how wide the area to render info inside is
+	 * @param height    - how tall the area to render info inside is
 	 * @param fluidTank - the tank to render info of
 	 */
-	public static void renderTankInfo(GuiInfoContainer gui, int mouseX,
-			int mouseY, int x, int y, int width, int height, FluidTank fluidTank) {
-		if (x <= mouseX && x + width > mouseX && y < mouseY
-				&& y + height >= mouseY) {
+	public static void renderTankInfo(GuiInfoContainer gui, int mouseX, int mouseY, int x, int y, int width, int height,
+			FluidTank fluidTank) {
+		if (x <= mouseX && x + width > mouseX && y < mouseY && y + height >= mouseY) {
 			if (fluidTank.getFluid() != null) {
-				gui.drawFluidInfo(
-						new String[] {"" + (StatCollector.translateToLocal(fluidTank.getFluid().getFluid().getUnlocalizedName())).trim(), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
+				gui.drawFluidInfo(new String[] { ""
+						+ (StatCollector.translateToLocal(fluidTank.getFluid().getFluid().getUnlocalizedName())).trim(),
+						fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
 			} else {
-				gui.drawFluidInfo(new String[] {I18n.format("None"), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
+				gui.drawFluidInfo(new String[] { I18n.format("None"),
+						fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
 			}
 		}
 	}
-	
-	public static void renderTankInfo(GuiInfoContainer gui, int mouseX,
-			int mouseY, int x, int y, int width, int height, FluidTank fluidTank, Fluid fluid) {
-		if (x <= mouseX && x + width > mouseX && y < mouseY
-				&& y + height >= mouseY) {
+
+	public static void renderTankInfo(GuiInfoContainer gui, int mouseX, int mouseY, int x, int y, int width, int height,
+			FluidTank fluidTank, Fluid fluid) {
+		if (x <= mouseX && x + width > mouseX && y < mouseY && y + height >= mouseY) {
 			if (fluid != null) {
 				gui.drawFluidInfo(
-						new String[] {"" + (StatCollector.translateToLocal(fluid.getUnlocalizedName())).trim(), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
+						new String[] { "" + (StatCollector.translateToLocal(fluid.getUnlocalizedName())).trim(),
+								fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" },
+						mouseX, mouseY);
 			} else {
-				gui.drawFluidInfo(new String[] {I18n.format("None"), fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
+				gui.drawFluidInfo(new String[] { I18n.format("None"),
+						fluidTank.getFluidAmount() + "/" + fluidTank.getCapacity() + "mB" }, mouseX, mouseY);
 			}
 		}
 	}
-	
-	public static boolean checkFluidConnectables(World world, int x, int y, int z, FFPipeNetwork net)
-	{
+
+	public static boolean checkFluidConnectables(World world, int x, int y, int z, FFPipeNetwork net) {
 		TileEntity tileentity = world.getTileEntity(x, y, z);
-		if(tileentity != null && tileentity instanceof IFluidPipe && ((IFluidPipe)tileentity).getNetworkTrue() == net)
+		if (tileentity != null && tileentity instanceof IFluidPipe && ((IFluidPipe) tileentity).getNetworkTrue() == net)
 			return true;
-		if(tileentity != null && !(tileentity instanceof IFluidPipe) && tileentity instanceof IFluidHandler)
-		{
+		if (tileentity != null && !(tileentity instanceof IFluidPipe) && tileentity instanceof IFluidHandler) {
 			return true;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Replacement method for the old method of transferring fluids out of a machine
+	 * 
 	 * @param tileEntity - the tile entity it is filling from
-	 * @param tank - the fluid tank to fill from
-	 * @param world - the world the filling is taking place in
-	 * @param i - x coord of place to fill
-	 * @param j - y coord of place to fill
-	 * @param k - z coord of place to fill
-	 * @param maxDrain - the maximum amount that can be drained from the tank at a time
-	 * @return Whether something was actually filled or not, or whether it needs an update
+	 * @param tank       - the fluid tank to fill from
+	 * @param world      - the world the filling is taking place in
+	 * @param i          - x coord of place to fill
+	 * @param j          - y coord of place to fill
+	 * @param k          - z coord of place to fill
+	 * @param maxDrain   - the maximum amount that can be drained from the tank at a
+	 *                   time
+	 * @return Whether something was actually filled or not, or whether it needs an
+	 *         update
 	 */
-	public static boolean fillFluid(TileEntity tileEntity,FluidTank tank, World world, int i, int j, int k, int maxDrain) {
+	public static boolean fillFluid(TileEntity tileEntity, FluidTank tank, World world, int i, int j, int k,
+			int maxDrain) {
 		if (tank.getFluidAmount() <= 0 || tank.getFluid() == null) {
 			return false;
 		}
@@ -209,29 +206,40 @@ public class FFUtils {
 
 	/**
 	 * Fills a tank from a fluid handler item.
+	 * 
 	 * @param slots - the slot inventory
-	 * @param tank - the tank to be filled
+	 * @param tank  - the tank to be filled
 	 * @param slot1 - the slot with the full container
 	 * @param slot2 - the output slot
 	 */
 	public static boolean fillFluidContainer(ItemStack[] slots, FluidTank tank, int slot1, int slot2) {
-		if(slots == null || tank == null || tank.getFluid() == null || slots.length < slot1 || slots.length < slot2 || slots[slot1] == null){
+		if (slots == null || tank == null || tank.getFluid() == null || slots.length < slot1 || slots.length < slot2
+				|| slots[slot1] == null) {
 			return false;
 		}
-		if(slots[slot1].getItem() instanceof IFluidContainerItem){
+		if (slots[slot1].getItem() instanceof IFluidContainerItem) {
 			boolean returnValue = false;
-			if(((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]) == null || ((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]).getFluid() == tank.getFluid().getFluid()){
-				tank.drain(((IFluidContainerItem) slots[slot1].getItem()).fill(slots[slot1], new FluidStack(tank.getFluid(), Math.min(6000, tank.getFluidAmount())), true), true);
+			if (((IFluidContainerItem) slots[slot1].getItem()).getFluid(slots[slot1]) == null
+					|| ((IFluidContainerItem) slots[slot1].getItem()).getFluid(slots[slot1]).getFluid() == tank
+							.getFluid().getFluid()) {
+				tank.drain(((IFluidContainerItem) slots[slot1].getItem()).fill(slots[slot1],
+						new FluidStack(tank.getFluid(), Math.min(6000, tank.getFluidAmount())), true), true);
 				returnValue = true;
 			}
-			if(((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]) != null && (tank.getFluid() == null || ((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]).getFluid() != tank.getFluid().getFluid() || ((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]).amount >= ((IFluidContainerItem)slots[slot1].getItem()).getCapacity(slots[slot1]))){
+			if (((IFluidContainerItem) slots[slot1].getItem()).getFluid(slots[slot1]) != null
+					&& (tank.getFluid() == null
+							|| ((IFluidContainerItem) slots[slot1].getItem()).getFluid(slots[slot1]).getFluid() != tank
+									.getFluid().getFluid()
+							|| ((IFluidContainerItem) slots[slot1].getItem())
+									.getFluid(slots[slot1]).amount >= ((IFluidContainerItem) slots[slot1].getItem())
+											.getCapacity(slots[slot1]))) {
 				moveItems(slots, slot1, slot2);
 			}
 			return returnValue;
-		} else if (FluidContainerRegistry.isEmptyContainer(slots[slot1])){
-			if(FluidContainerRegistry.fillFluidContainer(tank.getFluid(), slots[slot1]) != null) {
+		} else if (FluidContainerRegistry.isEmptyContainer(slots[slot1])) {
+			if (FluidContainerRegistry.fillFluidContainer(tank.getFluid(), slots[slot1]) != null) {
 				FluidStack fStack = tank.getFluid();
-				if(fillEmpty(slots, slot1, slot2, fStack)) {
+				if (fillEmpty(slots, slot1, slot2, fStack)) {
 					tank.drain(FluidContainerRegistry.getFluidForFilledItem(slots[slot2]).amount, true);
 					return true;
 				}
@@ -239,32 +247,39 @@ public class FFUtils {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Fills a fluid handling item from a tank
+	 * 
 	 * @param slots - the slot inventory
-	 * @param tank - the tank to fill from
+	 * @param tank  - the tank to fill from
 	 * @param slot1 - the slot with an empty container
 	 * @param slot2 - the output slot.
 	 */
-	public static boolean fillFromFluidContainer(ItemStack[] slots, FluidTank tank, int slot1, int slot2){
-		
-		if(slots == null || tank == null || slots.length < slot1 || slots.length < slot2 || slots[slot1] == null){
+	public static boolean fillFromFluidContainer(ItemStack[] slots, FluidTank tank, int slot1, int slot2) {
+
+		if (slots == null || tank == null || slots.length < slot1 || slots.length < slot2 || slots[slot1] == null) {
 			return false;
 		}
-		if(slots[slot1].getItem() instanceof IFluidContainerItem){
+		if (slots[slot1].getItem() instanceof IFluidContainerItem) {
 			boolean returnValue = false;
-			if(((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]) != null && (tank.getFluid() == null || ((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]).getFluid() == tank.getFluid().getFluid())){
-				tank.fill(((IFluidContainerItem)slots[slot1].getItem()).drain(slots[slot1], Math.min(6000, tank.getCapacity() - tank.getFluidAmount()), true), true);
+			if (((IFluidContainerItem) slots[slot1].getItem()).getFluid(slots[slot1]) != null
+					&& (tank.getFluid() == null || ((IFluidContainerItem) slots[slot1].getItem()).getFluid(slots[slot1])
+							.getFluid() == tank.getFluid().getFluid())) {
+				tank.fill(((IFluidContainerItem) slots[slot1].getItem()).drain(slots[slot1],
+						Math.min(6000, tank.getCapacity() - tank.getFluidAmount()), true), true);
 				returnValue = true;
 			}
-			if(((IFluidContainerItem)slots[slot1].getItem()).getFluid(slots[slot1]) == null)
+			if (((IFluidContainerItem) slots[slot1].getItem()).getFluid(slots[slot1]) == null)
 				moveItems(slots, slot1, slot2);
 			return returnValue;
-		} else if(FluidContainerRegistry.isFilledContainer(slots[slot1]) && FluidContainerRegistry.getFluidForFilledItem(slots[slot1]) != null){
-			if(tank.getCapacity() - tank.getFluidAmount() >= FluidContainerRegistry.getContainerCapacity(slots[slot1]) && (tank.getFluid() == null || tank.getFluid().getFluid() == FluidContainerRegistry.getFluidForFilledItem(slots[slot1]).getFluid())){
+		} else if (FluidContainerRegistry.isFilledContainer(slots[slot1])
+				&& FluidContainerRegistry.getFluidForFilledItem(slots[slot1]) != null) {
+			if (tank.getCapacity() - tank.getFluidAmount() >= FluidContainerRegistry.getContainerCapacity(slots[slot1])
+					&& (tank.getFluid() == null || tank.getFluid().getFluid() == FluidContainerRegistry
+							.getFluidForFilledItem(slots[slot1]).getFluid())) {
 				ItemStack temp = slots[slot1];
-				if(moveFullToEmpty(slots, slot1, slot2)) {
+				if (moveFullToEmpty(slots, slot1, slot2)) {
 					tank.fill(FluidContainerRegistry.getFluidForFilledItem(temp), true);
 					return true;
 				}
@@ -274,17 +289,19 @@ public class FFUtils {
 	}
 
 	private static boolean moveFullToEmpty(ItemStack[] slots, int in, int out) {
-		if(slots[in] != null && FluidContainerRegistry.drainFluidContainer(slots[in]) != null){
-			if(slots[out] == null){
+		if (slots[in] != null && FluidContainerRegistry.drainFluidContainer(slots[in]) != null) {
+			if (slots[out] == null) {
 				slots[out] = FluidContainerRegistry.drainFluidContainer(slots[in]);
-				slots[in].stackSize --;
-				if(slots[in].stackSize <= 0){
+				slots[in].stackSize--;
+				if (slots[in].stackSize <= 0) {
 					slots[in] = null;
 				}
 				return true;
-			} else if(slots[out] != null && slots[out].getItem() == FluidContainerRegistry.drainFluidContainer(slots[in]).getItem() && slots[out].stackSize < slots[out].getMaxStackSize()){
+			} else if (slots[out] != null
+					&& slots[out].getItem() == FluidContainerRegistry.drainFluidContainer(slots[in]).getItem()
+					&& slots[out].stackSize < slots[out].getMaxStackSize()) {
 				slots[in].stackSize--;
-				if(slots[in].stackSize <= 0)
+				if (slots[in].stackSize <= 0)
 					slots[in] = null;
 				slots[out].stackSize++;
 				return true;
@@ -292,19 +309,21 @@ public class FFUtils {
 		}
 		return false;
 	}
-	
+
 	private static boolean fillEmpty(ItemStack[] slots, int in, int out, FluidStack fStack) {
-		if(slots[in] != null && FluidContainerRegistry.fillFluidContainer(fStack, slots[in]) != null){
-			if(slots[out] == null){
+		if (slots[in] != null && FluidContainerRegistry.fillFluidContainer(fStack, slots[in]) != null) {
+			if (slots[out] == null) {
 				slots[out] = FluidContainerRegistry.fillFluidContainer(fStack, slots[in]);
-				slots[in].stackSize --;
-				if(slots[in].stackSize <= 0){
+				slots[in].stackSize--;
+				if (slots[in].stackSize <= 0) {
 					slots[in] = null;
 				}
 				return true;
-			} else if(slots[out] != null && slots[out].getItem() == FluidContainerRegistry.fillFluidContainer(fStack, slots[in]).getItem() && slots[out].stackSize < slots[out].getMaxStackSize()){
+			} else if (slots[out] != null
+					&& slots[out].getItem() == FluidContainerRegistry.fillFluidContainer(fStack, slots[in]).getItem()
+					&& slots[out].stackSize < slots[out].getMaxStackSize()) {
 				slots[in].stackSize--;
-				if(slots[in].stackSize <= 0)
+				if (slots[in].stackSize <= 0)
 					slots[in] = null;
 				slots[out].stackSize++;
 				return true;
@@ -312,19 +331,20 @@ public class FFUtils {
 		}
 		return false;
 	}
-	
+
 	private static boolean moveItems(ItemStack[] slots, int in, int out) {
-		if(slots[in] != null){
-			
-			if(slots[out] == null){
-				
+		if (slots[in] != null) {
+
+			if (slots[out] == null) {
+
 				slots[out] = slots[in];
 				slots[in] = null;
 				return true;
 			} else {
-				int amountToTransfer = Math.min(slots[out].getMaxStackSize() - slots[out].stackSize, slots[in].stackSize);
+				int amountToTransfer = Math.min(slots[out].getMaxStackSize() - slots[out].stackSize,
+						slots[in].stackSize);
 				slots[in].stackSize -= amountToTransfer;
-				if(slots[in].stackSize <= 0)
+				if (slots[in].stackSize <= 0)
 					slots[in] = null;
 				slots[out].stackSize += amountToTransfer;
 				return true;
