@@ -189,10 +189,10 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		this.power = nbt.getLong("powerTime");
 		slots = new ItemStack[getSizeInventory()];
 
-		tanks[0].readFromNBT((NBTTagCompound) nbt.getTag("input1"));
-		tanks[1].readFromNBT((NBTTagCompound) nbt.getTag("input2"));
-		tanks[2].readFromNBT((NBTTagCompound) nbt.getTag("output1"));
-		tanks[3].readFromNBT((NBTTagCompound) nbt.getTag("output2"));
+		tanks[0].readFromNBT(nbt.getCompoundTag("input1"));
+		tanks[1].readFromNBT(nbt.getCompoundTag("input2"));
+		tanks[2].readFromNBT(nbt.getCompoundTag("output1"));
+		tanks[3].readFromNBT(nbt.getCompoundTag("output2"));
 		
 		types = nbt.getIntArray("types");
 		

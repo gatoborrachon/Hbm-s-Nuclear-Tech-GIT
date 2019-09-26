@@ -3,14 +3,10 @@ package com.hbm.tileentity.machine;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hbm.forgefluid.FFUtils;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
-import com.hbm.interfaces.IFluidSource;
-import com.hbm.interfaces.IOilAcceptor;
-import com.hbm.inventory.FluidContainerRegistry;
-import com.hbm.inventory.FluidTank;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemBattery;
 import com.hbm.lib.Library;
@@ -26,8 +22,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityMachineRefinery extends TileEntity implements ISidedInventory, IConsumer, IFluidContainer, IFluidAcceptor, IFluidSource {
+public class TileEntityMachineRefinery extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler {
 
 	private ItemStack slots[];
 
@@ -36,11 +39,9 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 	public static final int maxSulfur = 100;
 	public static final long maxPower = 1000;
 	public int age = 0;
+	public boolean needsUpdate = false;
 	public FluidTank[] tanks;
-	public List<IFluidAcceptor> list1 = new ArrayList();
-	public List<IFluidAcceptor> list2 = new ArrayList();
-	public List<IFluidAcceptor> list3 = new ArrayList();
-	public List<IFluidAcceptor> list4 = new ArrayList();
+	public Fluid[] tankTypes;
 
 	private static final int[] slots_top = new int[] { 1 };
 	private static final int[] slots_bottom = new int[] { 0, 2, 4, 6, 8, 10, 11};
@@ -51,11 +52,12 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 	public TileEntityMachineRefinery() {
 		slots = new ItemStack[12];
 		tanks = new FluidTank[5];
-		tanks[0] = new FluidTank(FluidType.HOTOIL, 64000, 0);
-		tanks[1] = new FluidTank(FluidType.HEAVYOIL, 16000, 1);
-		tanks[2] = new FluidTank(FluidType.NAPHTHA, 16000, 2);
-		tanks[3] = new FluidTank(FluidType.LIGHTOIL, 16000, 3);
-		tanks[4] = new FluidTank(FluidType.PETROLEUM, 16000, 4);
+		tankTypes = new Fluid[] {ModForgeFluids.hotoil, ModForgeFluids.heavyoil, ModForgeFluids.napatha, ModForgeFluids.lightoil, ModForgeFluids.petroleum};
+		tanks[0] = new FluidTank(64000);
+		tanks[1] = new FluidTank(16000);
+		tanks[2] = new FluidTank(16000);
+		tanks[3] = new FluidTank(16000);
+		tanks[4] = new FluidTank(16000);
 	}
 
 	@Override
@@ -128,7 +130,7 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 		
 		if(i == 0 && stack.getItem() instanceof ItemBattery)
 			return true;
-		if(i == 1 && FluidContainerRegistry.getFluidContent(stack, FluidType.HOTOIL) > 0)
+		if(i == 1 && FluidContainerRegistry.getFluidForFilledItem(stack) != null && FluidContainerRegistry.getFluidForFilledItem(stack).getFluid() == ModForgeFluids.hotoil)
 			return true;
 		if(stack.getItem() == ModItems.canister_empty) {
 			if(i == 3)
@@ -170,13 +172,19 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
 		NBTTagList list = nbt.getTagList("items", 10);
-
+		
+		tankTypes[0] = ModForgeFluids.hotoil;
+		tankTypes[1] = ModForgeFluids.heavyoil;
+		tankTypes[2] = ModForgeFluids.napatha;
+		tankTypes[3] = ModForgeFluids.lightoil;
+		tankTypes[4] = ModForgeFluids.petroleum;
+		
 		power = nbt.getLong("power");
-		tanks[0].readFromNBT(nbt, "input");
-		tanks[1].readFromNBT(nbt, "heavy");
-		tanks[2].readFromNBT(nbt, "naphtha");
-		tanks[3].readFromNBT(nbt, "light");
-		tanks[4].readFromNBT(nbt, "petroleum");
+		tanks[0].readFromNBT(nbt.getCompoundTag("inputTank1"));
+		tanks[1].readFromNBT(nbt.getCompoundTag("outputTank1"));
+		tanks[2].readFromNBT(nbt.getCompoundTag("outputTank2"));
+		tanks[3].readFromNBT(nbt.getCompoundTag("outputTank3"));
+		tanks[4].readFromNBT(nbt.getCompoundTag("outputTank4"));
 		sulfur = nbt.getInteger("sulfur");
 		slots = new ItemStack[getSizeInventory()];
 		
@@ -194,12 +202,25 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
+		NBTTagCompound inputTank1 = new NBTTagCompound();
+		NBTTagCompound outputTank1 = new NBTTagCompound();
+		NBTTagCompound outputTank2 = new NBTTagCompound();
+		NBTTagCompound outputTank3 = new NBTTagCompound();
+		NBTTagCompound outputTank4 = new NBTTagCompound();
+		
 		nbt.setLong("power", power);
-		tanks[0].writeToNBT(nbt, "input");
-		tanks[1].writeToNBT(nbt, "heavy");
-		tanks[2].writeToNBT(nbt, "naphtha");
-		tanks[3].writeToNBT(nbt, "light");
-		tanks[4].writeToNBT(nbt, "petroleum");
+		tanks[0].writeToNBT(inputTank1);
+		tanks[1].writeToNBT(outputTank1);
+		tanks[2].writeToNBT(outputTank2);
+		tanks[3].writeToNBT(outputTank3);
+		tanks[4].writeToNBT(outputTank4);
+		
+		nbt.setTag("inputTank1", inputTank1);
+		nbt.setTag("outputTank1", outputTank1);
+		nbt.setTag("outputTank2", outputTank2);
+		nbt.setTag("outputTank3", outputTank3);
+		nbt.setTag("outputTank4", outputTank4);
+		
 		nbt.setInteger("sulfur", sulfur);
 		NBTTagList list = new NBTTagList();
 		
@@ -262,10 +283,10 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 			}
 			
 			if(age == 9 || age == 19) {
-				fillFluidInit(tanks[1].getTankType());
-				fillFluidInit(tanks[2].getTankType());
-				fillFluidInit(tanks[3].getTankType());
-				fillFluidInit(tanks[4].getTankType());
+				fillFluidInit(tanks[1]);
+				fillFluidInit(tanks[2]);
+				fillFluidInit(tanks[3]);
+				fillFluidInit(tanks[4]);
 			}
 			
 			tanks[0].loadTank(1, 2, slots);
@@ -333,118 +354,16 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 		return maxPower;
 	}
 
-	@Override
-	public void fillFluidInit(FluidType type) {
-		fillFluid(this.xCoord + 1, this.yCoord, this.zCoord - 2, getTact(), type);
-		fillFluid(this.xCoord + 1, this.yCoord, this.zCoord + 2, getTact(), type);
-		fillFluid(this.xCoord - 1, this.yCoord, this.zCoord - 2, getTact(), type);
-		fillFluid(this.xCoord - 1, this.yCoord, this.zCoord + 2, getTact(), type);
+	public void fillFluidInit(FluidTank tank) {
+		FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord - 2, 2000);
+		FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord + 2, 2000);
+		FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord - 2, 2000);
+		FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord + 2, 2000);
 		
-		fillFluid(this.xCoord - 2, this.yCoord, this.zCoord + 1, getTact(), type);
-		fillFluid(this.xCoord + 2, this.yCoord, this.zCoord + 1, getTact(), type);
-		fillFluid(this.xCoord - 2, this.yCoord, this.zCoord - 1, getTact(), type);
-		fillFluid(this.xCoord + 2, this.yCoord, this.zCoord - 1, getTact(), type);
-	}
-
-	@Override
-	public void fillFluid(int x, int y, int z, boolean newTact, FluidType type) {
-		Library.transmitFluid(x, y, z, newTact, this, worldObj, type);
-	}
-
-	@Override
-	public boolean getTact() {
-		if (age >= 0 && age < 10) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getFill();
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getFill();
-		else if(type.name().equals(tanks[2].getTankType().name()))
-			return tanks[2].getFill();
-		else if(type.name().equals(tanks[3].getTankType().name()))
-			return tanks[3].getFill();
-		else if(type.name().equals(tanks[4].getTankType().name()))
-			return tanks[4].getFill();
-		
-		return 0;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			tanks[0].setFill(i);
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			tanks[1].setFill(i);
-		else if(type.name().equals(tanks[2].getTankType().name()))
-			tanks[2].setFill(i);
-		else if(type.name().equals(tanks[3].getTankType().name()))
-			tanks[3].setFill(i);
-		else if(type.name().equals(tanks[4].getTankType().name()))
-			tanks[4].setFill(i);
-	}
-
-	@Override
-	public List<IFluidAcceptor> getFluidList(FluidType type) {
-		if(type.name().equals(tanks[1].getTankType().name()))
-			return list1;
-		if(type.name().equals(tanks[2].getTankType().name()))
-			return list2;
-		if(type.name().equals(tanks[3].getTankType().name()))
-			return list3;
-		if(type.name().equals(tanks[4].getTankType().name()))
-			return list4;
-		return new ArrayList<IFluidAcceptor>();
-	}
-
-	@Override
-	public void clearFluidList(FluidType type) {
-		if(type.name().equals(tanks[1].getTankType().name()))
-			list1.clear();
-		if(type.name().equals(tanks[2].getTankType().name()))
-			list2.clear();
-		if(type.name().equals(tanks[3].getTankType().name()))
-			list3.clear();
-		if(type.name().equals(tanks[4].getTankType().name()))
-			list4.clear();
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getMaxFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public void setFillstate(int fill, int index) {
-		if(index < 5 && tanks[index] != null)
-			tanks[index].setFill(fill);
-	}
-
-	@Override
-	public void setType(FluidType type, int index) {
-		if(index < 5 && tanks[index] != null)
-			tanks[index].setTankType(type);
-	}
-
-	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tanks[0]);
-		list.add(tanks[1]);
-		list.add(tanks[2]);
-		list.add(tanks[3]);
-		list.add(tanks[4]);
-		
-		return list;
+		FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord + 1, 2000);
+		FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord + 1, 2000);
+		FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord - 1, 2000);
+		FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord - 1, 2000);
 	}
 	
 	@Override
@@ -457,5 +376,41 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 	public double getMaxRenderDistanceSquared()
 	{
 		return 65536.0D;
+	}
+
+	@Override
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
