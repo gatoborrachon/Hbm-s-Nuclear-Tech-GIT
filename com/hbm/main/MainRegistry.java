@@ -1413,9 +1413,9 @@ public class MainRegistry
 		}
 		for(Map.Entry<String, Fluid> entry : FluidRegistry.getRegisteredFluids().entrySet()){
 			i++;
-			net.minecraftforge.fluids.FluidContainerRegistry.registerFluidContainer(net.minecraftforge.fluids.FluidRegistry.getFluidStack(entry.getKey(), 1000), new ItemStack(ModItems.fluid_tank_full, 1, i), new ItemStack(ModItems.fluid_tank_empty));
-			net.minecraftforge.fluids.FluidContainerRegistry.registerFluidContainer(net.minecraftforge.fluids.FluidRegistry.getFluidStack(entry.getKey(), 16000), new ItemStack(ModItems.fluid_barrel_full, 1, i), new ItemStack(ModItems.fluid_barrel_empty));
-	}
+			net.minecraftforge.fluids.FluidContainerRegistry.registerFluidContainer(net.minecraftforge.fluids.FluidRegistry.getFluidStack(entry.getKey(), 1000), new ItemStack(ModItems.fluid_tank_full, 1, FluidRegistry.getFluidID(entry.getKey()) + FluidType.values().length + 10), new ItemStack(ModItems.fluid_tank_empty));
+			net.minecraftforge.fluids.FluidContainerRegistry.registerFluidContainer(net.minecraftforge.fluids.FluidRegistry.getFluidStack(entry.getKey(), 16000), new ItemStack(ModItems.fluid_barrel_full, 1, FluidRegistry.getFluidID(entry.getKey()) + FluidType.values().length + 10), new ItemStack(ModItems.fluid_barrel_empty));
+		}
 				
 				
 		HazmatRegistry.instance.registerHazmat(ModItems.hazmat_helmet, 0.2F);

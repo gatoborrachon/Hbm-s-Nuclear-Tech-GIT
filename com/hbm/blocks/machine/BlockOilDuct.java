@@ -97,6 +97,7 @@ public class BlockOilDuct extends BlockContainer {
 	@Override
 	 public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {
 		if(world.getTileEntity(x, y, z) != null && world.getTileEntity(x, y, z) instanceof TileEntityFFDuctBase) {
+			System.out.println(((TileEntityFFDuctBase)world.getTileEntity(x, y, z)).getNetworkTrue());
 			((TileEntityFFDuctBase)world.getTileEntity(x, y, z)).onNeighborBlockChange();
 		}
 	}

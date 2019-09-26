@@ -295,6 +295,7 @@ public class ModItems {
 	public static Item plate_schrabidium;
 	public static Item plate_copper;
 	public static Item nugget_beryllium;
+	
 	public static Item plate_gold;
 	public static Item hazmat_cloth;
 	public static Item hazmat_cloth_red;

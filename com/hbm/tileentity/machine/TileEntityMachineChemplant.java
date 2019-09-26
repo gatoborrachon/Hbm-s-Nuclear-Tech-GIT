@@ -57,11 +57,14 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 	public int maxProgress = 100;
 	public boolean isProgressing;
 	public boolean needsUpdate = false;
+	public boolean needsTankTypeUpdate = false;
 	int age = 0;
 	int consumption = 100;
 	int speed = 100;
 	public FluidTank[] tanks;
 	public Fluid[] tankTypes;
+	
+	public ItemStack previousTemplate = null;
 	
 	Random rand = new Random();
 	
@@ -326,6 +329,7 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		if(needsUpdate){
 			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 			needsUpdate = false;
+			needsTankTypeUpdate = false;
 		}
 		
 		if(speed < 25)
@@ -350,7 +354,7 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 			}
 			
 			setContainers();
-			
+	
 			power = Library.chargeTEFromItems(slots, 0, power, maxPower);
 			if(inputValidForTank(0, 17))
 				if(FFUtils.fillFromFluidContainer(slots, tanks[0], 17, 19))
@@ -573,10 +577,17 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 	}
 
 	private void setContainers() {
-		
 		if(slots[4] == null || (slots[4] != null && !(slots[4].getItem() instanceof ItemChemistryTemplate))) {
 		} else {
-			
+			needsTankTypeUpdate = true;
+			if(previousTemplate != null && ItemStack.areItemStacksEqual(previousTemplate, slots[4])){
+				
+				needsTankTypeUpdate = false;
+				
+			} else {
+				
+			}
+			previousTemplate = slots[4].copy();
 			FluidStack[] inputs = MachineRecipes.getFluidInputFromTempate(slots[4]);
 			FluidStack[] outputs = MachineRecipes.getFluidOutputFromTempate(slots[4]);
 
@@ -587,20 +598,30 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 			
 			if((inputs[0] != null && tanks[0].getFluid() == null) || tanks[0].getFluid() != null && tanks[0].getFluid().getFluid() != tankTypes[0]){
 				tanks[0].setFluid(null);
-				needsUpdate = true;
+				if(needsTankTypeUpdate){
+					needsUpdate = true;
+					needsTankTypeUpdate = false;
+				}
 			}
 			
 			if((inputs[1] != null && tanks[1].getFluid() == null) || tanks[1].getFluid() != null && tanks[1].getFluid().getFluid() != tankTypes[1]){
 				tanks[1].setFluid(null);
-				needsUpdate = true;
+				if(needsTankTypeUpdate){
+					needsUpdate = true;
+					needsTankTypeUpdate = false;
+				}
 			}
 			if((outputs[0] != null && tanks[2].getFluid() == null) || tanks[2].getFluid() != null && tanks[2].getFluid().getFluid() != tankTypes[2]){
 				tanks[2].setFluid(null);
-				needsUpdate = true;
+				if(needsTankTypeUpdate)
+					needsUpdate = true;
 			}
 			if((outputs[1] != null && tanks[3].getFluid() == null) || tanks[3].getFluid() != null && tanks[3].getFluid().getFluid() != tankTypes[3]){
 				tanks[3].setFluid(null);
-				needsUpdate = true;
+				if(needsTankTypeUpdate){
+					needsUpdate = true;
+					needsTankTypeUpdate = false;
+				}
 			}
 		}
 	}
@@ -999,39 +1020,73 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-		// TODO Auto-generated method stub
+		if(resource == null)
+			return 0;
+		if(tankTypes[0] != null && resource.getFluid() == tankTypes[0]) {
+			needsUpdate = true;
+			return tanks[0].fill(resource, doFill);
+		}
+		if(tankTypes[1] != null && resource.getFluid() == tankTypes[1]){
+			needsUpdate = true;
+			return tanks[1].fill(resource, doFill);
+		}
 		return 0;
 	}
 
 	@Override
-	public FluidStack drain(ForgeDirection from, FluidStack resource,
-			boolean doDrain) {
-		// TODO Auto-generated method stub
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+
+		if(resource == null)
+			return null;
+		if (resource.isFluidEqual(tanks[2].getFluid())) {
+			needsUpdate = true;
+			return tanks[2].drain(resource.amount, doDrain);
+		}
+		if (resource.isFluidEqual(tanks[3].getFluid())) {
+			needsUpdate = true;
+			return tanks[3].drain(resource.amount, doDrain);
+		}
 		return null;
 	}
 
 	@Override
 	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		// TODO Auto-generated method stub
+		if (tanks[2].getFluid() != null) {
+			needsUpdate = true;
+			return tanks[2].drain(maxDrain, doDrain);
+		} else if(tanks[3].getFluid() != null){
+			needsUpdate = true;
+			return tanks[3].drain(maxDrain, doDrain);
+		}
 		return null;
+
 	}
 
 	@Override
 	public boolean canFill(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
+		if(fluid == null)
+			return false;
+		if(tankTypes[0] != null && fluid == tankTypes[0])
+			return true;
+		if(tankTypes[1] != null && fluid == tankTypes[1])
+			return true;
 		return false;
 	}
-	
+
 	@Override
 	public boolean canDrain(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
+		if(fluid == null)
+			return true;
+		if(tankTypes[2] != null && fluid == tankTypes[2])
+			return true;
+		if(tankTypes[3] != null && fluid == tankTypes[3])
+			return true;
 		return false;
 	}
 
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-		// TODO Auto-generated method stub
-		return null;
+		return new FluidTankInfo[] {tanks[0].getInfo(), tanks[1].getInfo(), tanks[2].getInfo(), tanks[3].getInfo()};
 	}
 	
 	@Override

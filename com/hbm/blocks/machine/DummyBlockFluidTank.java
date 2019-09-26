@@ -31,7 +31,7 @@ public class DummyBlockFluidTank extends BlockContainer implements IDummy {
 	@Override
 	public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
 		if(this == ModBlocks.dummy_port_fluidtank){
-		return new TileEntityDummyFluidPort();
+			return new TileEntityDummyFluidPort();
 		} else {
 			return new TileEntityDummy();
 		}

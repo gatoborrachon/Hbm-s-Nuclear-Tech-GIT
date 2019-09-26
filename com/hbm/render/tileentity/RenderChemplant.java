@@ -135,7 +135,6 @@ public class RenderChemplant extends TileEntitySpecialRenderer {
         bindTexture(fluidTexture);
 
         GL11.glDisable(GL11.GL_LIGHTING);
-     //   System.out.println(FluidRegistry.LAVA.getUnlocalizedName().substring(11));
         if(chem.tanks[0].getFluid() != null) {
         	ResourceLocation test;
         	if(chem.tanks[0].getFluid().getFluid() == FluidRegistry.LAVA || chem.tanks[0].getFluid().getFluid() == FluidRegistry.WATER){
@@ -172,15 +171,17 @@ public class RenderChemplant extends TileEntitySpecialRenderer {
         }
 
         if(chem.tanks[1].getFluid() != null) {
+           	ResourceLocation test;
+        	if(chem.tanks[1].getFluid().getFluid() == FluidRegistry.LAVA || chem.tanks[1].getFluid().getFluid() == FluidRegistry.WATER){
+        		test = new ResourceLocation(RefStrings.MODID, "textures/blocks/forgefluid/" + chem.tanks[1].getFluid().getFluid().getUnlocalizedName().substring(11) + "_chemplant.png");
+        	} else {
         	String s = chem.tanks[1].getFluid().getFluid().getStillIcon().getIconName();
         	String textureBase = "textures/blocks/";
         	String[] test1 = s.split(":");
-        	String location;
-        	if(test1.length > 1)
-        		location = test1[0] + ":" + textureBase + test1[1] + ".png";
-        	else
-        		location = "minecraft:textures/blocks/" + test1[0] + ".png";
-        	ResourceLocation test = new ResourceLocation(location);
+        	String location = test1[0] + ":" + textureBase + test1[1] + ".png";
+        	test = new ResourceLocation(location);
+        	}
+        	bindTexture(test);
         	bindTexture(test);
 	        GL11.glPushMatrix();
 	        

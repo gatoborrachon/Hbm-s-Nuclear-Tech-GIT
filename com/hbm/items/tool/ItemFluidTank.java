@@ -1,6 +1,8 @@
 package com.hbm.items.tool;
 
 import java.util.List;
+import java.util.Map.Entry;
+
 import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.inventory.MachineRecipes;
 import com.hbm.items.ModItems;
@@ -18,6 +20,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 
@@ -37,8 +40,8 @@ public class ItemFluidTank extends Item {
 		for (; i < FluidType.values().length; ++i) {
 			list.add(new ItemStack(item, 1, i));
 		}
-		for (; i < FluidRegistry.getRegisteredFluids().size() + FluidType.values().length; i++) {
-			list.add(new ItemStack(item, 1, i));
+		for(Entry<Fluid, Integer> entry : FluidRegistry.getRegisteredFluidIDsByFluid().entrySet()){
+			list.add(new ItemStack(item, 1, entry.getValue() + FluidType.values().length + 10));
 		}
 	}
 
