@@ -20,6 +20,9 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -28,6 +31,7 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
 public class TileEntityMachineRefinery extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler {
@@ -288,37 +292,41 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 				fillFluidInit(tanks[3]);
 				fillFluidInit(tanks[4]);
 			}
-			
-			tanks[0].loadTank(1, 2, slots);
+			if(this.inputValidForTank(0, 1))
+				if(FFUtils.fillFromFluidContainer(slots, tanks[0], 1, 2))
+					needsUpdate = true;
 			
 			int ho = 50;
 			int nt = 25;
 			int lo = 15;
 			int pe = 10;
 			
-			if(power >= 5 && tanks[0].getFill() >= 100 &&
-					tanks[1].getFill() + ho <= tanks[1].getMaxFill() && 
-					tanks[2].getFill() + nt <= tanks[2].getMaxFill() && 
-					tanks[3].getFill() + lo <= tanks[3].getMaxFill() && 
-					tanks[4].getFill() + pe <= tanks[4].getMaxFill()) {
+			if(power >= 5 && tanks[0].getFluidAmount() >= 100 &&
+					tanks[1].getFluidAmount() + ho <= tanks[1].getCapacity() && 
+					tanks[2].getFluidAmount() + nt <= tanks[2].getCapacity() && 
+					tanks[3].getFluidAmount() + lo <= tanks[3].getCapacity() && 
+					tanks[4].getFluidAmount() + pe <= tanks[4].getCapacity()) {
 
-				tanks[0].setFill(tanks[0].getFill() - 100);
-				tanks[1].setFill(tanks[1].getFill() + ho);
-				tanks[2].setFill(tanks[2].getFill() + nt);
-				tanks[3].setFill(tanks[3].getFill() + lo);
-				tanks[4].setFill(tanks[4].getFill() + pe);
+				tanks[0].drain(100, true);
+				tanks[1].fill(new FluidStack(ModForgeFluids.heavyoil, ho), true);
+				tanks[2].fill(new FluidStack(ModForgeFluids.napatha, nt), true);
+				tanks[3].fill(new FluidStack(ModForgeFluids.lightoil, lo), true);
+				tanks[4].fill(new FluidStack(ModForgeFluids.petroleum, pe), true);
 				sulfur += 1;
 				power -= 5;
+				needsUpdate = true;
 			}
-
-			tanks[1].unloadTank(3, 4, slots);
-			tanks[2].unloadTank(5, 6, slots);
-			tanks[3].unloadTank(7, 8, slots);
-			tanks[4].unloadTank(9, 10, slots);
 			
-			for(int i = 0; i < 5; i++) {
-				tanks[i].updateTank(xCoord, yCoord, zCoord);
-			}
+			if(FFUtils.fillFluidContainer(slots, tanks[1], 3, 4))
+				needsUpdate = true;
+			if(FFUtils.fillFluidContainer(slots, tanks[2], 5, 6))
+				needsUpdate = true;
+			if(FFUtils.fillFluidContainer(slots, tanks[3], 7, 8))
+				needsUpdate = true;
+			if(FFUtils.fillFluidContainer(slots, tanks[4], 6, 10))
+				needsUpdate = true;
+			
+			
 			
 			if(sulfur >= maxSulfur) {
 				if(slots[11] == null) {
@@ -329,8 +337,25 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 					sulfur -= maxSulfur;
 				}
 			}
+			if(needsUpdate){
+				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				needsUpdate = false;
+			}
 			PacketDispatcher.wrapper.sendToAll(new AuxElectricityPacket(xCoord, yCoord, zCoord, power));
 		}
+	}
+	
+	protected boolean inputValidForTank(int tank, int slot){
+		
+		if(slots[slot] != null && tankTypes[tank] != null){
+			if(slots[slot].getItem() instanceof IFluidContainerItem && ((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]) != null){
+				return ((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]).getFluid() == tankTypes[tank];
+			}
+			if(FluidContainerRegistry.isFilledContainer(slots[slot]) && FluidContainerRegistry.getFluidForFilledItem(slots[slot]).getFluid() != null){
+				return FluidContainerRegistry.getFluidForFilledItem(slots[slot]).getFluid() == tankTypes[tank];
+			}
+		}
+		return false;
 	}
 	
 	public long getPowerScaled(long i) {
@@ -355,15 +380,17 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 	}
 
 	public void fillFluidInit(FluidTank tank) {
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord - 2, 2000);
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord + 2, 2000);
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord - 2, 2000);
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord + 2, 2000);
+		boolean update = false || needsUpdate;
+		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord - 2, 2000);
+		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord + 2, 2000);
+		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord - 2, 2000);
+		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord + 2, 2000);
 		
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord + 1, 2000);
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord + 1, 2000);
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord - 1, 2000);
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord - 1, 2000);
+		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord + 1, 2000);
+		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord + 1, 2000);
+		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord - 1, 2000);
+		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord - 1, 2000);
+		needsUpdate = update;
 	}
 	
 	@Override
@@ -380,37 +407,100 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-		// TODO Auto-generated method stub
+		if(resource == null)
+			return 0;
+		if(tankTypes[0] != null && resource.getFluid() == tankTypes[0]) {
+			needsUpdate = true;
+			return tanks[0].fill(resource, doFill);
+		}
 		return 0;
 	}
 
 	@Override
 	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
-		// TODO Auto-generated method stub
+
+		if(resource == null)
+			return null;
+		if (resource.isFluidEqual(tanks[1].getFluid())) {
+			needsUpdate = true;
+			return tanks[1].drain(resource.amount, doDrain);
+		}
+		if (resource.isFluidEqual(tanks[2].getFluid())) {
+			needsUpdate = true;
+			return tanks[2].drain(resource.amount, doDrain);
+		}
+		if (resource.isFluidEqual(tanks[3].getFluid())) {
+			needsUpdate = true;
+			return tanks[3].drain(resource.amount, doDrain);
+		}
+		if (resource.isFluidEqual(tanks[4].getFluid())) {
+			needsUpdate = true;
+			return tanks[4].drain(resource.amount, doDrain);
+		}
 		return null;
 	}
 
 	@Override
 	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		// TODO Auto-generated method stub
+		if (tanks[1].getFluid() != null) {
+			needsUpdate = true;
+			return tanks[1].drain(maxDrain, doDrain);
+		} else if(tanks[2].getFluid() != null){
+			needsUpdate = true;
+			return tanks[2].drain(maxDrain, doDrain);
+		} else if(tanks[3].getFluid() != null){
+			needsUpdate = true;
+			return tanks[3].drain(maxDrain, doDrain);
+		} else if(tanks[4].getFluid() != null){
+			needsUpdate = true;
+			return tanks[4].drain(maxDrain, doDrain);
+		}
 		return null;
+
 	}
 
 	@Override
 	public boolean canFill(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
+		if(fluid == null)
+			return false;
+		if(tankTypes[0] != null && fluid == tankTypes[0])
+			return true;
 		return false;
 	}
 
 	@Override
 	public boolean canDrain(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
+		if(fluid == null)
+			return true;
+		if(tankTypes[1] != null && fluid == tankTypes[1])
+			return true;
+		if(tankTypes[2] != null && fluid == tankTypes[2])
+			return true;
+		if(tankTypes[3] != null && fluid == tankTypes[3])
+			return true;
+		if(tankTypes[4] != null && fluid == tankTypes[4])
+			return true;
 		return false;
 	}
 
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-		// TODO Auto-generated method stub
-		return null;
+		return new FluidTankInfo[] {tanks[0].getInfo(), tanks[1].getInfo(), tanks[2].getInfo(), tanks[3].getInfo(), tanks[4].getInfo()};
+	}
+	
+	@Override
+	public Packet getDescriptionPacket() {
+
+		NBTTagCompound tag = new NBTTagCompound();
+		writeToNBT(tag);
+
+		return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag);
+
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+
+		readFromNBT(pkt.func_148857_g());
 	}
 }

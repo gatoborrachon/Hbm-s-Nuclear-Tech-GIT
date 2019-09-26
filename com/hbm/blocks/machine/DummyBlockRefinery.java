@@ -6,6 +6,7 @@ import com.hbm.blocks.ModBlocks;
 import com.hbm.interfaces.IDummy;
 import com.hbm.main.MainRegistry;
 import com.hbm.tileentity.machine.TileEntityDummy;
+import com.hbm.tileentity.machine.TileEntityDummyFluidPort;
 import com.hbm.tileentity.machine.TileEntityMachineCyclotron;
 import com.hbm.tileentity.machine.TileEntityMachineRefinery;
 
@@ -30,7 +31,11 @@ public class DummyBlockRefinery extends BlockContainer implements IDummy {
 
 	@Override
 	public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
-		return new TileEntityDummy();
+		if(this == ModBlocks.dummy_port_refinery){
+			return new TileEntityDummyFluidPort();
+		} else {
+			return new TileEntityDummy();
+		}
 	}
 
     @Override
