@@ -6,6 +6,7 @@ import java.util.List;
 import com.hbm.interfaces.IFluidPipe;
 import com.hbm.main.MainRegistry;
 import com.hbm.tileentity.machine.TileEntityDummyFluidPort;
+import com.hbm.tileentity.machine.TileEntityMachineFluidTank;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -83,6 +84,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * Called whenever the world ticks to fill any connected fluid handlers
 	 */
 	public void updateTick(){
+		//TODO Fix thing where several thousand boilers are added for some reason.
 		if(tickTimer < 20){
 			tickTimer ++;
 		} else {
@@ -117,7 +119,6 @@ public class FFPipeNetwork implements IFluidHandler {
 		
 		for(IFluidHandler consume : consumers){
 			i++;
-			
 			if(internalNetworkTank.getFluid() != null)
 				internalNetworkTank.drain(consume.fill(ForgeDirection.UNKNOWN, new FluidStack(internalNetworkTank.getFluid().getFluid(), i<consumers.size()?part:lastPart), true), true);
 		}

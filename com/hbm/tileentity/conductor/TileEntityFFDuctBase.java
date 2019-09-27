@@ -188,6 +188,9 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 	}
 	
 	public void checkFluidHandlers() {
+		if(this.network == null) {
+			return;
+		}
 		for(int i = 0; i < 6;i++) {
 			TileEntity te = FFPipeNetwork.getTileEntityAround(this, i);
 			if(te != null && !(te instanceof IFluidPipe) && te instanceof IFluidHandler) {
