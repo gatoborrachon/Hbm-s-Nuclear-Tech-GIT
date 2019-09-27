@@ -989,31 +989,31 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 		int meta = worldObj.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord);
 		boolean update = false || needsUpdate;
 		if(meta == 5) {
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord, 2000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord + 1, 2000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 3, this.yCoord, this.zCoord, 2000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 3, this.yCoord, this.zCoord + 1, 2000);
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord, 2000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord + 1, 2000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 3, this.yCoord, this.zCoord, 2000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 3, this.yCoord, this.zCoord + 1, 2000) || update;
 		}
 		
 		if(meta == 3) {
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord - 2, 2000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord - 2, 2000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord + 3, 2000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord + 3, 2000);
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord - 2, 2000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord - 2, 2000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord + 3, 2000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord + 3, 2000) || update;
 		}
 		
 		if(meta == 2) {
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord + 2, 2000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord + 2, 2000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord - 3, 2000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord - 3, 2000);
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord + 2, 2000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord + 2, 2000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord - 3, 2000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord - 3, 2000) || update;
 		}
 		
 		if(meta == 4) {
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord, 2000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord - 1, 2000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 3, this.yCoord, this.zCoord, 2000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 3, this.yCoord, this.zCoord - 1, 2000);
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord, 2000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord - 1, 2000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 3, this.yCoord, this.zCoord, 2000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 3, this.yCoord, this.zCoord - 1, 2000) || update;
 		}
 		needsUpdate = update;
 	}

@@ -224,17 +224,17 @@ public class TileEntityMachineFluidTank extends TileEntity implements ISidedInve
 
 
 	private void fillFluidInit() {
-		boolean update = false || needsUpdate;
+		boolean update = needsUpdate;
 		
 		if (tank.getFluid() != null) {
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord - 1, 6000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord + 1, 6000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord - 1, 6000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord + 1, 6000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord + 2, 6000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord + 2, 6000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord - 2, 6000);
-			update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord - 2, 6000);
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord - 1, 6000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord + 1, 6000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord - 1, 6000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord + 1, 6000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord + 2, 6000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord + 2, 6000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord - 2, 6000) || update;
+			update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord - 2, 6000) || update;
 		}
 		needsUpdate = update;
 	}

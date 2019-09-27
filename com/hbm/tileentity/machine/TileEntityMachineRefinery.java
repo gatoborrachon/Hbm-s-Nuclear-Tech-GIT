@@ -387,17 +387,16 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 
 	public void fillFluidInit(FluidTank tank) {
 		boolean update = false || needsUpdate;
+
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord - 2, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord + 2, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord - 2, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord + 2, 2000) || update;
 		
-		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord - 2, 2000);
-		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord + 2, 2000);
-		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord - 2, 2000);
-		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord + 2, 2000);
-		
-		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord + 1, 2000);
-		System.out.println("dfa" + this.xCoord + " " + this.yCoord + " " + this.zCoord);
-		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord + 1, 2000);
-		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord - 1, 2000);
-		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord - 1, 2000);
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord + 1, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord + 1, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord - 1, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord - 1, 2000) || update;
 		
 		needsUpdate = update;
 	}

@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.hbm.interfaces.IFluidPipe;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
 import com.hbm.tileentity.machine.TileEntityDummy;
 
 import net.minecraft.client.Minecraft;
@@ -230,13 +231,11 @@ public class FFUtils {
 	 */
 	public static boolean fillFluid(TileEntity tileEntity, FluidTank tank, World world, int i, int j, int k,
 			int maxDrain) {
-
 		if (tank.getFluidAmount() <= 0 || tank.getFluid() == null) {
 			return false;
 		}
-	
 		TileEntity te = world.getTileEntity(i, j, k);
-		System.out.println(i + " " + j + " " + k);
+
 		if (te != null && te instanceof IFluidHandler) {
 			if (te instanceof TileEntityDummy) {
 				TileEntityDummy ted = (TileEntityDummy) te;
@@ -245,10 +244,10 @@ public class FFUtils {
 				}
 			}
 			IFluidHandler tef = (IFluidHandler) te;
-			tank.drain(tef.fill(ForgeDirection.UNKNOWN,
-					new FluidStack(tank.getFluid(), Math.min(maxDrain, tank.getFluidAmount())), true), true);
-			
-			return true;
+			if(tef.fill(ForgeDirection.UNKNOWN, new FluidStack(tank.getFluid(), Math.min(maxDrain, tank.getFluidAmount())), false) > 0){
+				tank.drain(tef.fill(ForgeDirection.UNKNOWN, new FluidStack(tank.getFluid(), Math.min(maxDrain, tank.getFluidAmount())), true), true);
+				return true;
+			}
 		}
 		return false;
 	}

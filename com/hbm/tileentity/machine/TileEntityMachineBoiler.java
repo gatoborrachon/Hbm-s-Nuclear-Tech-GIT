@@ -244,7 +244,7 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 			}
 
 			if (age == 9 || age == 19)
-				fillFluidInit();
+				fillFluidInit(tanks[1]);
 
 			Object[] outs;
 			if (tanks[0].getFluid() != null) {
@@ -343,9 +343,17 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 		return false;
 	}
 
-	public void fillFluidInit() {
+	public void fillFluidInit(FluidTank tank) {
+		boolean update = needsUpdate;
+		
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord - 1, this.zCoord, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord + 1, this.zCoord, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord - 1, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord + 1, 2000) || update;
 
-
+		needsUpdate = update;
 	}
 
 
