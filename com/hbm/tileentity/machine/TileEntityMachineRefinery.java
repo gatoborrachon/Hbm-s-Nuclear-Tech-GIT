@@ -277,7 +277,10 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 	public void updateEntity() {
 
 		if (!worldObj.isRemote) {
-			
+			if(needsUpdate){
+				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				needsUpdate = false;
+			}
 			power = Library.chargeTEFromItems(slots, 0, power, maxPower);
 
 			age++;
@@ -286,10 +289,16 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 				age = 0;
 			}
 			
-			if(age == 9 || age == 19) {
+			if(age == 1 || age == 11) {
 				fillFluidInit(tanks[1]);
+			}
+			if(age == 2 || age == 12){
 				fillFluidInit(tanks[2]);
+			}
+			if(age == 3 || age == 13){
 				fillFluidInit(tanks[3]);
+			}
+			if(age == 4 || age == 14){
 				fillFluidInit(tanks[4]);
 			}
 			if(this.inputValidForTank(0, 1))
@@ -323,7 +332,7 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 				needsUpdate = true;
 			if(FFUtils.fillFluidContainer(slots, tanks[3], 7, 8))
 				needsUpdate = true;
-			if(FFUtils.fillFluidContainer(slots, tanks[4], 6, 10))
+			if(FFUtils.fillFluidContainer(slots, tanks[4], 9, 10))
 				needsUpdate = true;
 			
 			
@@ -337,10 +346,7 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 					sulfur -= maxSulfur;
 				}
 			}
-			if(needsUpdate){
-				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-				needsUpdate = false;
-			}
+
 			PacketDispatcher.wrapper.sendToAll(new AuxElectricityPacket(xCoord, yCoord, zCoord, power));
 		}
 	}
@@ -381,15 +387,18 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 
 	public void fillFluidInit(FluidTank tank) {
 		boolean update = false || needsUpdate;
+		
 		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord - 2, 2000);
 		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord + 2, 2000);
 		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord - 2, 2000);
 		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord + 2, 2000);
 		
 		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord + 1, 2000);
+		System.out.println("dfa" + this.xCoord + " " + this.yCoord + " " + this.zCoord);
 		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord + 1, 2000);
 		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord - 1, 2000);
 		update = update || FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord - 1, 2000);
+		
 		needsUpdate = update;
 	}
 	

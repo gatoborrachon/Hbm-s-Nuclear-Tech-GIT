@@ -37,6 +37,17 @@ import net.minecraftforge.fluids.IFluidHandler;
 
 public class FFUtils {
 
+	/**
+	 * Tessellates a liquid texture across a rectangle without looking weird and stretched.
+	 * @param tank - the tank with the fluid to render
+	 * @param guiLeft - the left side of the gui
+	 * @param guiTop - the top of the gui
+	 * @param zLevel - the z level of the gui
+	 * @param sizeX - how big the rectangle should be
+	 * @param sizeY - how tall the rectangle should be
+	 * @param offsetX - where the starting x of the rectangle should be on screen
+	 * @param offsetY - where the starting y of the rectangle should be on screen
+	 */
 	public static void drawLiquid(FluidTank tank, int guiLeft, int guiTop, float zLevel, int sizeX, int sizeY,
 			int offsetX, int offsetY) {
 		if (tank.getFluid() != null) {
@@ -45,34 +56,48 @@ public class FFUtils {
 			if (liquidIcon != null) {
 				int level = (int) (((double) tank.getFluidAmount() / (double) tank.getCapacity()) * sizeY);
 
-				drawFull(tank, guiLeft, guiTop, zLevel, liquidIcon, level, sizeX, sizeY, offsetX, offsetY);
+				drawFull(tank, guiLeft, guiTop, zLevel, liquidIcon, level, sizeX, offsetX, offsetY);
 			}
 		}
 	}
 
-	public static void drawFull(FluidTank tank, int guiLeft, int guiTop, float zLevel, IIcon liquidIcon, int level,
-			int sizeX, int sizeY, int offsetX, int offsetY) {
+	/**
+	 * Internal method to actually render the fluid
+	 * @param tank
+	 * @param guiLeft
+	 * @param guiTop
+	 * @param zLevel
+	 * @param liquidIcon
+	 * @param level
+	 * @param sizeX
+	 * @param offsetX
+	 * @param offsetY
+	 */
+	private static void drawFull(FluidTank tank, int guiLeft, int guiTop, float zLevel, IIcon liquidIcon, int level,
+			int sizeX, int offsetX, int offsetY) {
 		int color = tank.getFluid().getFluid().getColor();
 
 		float left = liquidIcon.getMinU();
 		float right = liquidIcon.getMaxU();
 		float up = liquidIcon.getMinV();
 		float down = liquidIcon.getMaxV();
-		float right2 = liquidIcon.getInterpolatedU(2);
+		float right2 = liquidIcon.getInterpolatedU(16 - (sizeX % 16));
 		float up2 = liquidIcon.getInterpolatedV(16 - (level % 16));
-		int number = Math.floorDiv(level, 16);
+		int tall = Math.floorDiv(level, 16);
 		int thick = Math.floorDiv(sizeX, 16);
+		int tallExtraPixels = level % 16;
+		int thickExtraPixels = sizeX % 16;
 
 		Tessellator tes = Tessellator.instance;
 		tes.startDrawingQuads();
 		tes.setColorOpaque_I(color);
-		// pixels 17 to 69 (-52)
+		//Draw main area
 		for (int j = 0; j < thick; j++) {
-			for (int i = 0; i < number; i++) {
-				tes.addVertexWithUV(guiLeft + offsetX, guiTop + offsetY - 16 - (i * 16), zLevel, left, up);
-				tes.addVertexWithUV(guiLeft + offsetX, guiTop + offsetY - (i * 16), zLevel, left, down);
-				tes.addVertexWithUV(guiLeft + offsetX + 16, guiTop + offsetY - (i * 16), zLevel, right, down);
-				tes.addVertexWithUV(guiLeft + offsetX + 16, guiTop + offsetY - 16 - (i * 16), zLevel, right, up);
+			for (int i = 0; i < tall; i++) {
+				tes.addVertexWithUV(guiLeft + offsetX + (j*16), guiTop + offsetY - 16 - (i * 16), zLevel, left, up);
+				tes.addVertexWithUV(guiLeft + offsetX + (j*16), guiTop + offsetY - (i * 16), zLevel, left, down);
+				tes.addVertexWithUV(guiLeft + offsetX + 16 + (j*16), guiTop + offsetY - (i * 16), zLevel, right, down);
+				tes.addVertexWithUV(guiLeft + offsetX + 16 + (j*16), guiTop + offsetY - 16 - (i * 16), zLevel, right, up);
 
 				/*
 				 * tes.addVertexWithUV(guiLeft + 71 + 16, guiTop + 69 - 16 - (i * 16), zLevel,
@@ -89,12 +114,33 @@ public class FFUtils {
 				 */
 			}
 		}
+		//Draw top area
+		for(int i = 0; i < thick; i++){
+			tes.addVertexWithUV(guiLeft + offsetX + (i*16), guiTop + offsetY - (tall*16) - tallExtraPixels, zLevel, left, up2);
+			tes.addVertexWithUV(guiLeft + offsetX + (i*16), guiTop + offsetY - (tall*16), zLevel, left, down);
+			tes.addVertexWithUV(guiLeft + offsetX + 16 + (i*16), guiTop + offsetY - (tall*16), zLevel, right, down);
+			tes.addVertexWithUV(guiLeft + offsetX + 16 + (i*16), guiTop + offsetY - (tall*16) - tallExtraPixels, zLevel, right, up2);
+		}
+		//Draw wideness extra area
+		for(int i = 0; i < tall; i++){
+			tes.addVertexWithUV(guiLeft + offsetX + thick*16, guiTop + offsetY - 16 - (i*16), zLevel, left, up);
+			tes.addVertexWithUV(guiLeft + offsetX + thick*16, guiTop + offsetY - (i*16), zLevel, left, down);
+			tes.addVertexWithUV(guiLeft + offsetX + thick*16 + thickExtraPixels, guiTop + offsetY - (i*16), zLevel, right2, down);
+			tes.addVertexWithUV(guiLeft + offsetX + thick*16 + thickExtraPixels, guiTop + offsetY - 16 - (i*16), zLevel, right2, up);
+		}
+		//Draw bit to complete the square
+		tes.addVertexWithUV(guiLeft + offsetX + (thick*16), guiTop + offsetY - (tall*16) - tallExtraPixels, zLevel, left, up2);
+		tes.addVertexWithUV(guiLeft + offsetX + (thick*16), guiTop + offsetY - (tall*16), zLevel, left, down);
+		tes.addVertexWithUV(guiLeft + offsetX + (thick*16) + thickExtraPixels, guiTop + offsetY - (tall*16), zLevel, right2, down);
+		tes.addVertexWithUV(guiLeft + offsetX + (thick*16) + thickExtraPixels, guiTop + offsetY - (tall*16) - tallExtraPixels, zLevel, right2, up2);
+		
+		
+	/*	
 		tes.addVertexWithUV(guiLeft + offsetX, guiTop + offsetY - (number * 16) - (level % 16), zLevel, left, up2);
 		tes.addVertexWithUV(guiLeft + offsetX, guiTop + offsetY - (number * 16), zLevel, left, down);
 		tes.addVertexWithUV(guiLeft + offsetX + 16, guiTop + offsetY - (number * 16), zLevel, right, down);
-		tes.addVertexWithUV(guiLeft + offsetX + 16, guiTop + offsetY - (number * 16) - (level % 16), zLevel, right,
-				up2);
-
+		tes.addVertexWithUV(guiLeft + offsetX + 16, guiTop + offsetY - (number * 16) - (level % 16), zLevel, right, up2);
+	 */
 		/*
 		 * tes.addVertexWithUV(guiLeft + 71 + 16, guiTop + 69 - (number * 16) - (level %
 		 * 16), zLevel, left, up2); tes.addVertexWithUV(guiLeft + 71 + 16, guiTop + 69 -
@@ -178,17 +224,19 @@ public class FFUtils {
 	 * @param k          - z coord of place to fill
 	 * @param maxDrain   - the maximum amount that can be drained from the tank at a
 	 *                   time
-	 * @return Whether something was actually filled or not, or whether it needs an
+	 * @return Whether something was actually filled or not, or whether it needs 
+	 * an
 	 *         update
 	 */
 	public static boolean fillFluid(TileEntity tileEntity, FluidTank tank, World world, int i, int j, int k,
 			int maxDrain) {
+
 		if (tank.getFluidAmount() <= 0 || tank.getFluid() == null) {
 			return false;
 		}
-
+	
 		TileEntity te = world.getTileEntity(i, j, k);
-
+		System.out.println(i + " " + j + " " + k);
 		if (te != null && te instanceof IFluidHandler) {
 			if (te instanceof TileEntityDummy) {
 				TileEntityDummy ted = (TileEntityDummy) te;
@@ -199,9 +247,14 @@ public class FFUtils {
 			IFluidHandler tef = (IFluidHandler) te;
 			tank.drain(tef.fill(ForgeDirection.UNKNOWN,
 					new FluidStack(tank.getFluid(), Math.min(maxDrain, tank.getFluidAmount())), true), true);
+			
 			return true;
 		}
 		return false;
+	}
+	
+	public static void testing(FluidTank tank){
+		
 	}
 
 	/**
@@ -255,6 +308,7 @@ public class FFUtils {
 	 * @param tank  - the tank to fill from
 	 * @param slot1 - the slot with an empty container
 	 * @param slot2 - the output slot.
+	 * @return true if something was actually filled
 	 */
 	public static boolean fillFromFluidContainer(ItemStack[] slots, FluidTank tank, int slot1, int slot2) {
 

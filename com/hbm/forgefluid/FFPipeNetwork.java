@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.hbm.interfaces.IFluidPipe;
 import com.hbm.main.MainRegistry;
+import com.hbm.tileentity.machine.TileEntityDummyFluidPort;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -82,7 +83,6 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * Called whenever the world ticks to fill any connected fluid handlers
 	 */
 	public void updateTick(){
-		//System.out.println(this);
 		if(tickTimer < 20){
 			tickTimer ++;
 		} else {
@@ -99,7 +99,6 @@ public class FFPipeNetwork implements IFluidHandler {
 	}
 	
 	public void fillFluidInit(){
-		//System.out.println(this);
 		//Pretty much the same thing as the transfer fluid in Library.java
 		if(internalNetworkTank.getFluid() == null || internalNetworkTank.getFluidAmount() <= 0)
 			return;
@@ -115,8 +114,10 @@ public class FFPipeNetwork implements IFluidHandler {
 		int part = this.internalNetworkTank.getFluidAmount() / size;
 		int lastPart = part + this.internalNetworkTank.getFluidAmount() - part * size;
 		int i = 1;
+		
 		for(IFluidHandler consume : consumers){
 			i++;
+			
 			if(internalNetworkTank.getFluid() != null)
 				internalNetworkTank.drain(consume.fill(ForgeDirection.UNKNOWN, new FluidStack(internalNetworkTank.getFluid().getFluid(), i<consumers.size()?part:lastPart), true), true);
 		}
@@ -342,10 +343,13 @@ public class FFPipeNetwork implements IFluidHandler {
 
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-		if(resource != null && resource.getFluid() == this.type)
+		
+		if(resource != null && resource.getFluid() == this.type){
 			return internalNetworkTank.fill(resource, doFill);
-		else
+			
+		}else{
 			return 0;
+		}
 	}
 
 	@Override

@@ -258,7 +258,7 @@ public class TileEntityMachineFluidTank extends TileEntity implements ISidedInve
 
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-		if (this.canFill(from, resource.getFluid())) {
+		if (this.canFill(from, resource.getFluid())) {		
 			needsUpdate = true;
 			return tank.fill(resource, doFill);
 		}

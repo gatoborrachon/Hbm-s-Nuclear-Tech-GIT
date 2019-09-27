@@ -60,7 +60,7 @@ public class GUIMachineRefinery extends GuiInfoContainer {
 		
 		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 		
-		FFUtils.drawLiquid(refinery.tanks[0], guiLeft, guiTop, zLevel, 16, 52, 26, 70);
+		FFUtils.drawLiquid(refinery.tanks[0], guiLeft, guiTop, zLevel, 34, 52, 26, 70);
 		
 		FFUtils.drawLiquid(refinery.tanks[1], guiLeft, guiTop, zLevel, 16, 52, 80, 70);
 		FFUtils.drawLiquid(refinery.tanks[2], guiLeft, guiTop, zLevel, 16, 52, 98, 70);
