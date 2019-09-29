@@ -3,13 +3,11 @@ package com.hbm.inventory.gui;
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.forgefluid.FFUtils;
-import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.container.ContainerMachineRefinery;
 import com.hbm.lib.RefStrings;
 import com.hbm.tileentity.machine.TileEntityMachineRefinery;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -38,7 +36,7 @@ public class GUIMachineRefinery extends GuiInfoContainer {
 		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 116, guiTop + 70 - 52, 16, 52, refinery.tanks[3], refinery.tankTypes[3]);
 		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 70 - 52, 16, 52, refinery.tanks[4], refinery.tankTypes[4]);
 		
-		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 8, guiTop + 70 - 52, 16, 52, refinery.power, refinery.maxPower);
+		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 8, guiTop + 70 - 52, 16, 52, refinery.power, TileEntityMachineRefinery.maxPower);
 	}
 	
 	@Override

@@ -95,9 +95,12 @@ public class RenderFluidTank extends TileEntitySpecialRenderer {
 		String s = "NONE";
 		
 		if(tileEntity instanceof TileEntityMachineFluidTank){
-			if(((TileEntityMachineFluidTank)tileEntity).tank.getFluid() !=null){
-			
-			s = FluidRegistry.getFluidName(((TileEntityMachineFluidTank)tileEntity).tank.getFluid()).toUpperCase();
+			if(((TileEntityMachineFluidTank)tileEntity).tank.getFluid() != null){
+				s = FluidRegistry.getFluidName(((TileEntityMachineFluidTank)tileEntity).tank.getFluid()).toUpperCase();
+				if(s.substring(0, 3).equals("HBM")){
+					s = s.substring(3);
+				}
+
 			}
 		}
 		
@@ -106,7 +109,7 @@ public class RenderFluidTank extends TileEntitySpecialRenderer {
 		try {
 			Minecraft.getMinecraft().getResourceManager().getResource(rotTexture);
 		} catch (IOException e) {
-			//Set to my really ugly unknown texture
+			//Drillgon200: Set to my really ugly unknown texture
 		 rotTexture = new ResourceLocation(RefStrings.MODID, "textures/models/tank_UNKNOWN.png");
 		}
 

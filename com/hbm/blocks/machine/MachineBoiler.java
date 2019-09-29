@@ -186,7 +186,7 @@ public class MachineBoiler extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
-
+		
 		if(this == ModBlocks.machine_boiler_off || this == ModBlocks.machine_boiler_on)
 			return new TileEntityMachineBoiler();
 		if(this == ModBlocks.machine_boiler_electric_off || this == ModBlocks.machine_boiler_electric_on)

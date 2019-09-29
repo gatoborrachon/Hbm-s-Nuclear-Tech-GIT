@@ -101,6 +101,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	}
 	
 	public void fillFluidInit(){
+		System.out.println(this.pipes.size() + " " + this.fillables.size());
 		//Pretty much the same thing as the transfer fluid in Library.java
 		if(internalNetworkTank.getFluid() == null || internalNetworkTank.getFluidAmount() <= 0)
 			return;

@@ -14,7 +14,6 @@ import java.util.List;
 
 import com.hbm.forgefluid.FFPipeNetwork;
 import com.hbm.forgefluid.FFUtils;
-import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IFluidPipe;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.packet.TEFluidTypePacketTest;
@@ -27,9 +26,9 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 	public ForgeDirection[] connections = new ForgeDirection[6];
 	public Fluid type = null;
 	public FFPipeNetwork network = null;
+	public IFluidHandler[] fluidHandlerCache = new IFluidHandler[6];
 	
 	public boolean isValidForForming = true;
-	
 	public boolean firstUpdate = true;
 
 	public TileEntityFFDuctBase() {
@@ -197,6 +196,10 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 				if(!this.network.getConsumers().contains(te)) {
 					this.network.getConsumers().add((IFluidHandler) te);
 				}
+				if(fluidHandlerCache[i] != null){
+					this.network.getConsumers().remove(fluidHandlerCache[i]);
+				}
+				fluidHandlerCache[i] = (IFluidHandler)te;
 					
 			}
 		}
