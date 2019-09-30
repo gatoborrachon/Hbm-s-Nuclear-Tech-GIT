@@ -5,12 +5,9 @@ import java.util.List;
 
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.machine.MachineBoiler;
-import com.hbm.handler.FluidTypeHandler.FluidType;
+import com.hbm.forgefluid.FFUtils;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
-import com.hbm.interfaces.IFluidSource;
-import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.MachineRecipes;
 import com.hbm.items.special.ItemBattery;
 import com.hbm.lib.Library;
@@ -23,10 +20,22 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidContainerItem;
+import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityMachineBoilerElectric extends TileEntity implements ISidedInventory, IFluidContainer, IFluidAcceptor, IFluidSource, IConsumer {
+public class TileEntityMachineBoilerElectric extends TileEntity implements ISidedInventory, IFluidHandler, IConsumer {
 
 	private ItemStack slots[];
 	
@@ -35,7 +44,7 @@ public class TileEntityMachineBoilerElectric extends TileEntity implements ISide
 	public static final long maxPower = 10000;
 	public static final int maxHeat = 80000;
 	public int age = 0;
-	public List<IFluidAcceptor> list = new ArrayList();
+	boolean needsUpdate = false;
 	public FluidTank[] tanks;
 	
 	private static final int[] slots_top = new int[] {4};
@@ -47,8 +56,8 @@ public class TileEntityMachineBoilerElectric extends TileEntity implements ISide
 	public TileEntityMachineBoilerElectric() {
 		slots = new ItemStack[7];
 		tanks = new FluidTank[2];
-		tanks[0] = new FluidTank(FluidType.WATER, 16000, 0);
-		tanks[1] = new FluidTank(FluidType.STEAM, 16000, 1);
+		tanks[0] = new FluidTank(16000);
+		tanks[1] = new FluidTank(16000);
 	}
 
 	@Override
@@ -156,8 +165,15 @@ public class TileEntityMachineBoilerElectric extends TileEntity implements ISide
 
 		heat = nbt.getInteger("heat");
 		power = nbt.getLong("power");
-		tanks[0].readFromNBT(nbt, "water");
-		tanks[1].readFromNBT(nbt, "steam");
+		NBTTagList tanksList = nbt.getTagList("tanks", 10);
+		for (int i = 0; i < tanksList.tagCount(); i++) {
+			NBTTagCompound nbt1 = tanksList.getCompoundTagAt(i);
+			byte b0 = nbt1.getByte("tank");
+			if (b0 >= 0 && b0 < tanks.length) {
+				tanks[i].readFromNBT(nbt1);
+				// System.out.println(nbt1);
+			}
+		}
 		slots = new ItemStack[getSizeInventory()];
 		
 		for(int i = 0; i < list.tagCount(); i++)
@@ -176,8 +192,17 @@ public class TileEntityMachineBoilerElectric extends TileEntity implements ISide
 		super.writeToNBT(nbt);
 		nbt.setInteger("heat", heat);
 		nbt.setLong("power", power);
-		tanks[0].writeToNBT(nbt, "water");
-		tanks[1].writeToNBT(nbt, "steam");
+		NBTTagList tankList = new NBTTagList();
+		for (int i = 0; i < tanks.length; i++) {
+			if (tanks[i] != null) {
+				NBTTagCompound tankInfo = new NBTTagCompound();
+				tankInfo.setByte("tank", (byte) i);
+				tanks[i].writeToNBT(tankInfo);
+				tankList.appendTag(tankInfo);
+			}
+
+		}
+		nbt.setTag("tanks", tankList);
 		NBTTagList list = new NBTTagList();
 		
 		for(int i = 0; i < slots.length; i++)
@@ -222,6 +247,11 @@ public class TileEntityMachineBoilerElectric extends TileEntity implements ISide
 		
 		boolean mark = false;
 		
+		if (needsUpdate) {
+			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+			needsUpdate = false;
+		}
+		
 		if(!worldObj.isRemote)
 		{
 			age++;
@@ -231,26 +261,23 @@ public class TileEntityMachineBoilerElectric extends TileEntity implements ISide
 			}
 			
 			if(age == 9 || age == 19)
-				fillFluidInit(tanks[1].getTankType());
+				fillFluidInit(tanks[1]);
 
 			power = Library.chargeTEFromItems(slots, 4, power, maxPower);
 			
-			tanks[0].setType(0, 1, slots);
-			tanks[0].loadTank(2, 3, slots);
+			if(this.inputValidForTank(0, 2))
+			if(FFUtils.fillFromFluidContainer(slots, tanks[0], 2, 3))
+				needsUpdate = true;
+
+			if(FFUtils.fillFluidContainer(slots, tanks[1], 4, 5))
+				needsUpdate = true;
 			
-			Object[] outs = null;//MachineRecipes.getBoilerOutput(tanks[0].getTankType());
-			
-			if(outs == null) {
-				tanks[1].setTankType(FluidType.NONE);
-			} else {
-				tanks[1].setTankType((FluidType) outs[0]);
-			}
-			
-			tanks[1].unloadTank(5, 6, slots);
-			
-			for(int i = 0; i < 2; i++)
-				tanks[i].updateTank(xCoord, yCoord, zCoord);
-			
+			Object[] outs;
+			if(tanks[0].getFluid() != null)
+				outs = MachineRecipes.getBoilerOutput(tanks[0].getFluid().getFluid());
+			else
+				outs = MachineRecipes.getBoilerOutput(null);
+
 			if(heat > 2000) {
 				heat -= 30;
 			}
@@ -279,10 +306,10 @@ public class TileEntityMachineBoilerElectric extends TileEntity implements ISide
 			if(outs != null) {
 				
 				for(int i = 0; i < (heat / ((Integer)outs[3]).intValue()); i++) {
-					if(tanks[0].getFill() >= ((Integer)outs[2]).intValue() && tanks[1].getFill() + ((Integer)outs[1]).intValue() <= tanks[1].getMaxFill()) {
-						tanks[0].setFill(tanks[0].getFill() - ((Integer)outs[2]).intValue());
-						tanks[1].setFill(tanks[1].getFill() + ((Integer)outs[1]).intValue());
-						
+					if (tanks[0].getFluidAmount() >= ((Integer) outs[2]).intValue() && tanks[1].getFluidAmount() + ((Integer) outs[1]).intValue() <= tanks[1].getCapacity()) {
+						tanks[0].drain((Integer) outs[2], true);
+						tanks[1].fill(new FluidStack((Fluid) outs[0], (Integer) outs[1]), true);
+						needsUpdate = true;
 						if(i == 0)
 							heat -= 35;
 						else
@@ -314,87 +341,17 @@ public class TileEntityMachineBoilerElectric extends TileEntity implements ISide
 		return false;
 	}
 
-	@Override
-	public void fillFluidInit(FluidType type) {
+	public void fillFluidInit(FluidTank tank) {	
+		boolean update = needsUpdate;
 		
-		fillFluid(this.xCoord + 1, this.yCoord, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord - 1, this.yCoord, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord + 1, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord - 1, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord + 1, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord - 1, getTact(), type);
-	}
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord - 1, this.zCoord, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord + 1, this.zCoord, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord - 1, 2000) || update;
+		update = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord + 1, 2000) || update;
 
-	@Override
-	public void fillFluid(int x, int y, int z, boolean newTact, FluidType type) {
-		Library.transmitFluid(x, y, z, newTact, this, worldObj, type);
-	}
-	
-	@Override
-	public boolean getTact() {
-		if(age >= 0 && age < 10)
-		{
-			return true;
-		}
-		
-		return false;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			tanks[0].setFill(i);
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			tanks[1].setFill(i);
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getFill();
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getFill();
-		
-		return 0;
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getMaxFill();
-		
-		return 0;
-	}
-
-	@Override
-	public void setFillstate(int fill, int index) {
-		if(index < 2 && tanks[index] != null)
-			tanks[index].setFill(fill);
-	}
-
-	@Override
-	public void setType(FluidType type, int index) {
-		if(index < 2 && tanks[index] != null)
-			tanks[index].setTankType(type);
-	}
-
-	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tanks[0]);
-		list.add(tanks[1]);
-		
-		return list;
-	}
-	
-	@Override
-	public List<IFluidAcceptor> getFluidList(FluidType type) {
-		return list;
-	}
-	
-	@Override
-	public void clearFluidList(FluidType type) {
-		list.clear();
+		needsUpdate = update;
 	}
 
 	@Override
@@ -411,5 +368,82 @@ public class TileEntityMachineBoilerElectric extends TileEntity implements ISide
 	@Override
 	public long getMaxPower() {
 		return maxPower;
+	}
+
+	@Override
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		if (isValidFluid(resource)) {
+			needsUpdate = true;
+			return tanks[0].fill(resource, doFill);
+		}
+		return 0;
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		if (resource == null || !resource.isFluidEqual(tanks[1].getFluid())) {
+			return null;
+		}
+		needsUpdate = true;
+		return tanks[1].drain(resource.amount, doDrain);
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		needsUpdate = true;
+		return tanks[1].drain(maxDrain, doDrain);
+	}
+
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		return tanks[0].getFluidAmount() < 8000;
+	}
+
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+
+		return tanks[1].getFluidAmount() != 0;
+	}
+
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+
+		return new FluidTankInfo[] { tanks[0].getInfo(), tanks[1].getInfo() };
+	}
+
+	private boolean isValidFluid(FluidStack stack) {
+		if(stack == null)
+			return false;
+		return stack.getFluid() == FluidRegistry.WATER || stack.getFluid() == ModForgeFluids.oil
+				|| stack.getFluid() == ModForgeFluids.steam || stack.getFluid() == ModForgeFluids.hotsteam;
+	}
+	
+	protected boolean inputValidForTank(int tank, int slot){
+		
+		if(slots[slot] != null){
+			if(slots[slot].getItem() instanceof IFluidContainerItem && isValidFluid(((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]))){
+				return true;
+			}
+			if(FluidContainerRegistry.isFilledContainer(slots[slot]) && isValidFluid(FluidContainerRegistry.getFluidForFilledItem(slots[slot]))){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public Packet getDescriptionPacket() {
+
+		NBTTagCompound tag = new NBTTagCompound();
+		writeToNBT(tag);
+
+		return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag);
+
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+
+		readFromNBT(pkt.func_148857_g());
 	}
 }

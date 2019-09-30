@@ -199,26 +199,32 @@ public class MachineBoiler extends BlockContainer {
 		int i = world.getBlockMetadata(x, y, z);
 		Block block = world.getBlock(x, y, z);
 		TileEntity entity = world.getTileEntity(x, y, z);
+		boolean needsSetMeta = false;
 		keepInventory = true;
 
 		if(block == ModBlocks.machine_boiler_off || block == ModBlocks.machine_boiler_on)
-			if(isProcessing)
+			if(isProcessing && block != ModBlocks.machine_boiler_on)
 			{
 				world.setBlock(x, y, z, ModBlocks.machine_boiler_on);
-			} else {
+				needsSetMeta = true;
+			} else if(block != ModBlocks.machine_boiler_off) {
 				world.setBlock(x, y, z, ModBlocks.machine_boiler_off);
+				needsSetMeta = true;
 			}
 
 		if(block == ModBlocks.machine_boiler_electric_off || block == ModBlocks.machine_boiler_electric_on)
-			if(isProcessing)
+			if(isProcessing && block != ModBlocks.machine_boiler_electric_on)
 			{
 				world.setBlock(x, y, z, ModBlocks.machine_boiler_electric_on);
-			} else {
+				needsSetMeta = true;
+			} else if(block != ModBlocks.machine_boiler_electric_off) {
 				world.setBlock(x, y, z, ModBlocks.machine_boiler_electric_off);
+				needsSetMeta = true;
 			}
 		
 		keepInventory = false;
-		world.setBlockMetadataWithNotify(x, y, z, i, 3);
+		if(needsSetMeta)
+			world.setBlockMetadataWithNotify(x, y, z, i, 3);
 		
 		if(entity != null) {
 			entity.validate();

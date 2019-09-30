@@ -68,8 +68,8 @@ public class TEFluidTypePacketTest implements IMessage {
 				if (te != null && te instanceof IFluidPipe) {
 					
 					IFluidPipe duct = (IFluidPipe) te;
-					
-					duct.setType(m.type);
+					if(!m.type.equals(duct.getType()))
+						duct.setTypeTrue(m.type);
 				}
 				return null;
 			} catch(Exception ex) {

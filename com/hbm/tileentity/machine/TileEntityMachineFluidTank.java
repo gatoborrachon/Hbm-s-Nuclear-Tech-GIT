@@ -299,7 +299,7 @@ public class TileEntityMachineFluidTank extends TileEntity implements ISidedInve
 	@Override
 	public boolean canDrain(ForgeDirection from, Fluid fluid) {
 		if (!this.worldObj.isRemote) {
-			return this.dna();
+			return tank.getFluid() != null;
 		}
 		return false;
 	}

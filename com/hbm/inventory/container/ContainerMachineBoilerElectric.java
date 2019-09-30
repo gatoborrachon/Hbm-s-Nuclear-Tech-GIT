@@ -20,8 +20,10 @@ public class ContainerMachineBoilerElectric extends Container {
 		diFurnace = tedf;
 
 		//Fluid ID
-		this.addSlotToContainer(new Slot(tedf, 0, 8, 17));
-		this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 1, 8, 53));
+		//Drillgon200: don't need these anymore
+		//this.addSlotToContainer(new Slot(tedf, 0, 8, 17));
+		//this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 1, 8, 53));
+		
 		//Input IO
 		this.addSlotToContainer(new Slot(tedf, 2, 44, 17));
 		this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 3, 44, 53));

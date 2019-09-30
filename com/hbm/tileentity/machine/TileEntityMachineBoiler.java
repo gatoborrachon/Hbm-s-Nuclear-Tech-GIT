@@ -52,8 +52,7 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 	private String customName;
 
 	private boolean needsUpdate = false;
-
-	//TODO Something is really messed up with this and fluid pipes.
+	
 	public TileEntityMachineBoiler() {
 		slots = new ItemStack[7];
 		tanks = new FluidTank[2];
@@ -160,10 +159,10 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
 		NBTTagList list = nbt.getTagList("items", 10);
-		NBTTagList tanksList = nbt.getTagList("tanks", 10);
-
+		
 		heat = nbt.getInteger("heat");
 		burnTime = nbt.getInteger("burnTime");
+		NBTTagList tanksList = nbt.getTagList("tanks", 10);
 		for (int i = 0; i < tanksList.tagCount(); i++) {
 			NBTTagCompound nbt1 = tanksList.getCompoundTagAt(i);
 			byte b0 = nbt1.getByte("tank");
@@ -253,7 +252,8 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 			} else {
 				outs = MachineRecipes.getBoilerOutput(null);
 			}
-			if(FFUtils.fillFromFluidContainer(slots, tanks[0], 2, 3))
+			if(this.inputValidForTank(0, 2))
+				if(FFUtils.fillFromFluidContainer(slots, tanks[0], 2, 3))
 				needsUpdate = true;
 
 			if(FFUtils.fillFluidContainer(slots, tanks[1], 4, 5))
@@ -313,7 +313,7 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 							&& tanks[1].getFluidAmount() + ((Integer) outs[1]).intValue() <= tanks[1].getCapacity()) {
 						tanks[0].drain((Integer) outs[2], true);
 						tanks[1].fill(new FluidStack((Fluid) outs[0], (Integer) outs[1]), true);
-
+						needsUpdate = true;
 						if (i == 0)
 							heat -= 25;
 						else
@@ -358,11 +358,16 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 	}
 
 
-	public boolean getTact() {
-		if (age >= 0 && age < 10) {
-			return true;
+	protected boolean inputValidForTank(int tank, int slot){
+		
+		if(slots[slot] != null){
+			if(slots[slot].getItem() instanceof IFluidContainerItem && isValidFluid(((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]))){
+				return true;
+			}
+			if(FluidContainerRegistry.isFilledContainer(slots[slot]) && isValidFluid(FluidContainerRegistry.getFluidForFilledItem(slots[slot]))){
+				return true;
+			}
 		}
-
 		return false;
 	}
 
@@ -408,6 +413,8 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 	}
 
 	private boolean isValidFluid(FluidStack stack) {
+		if(stack == null)
+			return false;
 		return stack.getFluid() == FluidRegistry.WATER || stack.getFluid() == ModForgeFluids.oil
 				|| stack.getFluid() == ModForgeFluids.steam || stack.getFluid() == ModForgeFluids.hotsteam;
 	}

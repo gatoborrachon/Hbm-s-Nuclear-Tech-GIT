@@ -6,6 +6,8 @@ import java.util.List;
 import com.hbm.interfaces.IFluidPipe;
 import com.hbm.main.MainRegistry;
 import com.hbm.tileentity.machine.TileEntityDummyFluidPort;
+import com.hbm.tileentity.machine.TileEntityMachineBoiler;
+import com.hbm.tileentity.machine.TileEntityMachineBoilerElectric;
 import com.hbm.tileentity.machine.TileEntityMachineFluidTank;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -29,6 +31,8 @@ public class FFPipeNetwork implements IFluidHandler {
 
 	private int tickTimer = 0;
 
+	//TODO fix bug where network can't fill tile entities (probably because they weren't loaded when the network was built, try waiting until next update tick to build network)
+	
 	/**
 	 * Constructor.
 	 */
@@ -84,6 +88,7 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * Called whenever the world ticks to fill any connected fluid handlers
 	 */
 	public void updateTick(){
+		//System.out.println(this.getType().getName() + " " + this.fillables.size());
 		//TODO Fix thing where several thousand boilers are added for some reason.
 		if(tickTimer < 20){
 			tickTimer ++;
@@ -91,8 +96,8 @@ public class FFPipeNetwork implements IFluidHandler {
 			tickTimer = 0;
 		}
 		if(tickTimer == 9 || tickTimer == 19){
-		//	if(pipes.isEmpty())
-			//	this.Destroy();
+			if(pipes.isEmpty())
+				this.destroySoft();
 		//	cleanPipes();
 			//cleanConsumers();
 			fillFluidInit();
@@ -101,7 +106,8 @@ public class FFPipeNetwork implements IFluidHandler {
 	}
 	
 	public void fillFluidInit(){
-		System.out.println(this.pipes.size() + " " + this.fillables.size());
+		//if(getType() == ModForgeFluids.oil)
+		//	System.out.println(this.fillables.size());
 		//Pretty much the same thing as the transfer fluid in Library.java
 		if(internalNetworkTank.getFluid() == null || internalNetworkTank.getFluidAmount() <= 0)
 			return;
@@ -120,8 +126,9 @@ public class FFPipeNetwork implements IFluidHandler {
 		
 		for(IFluidHandler consume : consumers){
 			i++;
-			if(internalNetworkTank.getFluid() != null)
+			if(internalNetworkTank.getFluid() != null){
 				internalNetworkTank.drain(consume.fill(ForgeDirection.UNKNOWN, new FluidStack(internalNetworkTank.getFluid().getFluid(), i<consumers.size()?part:lastPart), true), true);
+			}
 		}
 	}
 
@@ -146,6 +153,8 @@ public class FFPipeNetwork implements IFluidHandler {
 	 */
 	public static FFPipeNetwork mergeNetworks(FFPipeNetwork net, FFPipeNetwork merge) {
 		if (net != null && merge != null && net != merge) {
+			if(net.getType() == null || merge.getType() == null || net.getType() != merge.getType())
+				return net;
 			for (IFluidPipe pipe : merge.pipes) {
 				net.addPipe(pipe);
 				pipe.setNetwork(net);
@@ -178,7 +187,7 @@ public class FFPipeNetwork implements IFluidHandler {
 			fPipe.getNetwork().Destroy();
 			//System.out.println("true net: " + fPipe.getNetworkTrue());
 			net = new FFPipeNetwork(fPipe.getType());
-			net.setType(fPipe.getType());
+			
 			List[] netVars = iteratePipes(null, null, null, pipe, net.getType());
 		//	net.pipes = netVars[0];
 			net.pipes.clear();
@@ -192,6 +201,7 @@ public class FFPipeNetwork implements IFluidHandler {
 		//	net.fillables = netVars[1];
 			net.fillables.clear();
 			net.fillables.addAll(netVars[1]);
+			net.setType(fPipe.getType());
 			
 			List<FFPipeNetwork> mergeList = netVars[2];
 			for(FFPipeNetwork network : mergeList){
@@ -231,7 +241,7 @@ public class FFPipeNetwork implements IFluidHandler {
 				next = getTileEntityAround(te, i);
 				if (next instanceof IFluidHandler && next instanceof IFluidPipe && ((IFluidPipe)next).getIsValidForForming() && ((IFluidPipe)next).getType() == type && !pipes.contains((IFluidPipe)next)) {
 
-					List[] nextPipe = iteratePipes(pipes, consumers, networks, next, type);
+					iteratePipes(pipes, consumers, networks, next, type);
 					//So java really does pass by location and not by value. I feel dumb now.
 					
 					//System.out.println("pipes length 1: " + pipes.size());
@@ -241,8 +251,11 @@ public class FFPipeNetwork implements IFluidHandler {
 					//consumers.addAll(nextPipe[1]);
 					//networks.addAll(nextPipe[2]);
 				} else if (next instanceof IFluidHandler && !(next instanceof IFluidPipe)) {
-				
-					consumers.add((IFluidHandler) next);
+					if(!consumers.contains((IFluidHandler)next)){
+						consumers.add((IFluidHandler) next);
+						
+					}
+					
 				}
 			}
 			if(((IFluidPipe)te).getNetworkTrue() != null && ((IFluidPipe)te).getIsValidForForming() && ((IFluidPipe)te).getNetworkTrue().getType() == type && !networks.contains(((IFluidPipe)te).getNetwork())){
@@ -304,8 +317,9 @@ public class FFPipeNetwork implements IFluidHandler {
 	 * @param fluid - the fluid to set the network's fluid to
 	 */
 	public void setType(Fluid fluid) {
+		//System.out.println("here");
 		for(IFluidPipe pipe : this.pipes){
-			pipe.setType(fluid);
+			pipe.setTypeTrue(fluid);
 		}
 		this.type = fluid;
 	}

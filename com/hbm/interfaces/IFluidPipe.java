@@ -12,5 +12,6 @@ public interface IFluidPipe {
 	public void setType(Fluid fluid);
 	public boolean getIsValidForForming();
 	public void breakBlock();
+	void setTypeTrue(Fluid fluid);
 	
 }

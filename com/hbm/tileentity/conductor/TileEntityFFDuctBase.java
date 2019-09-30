@@ -30,21 +30,34 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 	
 	public boolean isValidForForming = true;
 	public boolean firstUpdate = true;
+	public boolean needsBuildNetwork = false;
+	
+	public int weirdTest = 0;
 
 	public TileEntityFFDuctBase() {
 	}
 	
 	@Override
+	public void onChunkUnload(){
+		if(this.getNetworkTrue() != null){
+			this.getNetworkTrue().getPipes().remove(this);
+		}
+	}
+	@Override
 	public void updateEntity(){
 		if(!worldObj.isRemote && type != null)
 			PacketDispatcher.wrapper.sendToAll(new TEFluidTypePacketTest(xCoord, yCoord, zCoord, type));
 		this.updateConnections();
-		if(firstUpdate && this.network == null){
-			this.getNetwork();
-			this.checkOtherNetworks();
-			this.network.addPipe(this);
-			this.checkFluidHandlers();
-			firstUpdate = false;
+		if(needsBuildNetwork){
+			//this.getNetwork();
+			//this.checkOtherNetworks();
+			//this.network.addPipe(this);
+			//this.checkFluidHandlers();
+			if(this.network == null) {
+				FFPipeNetwork.buildNewNetwork(this);
+				System.out.println("here");
+			}
+			needsBuildNetwork = false;
 		}
 	}
 	
@@ -76,7 +89,12 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 	@Override
 	public void setType(Fluid fluid) {
 		this.type = fluid;
-		this.typeChanged();
+		this.typeChanged(fluid);
+	}
+	
+	@Override
+	public void setTypeTrue(Fluid fluid){
+		this.type = fluid;
 	}
 
 	public FFPipeNetwork createNewNetwork() {
@@ -138,9 +156,10 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
     {
 		super.readFromNBT(nbt);
 		type = FluidRegistry.getFluid(nbt.getInteger("FluidType"));
-		//if(this.network == null) {
+	//	if(this.network == null) {
 		//	FFPipeNetwork.buildNewNetwork(this);
 		//}
+		needsBuildNetwork = true;
     }
 
     @Override
@@ -172,8 +191,8 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 		}
 	}
 	
-	public void typeChanged(){
-		this.getNetwork().Destroy();
+	public void typeChanged(Fluid type){
+		this.getNetwork().setType(type);;
 		for(int i = 0; i < 6; i++){
 			TileEntity ent = FFPipeNetwork.getTileEntityAround(this, i);
 			if(ent != null && ent instanceof IFluidPipe){
@@ -212,6 +231,7 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		//System.out.println(this.getNetworkTrue().getType());
 		return this.getNetwork().fill(from, resource, doFill);
 	}
 
