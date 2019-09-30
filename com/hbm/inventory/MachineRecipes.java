@@ -373,57 +373,54 @@ public class MachineRecipes {
 
 		return null;
 	}
-
-	//bro, i don't care
-	@SuppressWarnings("incomplete-switch")
-	public static List<GasCentOutput> getGasCentOutput(FluidType fluid) {
+	public static List<GasCentOutput> getGasCentOutput(Fluid fluid) {
 		
 		List<GasCentOutput> list = new ArrayList();
-		
-		switch(fluid) {
-		case LAVA:
+		if(fluid == null){
+			return null;
+		} else if(fluid == FluidRegistry.LAVA){
 			list.add(new GasCentOutput(1, new ItemStack(ModBlocks.gravel_obsidian), 1));
 			list.add(new GasCentOutput(2, new ItemStack(Blocks.gravel), 2));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.powder_lithium), 3));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.powder_iron, 2), 4));
 			return list;
-		case UF6:
+		} else if(fluid == ModForgeFluids.uf6){
 			list.add(new GasCentOutput(4, new ItemStack(ModItems.nugget_u238), 1));
 			list.add(new GasCentOutput(4, new ItemStack(ModItems.nugget_u238), 2));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.nugget_u235), 3));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.fluorite), 4));
 			return list;
-		case PUF6:
+		} else if(fluid == ModForgeFluids.puf6){
 			list.add(new GasCentOutput(3, new ItemStack(ModItems.nugget_pu238), 1));
 			list.add(new GasCentOutput(2, new ItemStack(ModItems.nugget_pu239), 2));
 			list.add(new GasCentOutput(4, new ItemStack(ModItems.nugget_pu240), 3));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.fluorite), 4));
 			return list;
-		case WATZ:
+		} else if(fluid == ModForgeFluids.watz){
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.nugget_schrabidium), 1));
 			list.add(new GasCentOutput(3, new ItemStack(ModItems.nugget_uranium), 2));
 			list.add(new GasCentOutput(3, new ItemStack(ModItems.powder_iron), 3));
 			list.add(new GasCentOutput(3, new ItemStack(ModItems.powder_copper), 4));
 			return list;
-		case SAS3:
+		} else if(fluid == ModForgeFluids.sas3){
 			list.add(new GasCentOutput(4, new ItemStack(ModItems.nugget_schrabidium), 1));
 			list.add(new GasCentOutput(4, new ItemStack(ModItems.nugget_schrabidium), 2));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.sulfur), 3));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.sulfur), 4));
 			return list;
-		case COOLANT:
+		} else if(fluid == ModForgeFluids.coolant){
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.niter), 1));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.niter), 2));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.niter), 3));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.niter), 4));
 			return list;
-		case CRYOGEL:
+		} else if(fluid == ModForgeFluids.cryogel){
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.powder_ice), 1));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.powder_ice), 2));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.niter), 3));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.niter), 4));
 			return list;
-		case NITAN:
+		} else if(fluid == ModForgeFluids.nitan){
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.powder_nitan_mix), 1));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.powder_nitan_mix), 2));
 			list.add(new GasCentOutput(1, new ItemStack(ModItems.powder_nitan_mix), 3));
@@ -446,31 +443,28 @@ public class MachineRecipes {
 		}
 	}
 
-	@SuppressWarnings("incomplete-switch")
-	public static int getFluidConsumedGasCent(FluidType fluid) {
-		
-		List<GasCentOutput> list = new ArrayList();
-		
-		switch(fluid) {
-		case LAVA:
+
+	public static int getFluidConsumedGasCent(Fluid fluid) {
+		if(fluid == null)
+			return 0;
+		else if(fluid == FluidRegistry.LAVA)
 			return 1000;
-		case UF6:
+		else if(fluid == ModForgeFluids.uf6)
 			return 100;
-		case PUF6:
+		else if(fluid == ModForgeFluids.puf6)
 			return 100;
-		case WATZ:
+		else if(fluid == ModForgeFluids.watz)
 			return 100;
-		case SAS3:
+		else if(fluid == ModForgeFluids.sas3)
 			return 100;
-		case COOLANT:
+		else if(fluid == ModForgeFluids.coolant)
 			return 2000;
-		case CRYOGEL:
+		else if(fluid == ModForgeFluids.cryogel)
 			return 1000;
-		case NITAN:
+		else if(fluid == ModForgeFluids.nitan)
 			return 500;
-		}
-		
-		return 100;
+		else
+			return 100;
 	}
 	
 	private static List<ItemStack> addToListWithWeight(List<ItemStack> list, ItemStack stack, int weight) {
@@ -1325,7 +1319,8 @@ public class MachineRecipes {
 
 	public Map<Object, Object[]> getGasCentrifugeRecipes() {
 		Map<Object, Object[]> recipes = new HashMap<Object, Object[]>();
-
+		//TODO add fluid icon recipe system later
+		/*
 		for(int i = 0; i < FluidType.values().length; i++) {
 			
 			if(getGasCentOutput(FluidType.getEnum(i)) != null) {
@@ -1339,7 +1334,8 @@ public class MachineRecipes {
 				}
 				
 				ItemStack input = new ItemStack(ModItems.fluid_icon, 1, i);
-				ItemFluidIcon.addQuantity(input, getFluidConsumedGasCent(FluidType.getEnum(i)) * totalWeight);
+				
+				//ItemFluidIcon.addQuantity(input, getFluidConsumedGasCent(FluidType.getEnum(i)) * totalWeight);
 
 				ItemStack[] out = new ItemStack[4];
 				
@@ -1356,7 +1352,7 @@ public class MachineRecipes {
 				recipes.put(input, out);
 			}
 		}
-		
+		*/
 		return recipes;
 	}
 

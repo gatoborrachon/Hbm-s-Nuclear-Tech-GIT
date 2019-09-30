@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
-import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.MachineRecipes;
 import com.hbm.inventory.MachineRecipes.GasCentOutput;
 import com.hbm.lib.Library;
@@ -27,8 +23,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityMachineGasCent extends TileEntity implements ISidedInventory, IConsumer, IFluidContainer, IFluidAcceptor {
+public class TileEntityMachineGasCent extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler {
 
 	private ItemStack slots[];
 	
@@ -48,7 +50,7 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 	
 	public TileEntityMachineGasCent() {
 		slots = new ItemStack[9];
-		tank = new FluidTank(FluidType.UF6, 8000, 0);
+		tank = new FluidTank(8000);
 	}
 
 	@Override
@@ -156,7 +158,7 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 		
 		power = nbt.getLong("powerTime");
 		progress = nbt.getShort("CookTime");
-		tank.readFromNBT(nbt, "tank");
+		tank.readFromNBT(nbt);
 		slots = new ItemStack[getSizeInventory()];
 		
 		for(int i = 0; i < list.tagCount(); i++)
@@ -175,7 +177,7 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 		super.writeToNBT(nbt);
 		nbt.setLong("powerTime", power);
 		nbt.setShort("cookTime", (short) progress);
-		tank.writeToNBT(nbt, "tank");
+		tank.writeToNBT(nbt);
 		NBTTagList list = new NBTTagList();
 		
 		for(int i = 0; i < slots.length; i++)
@@ -217,7 +219,7 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 	
 	private boolean canProcess() {
 		
-		if(power > 0 && this.tank.getFill() >= MachineRecipes.getFluidConsumedGasCent(tank.getTankType())) {
+		if(power > 0 && this.tank.getFluidAmount() >= MachineRecipes.getFluidConsumedGasCent(tank.getFluid() == null ? null : tank.getFluid().getFluid())) {
 			
 			List<GasCentOutput> list = MachineRecipes.getGasCentOutput(tank.getTankType());
 			
@@ -250,7 +252,7 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 	
 	private void process() {
 
-		List<GasCentOutput> out = MachineRecipes.getGasCentOutput(tank.getTankType());
+		List<GasCentOutput> out = MachineRecipes.getGasCentOutput(tank.getFluid() == null ? null : tank.getFluid().getFluid());
 		this.progress = 0;
 		tank.setFill(tank.getFill() - MachineRecipes.getFluidConsumedGasCent(tank.getTankType()));
 		
@@ -341,37 +343,40 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 	}
 
 	@Override
-	public void setFillstate(int fill, int index) {
-		tank.setFill(fill);
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
-	public void setType(FluidType type, int index) {
-		tank.setTankType(type);
+	public FluidStack drain(ForgeDirection from, FluidStack resource,
+			boolean doDrain) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public int getMaxFluidFill(FluidType type) {
-		return type.name().equals(this.tank.getTankType().name()) ? tank.getMaxFill() : 0;
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public int getFluidFill(FluidType type) {
-		return type.name().equals(this.tank.getTankType().name()) ? tank.getFill() : 0;
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tank.getTankType().name()))
-			tank.setFill(i);
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tank);
-		
-		return list;
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
