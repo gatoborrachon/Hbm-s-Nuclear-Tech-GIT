@@ -300,7 +300,7 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 			
 			//First number doesn't matter, there's only one tank.
 			if(this.inputValidForTank(-1, 3))
-				if(FFUtils.fillFromFluidContainer(slots, tank, 2, 3))
+				if(FFUtils.fillFromFluidContainer(slots, tank, 3, 4))
 					needsUpdate = true;
 			
 			
@@ -333,7 +333,6 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 	}
 	
 	protected boolean inputValidForTank(int tank, int slot){
-		
 		if(slots[slot] != null){
 			if(slots[slot].getItem() instanceof IFluidContainerItem && isValidFluid(((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]))){
 				return true;

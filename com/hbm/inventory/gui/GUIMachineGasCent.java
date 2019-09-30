@@ -2,6 +2,7 @@ package com.hbm.inventory.gui;
 
 import org.lwjgl.opengl.GL11;
 
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.container.ContainerMachineGasCent;
 import com.hbm.lib.RefStrings;
@@ -9,6 +10,7 @@ import com.hbm.tileentity.machine.TileEntityMachineGasCent;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -30,7 +32,7 @@ public class GUIMachineGasCent extends GuiInfoContainer {
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
 
-		diFurnace.tank.renderTankInfo(this, mouseX, mouseY, guiLeft + 53, guiTop + 69 - 52, 16, 52);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 53, guiTop + 69 - 52, 16, 52, diFurnace.tank);
 		
 		this.drawCustomInfoStat(mouseX, mouseY, guiLeft + 98, guiTop + 30, 6, 32, mouseX, mouseY, new String[] {String.valueOf((int)((double)diFurnace.progress / (double)diFurnace.processingSpeed * 100D)) + "%"});
 		
@@ -57,7 +59,8 @@ public class GUIMachineGasCent extends GuiInfoContainer {
 		int j = (int)diFurnace.getCentrifugeProgressScaled(33);
 		drawTexturedModalRect(guiLeft + 98, guiTop + 63 - j, 192, 32 - j, 6, j);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tank.getSheet());
-		diFurnace.tank.renderTank(this, guiLeft + 53, guiTop + 69, diFurnace.tank.getTankType().textureX() * FluidTank.x, diFurnace.tank.getTankType().textureY() * FluidTank.y, 16, 52);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+
+		FFUtils.drawLiquid(diFurnace.tank, guiLeft, guiTop, zLevel, 16, 52, 53, 69);
 	}
 }

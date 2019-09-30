@@ -21,8 +21,9 @@ public class ContainerMachineGasCent extends Container {
 		//Battery
 		this.addSlotToContainer(new Slot(tedf, 0, 8, 53));
 		//Fluid ID IO
-		this.addSlotToContainer(new Slot(tedf, 1, 35, 17));
-		this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 2, 35, 53));
+		//Drillgon200 - Don't need you anymore.
+		//this.addSlotToContainer(new Slot(tedf, 1, 35, 17));
+		//this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 2, 35, 53));
 		//Fluid IO
 		this.addSlotToContainer(new Slot(tedf, 3, 71, 17));
 		this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 4, 71, 53));
