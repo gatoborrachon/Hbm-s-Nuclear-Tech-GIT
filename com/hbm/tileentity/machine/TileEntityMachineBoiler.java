@@ -254,7 +254,7 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 			}
 			if(this.inputValidForTank(0, 2))
 				if(FFUtils.fillFromFluidContainer(slots, tanks[0], 2, 3))
-				needsUpdate = true;
+					needsUpdate = true;
 
 			if(FFUtils.fillFluidContainer(slots, tanks[1], 4, 5))
 				needsUpdate = true;

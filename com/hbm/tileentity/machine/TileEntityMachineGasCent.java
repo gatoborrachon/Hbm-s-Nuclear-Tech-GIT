@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.hbm.forgefluid.FFUtils;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
 import com.hbm.inventory.MachineRecipes;
 import com.hbm.inventory.MachineRecipes.GasCentOutput;
@@ -21,13 +23,19 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
 public class TileEntityMachineGasCent extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler {
@@ -39,6 +47,7 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 	public boolean isProgressing;
 	public static final int maxPower = 100000;
 	public static final int processingSpeed = 200;
+	public boolean needsUpdate = false;
 	
 	public FluidTank tank;
 	
@@ -221,7 +230,7 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 		
 		if(power > 0 && this.tank.getFluidAmount() >= MachineRecipes.getFluidConsumedGasCent(tank.getFluid() == null ? null : tank.getFluid().getFluid())) {
 			
-			List<GasCentOutput> list = MachineRecipes.getGasCentOutput(tank.getTankType());
+			List<GasCentOutput> list = MachineRecipes.getGasCentOutput(tank.getFluid() == null ? null : tank.getFluid().getFluid());
 			
 			if(list == null)
 				return false;
@@ -254,7 +263,7 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 
 		List<GasCentOutput> out = MachineRecipes.getGasCentOutput(tank.getFluid() == null ? null : tank.getFluid().getFluid());
 		this.progress = 0;
-		tank.setFill(tank.getFill() - MachineRecipes.getFluidConsumedGasCent(tank.getTankType()));
+		tank.drain(MachineRecipes.getFluidConsumedGasCent(tank.getFluid() == null ? null : tank.getFluid().getFluid()), true);
 		
 		List<GasCentOutput> random = new ArrayList();
 		
@@ -281,11 +290,20 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 	public void updateEntity() {
 
 		if(!worldObj.isRemote) {
+			
+			if (needsUpdate) {
+				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				needsUpdate = false;
+			}
 
 			power = Library.chargeTEFromItems(slots, 0, power, maxPower);
-			tank.setType(1, 2, slots);
-			tank.loadTank(3, 4, slots);
-			tank.updateTank(xCoord, yCoord, zCoord);
+			
+			//First number doesn't matter, there's only one tank.
+			if(this.inputValidForTank(-1, 3))
+				if(FFUtils.fillFromFluidContainer(slots, tank, 2, 3))
+					needsUpdate = true;
+			
+			
 			
 			if(canProcess()) {
 				
@@ -314,6 +332,26 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 		}
 	}
 	
+	protected boolean inputValidForTank(int tank, int slot){
+		
+		if(slots[slot] != null){
+			if(slots[slot].getItem() instanceof IFluidContainerItem && isValidFluid(((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]))){
+				return true;
+			}
+			if(FluidContainerRegistry.isFilledContainer(slots[slot]) && isValidFluid(FluidContainerRegistry.getFluidForFilledItem(slots[slot]))){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isValidFluid(FluidStack stack) {
+		if(stack == null)
+			return false;
+		return stack.getFluid() == FluidRegistry.LAVA || stack.getFluid() == ModForgeFluids.uf6
+				|| stack.getFluid() == ModForgeFluids.puf6 || stack.getFluid() == ModForgeFluids.watz || stack.getFluid() == ModForgeFluids.sas3 || stack.getFluid() == ModForgeFluids.coolant || stack.getFluid() == ModForgeFluids.cryogel || stack.getFluid() == ModForgeFluids.nitan;
+	}
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
 		return TileEntity.INFINITE_EXTENT_AABB;
@@ -344,39 +382,55 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-		// TODO Auto-generated method stub
+		if (isValidFluid(resource)) {
+			needsUpdate = true;
+			return tank.fill(resource, doFill);
+		}
 		return 0;
 	}
 
 	@Override
-	public FluidStack drain(ForgeDirection from, FluidStack resource,
-			boolean doDrain) {
-		// TODO Auto-generated method stub
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
 		return null;
 	}
 
 	@Override
 	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean canFill(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
-		return false;
+		return tank.getFluidAmount() < 8000;
 	}
 
 	@Override
 	public boolean canDrain(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
-		return false;
+
+		return tank.getFluidAmount() != 0;
 	}
 
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-		// TODO Auto-generated method stub
-		return null;
+
+		return new FluidTankInfo[] {tank.getInfo()};
+	}
+
+
+	@Override
+	public Packet getDescriptionPacket() {
+
+		NBTTagCompound tag = new NBTTagCompound();
+		writeToNBT(tag);
+
+		return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag);
+
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+
+		readFromNBT(pkt.func_148857_g());
 	}
 
 }
