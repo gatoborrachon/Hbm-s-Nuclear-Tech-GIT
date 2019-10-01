@@ -1,10 +1,8 @@
 package com.hbm.tileentity.machine;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -28,7 +26,6 @@ import java.util.List;
 
 import com.hbm.blocks.machine.MachineCoal;
 import com.hbm.forgefluid.FFUtils;
-import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
 import com.hbm.interfaces.ISource;
 import com.hbm.items.ModItems;
@@ -46,7 +43,7 @@ public class TileEntityMachineCoal extends TileEntity implements ISidedInventory
 	public int burnTime;
 	public static final long maxPower = 100000;
 	public int age = 0;
-	public List<IConsumer> list = new ArrayList();
+	public List<IConsumer> list = new ArrayList<IConsumer>();
 	public FluidTank tank;
 	public Fluid tankType = FluidRegistry.WATER;
 	public boolean needsUpdate = false;
@@ -298,6 +295,7 @@ public class TileEntityMachineCoal extends TileEntity implements ISidedInventory
 			if(tank.getFluidAmount() > 0)
 			{
 				tank.drain(1, true);
+				needsUpdate = true;
 				
 				if(power + 25 <= maxPower)
 				{

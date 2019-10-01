@@ -152,16 +152,19 @@ public class MachineCoal extends BlockContainer {
 		int i = world.getBlockMetadata(x, y, z);
 		TileEntity entity = world.getTileEntity(x, y, z);
 		keepInventory = true;
-		
-		if(isProcessing)
+		boolean needsNotify = false;
+		if(isProcessing && world.getBlock(x, y, z) == ModBlocks.machine_coal_off)
 		{
 			world.setBlock(x, y, z, ModBlocks.machine_coal_on);
-		}else{
+			needsNotify = true;
+		}else if(!isProcessing && world.getBlock(x, y, z) == ModBlocks.machine_coal_on){
 			world.setBlock(x, y, z, ModBlocks.machine_coal_off);
+			needsNotify = true;
 		}
 		
 		keepInventory = false;
-		world.setBlockMetadataWithNotify(x, y, z, i, 2);
+		if(needsNotify)
+			world.setBlockMetadataWithNotify(x, y, z, i, 2);
 		
 		if(entity != null) {
 			entity.validate();

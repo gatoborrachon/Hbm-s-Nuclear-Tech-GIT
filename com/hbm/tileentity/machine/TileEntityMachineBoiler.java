@@ -1,17 +1,10 @@
 package com.hbm.tileentity.machine;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.machine.MachineBoiler;
 import com.hbm.forgefluid.FFUtils;
 import com.hbm.forgefluid.ModForgeFluids;
-import com.hbm.handler.FluidTypeHandler.FluidType;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IHBMFluidHandler;
 import com.hbm.inventory.MachineRecipes;
-import com.hbm.lib.Library;
 import com.hbm.packet.AuxGaugePacket;
 import com.hbm.packet.PacketDispatcher;
 
