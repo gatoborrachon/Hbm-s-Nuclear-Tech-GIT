@@ -400,7 +400,7 @@ public class TileEntityMachineGasCent extends TileEntity implements ISidedInvent
 
 	@Override
 	public boolean canFill(ForgeDirection from, Fluid fluid) {
-		return tank.getFluidAmount() < 8000;
+		return true;
 	}
 
 	@Override

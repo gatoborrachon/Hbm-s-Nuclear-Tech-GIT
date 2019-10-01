@@ -2,6 +2,7 @@ package com.hbm.inventory.gui;
 
 import org.lwjgl.opengl.GL11;
 
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.container.ContainerMachineDiesel;
 import com.hbm.inventory.container.ContainerMachineTurbofan;
@@ -10,6 +11,7 @@ import com.hbm.tileentity.machine.TileEntityMachineDiesel;
 import com.hbm.tileentity.machine.TileEntityMachineTurbofan;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -31,7 +33,7 @@ public class GUIMachineTurbofan extends GuiInfoContainer {
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
 
-		diFurnace.tank.renderTankInfo(this, mouseX, mouseY, guiLeft + 53, guiTop + 69 - 52, 34, 52);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 53, guiTop + 69 - 52, 34, 52, diFurnace.tank);
 		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 152 - 9, guiTop + 69 - 52, 16, 52, diFurnace.power, diFurnace.maxPower);
 
 		String[] text = new String[] { "Acceptable upgrades:",
@@ -65,9 +67,7 @@ public class GUIMachineTurbofan extends GuiInfoContainer {
 
 		this.drawInfoPanel(guiLeft + 96, guiTop + 21, 8, 8, 8);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tank.getSheet());
-		diFurnace.tank.renderTank(this, guiLeft + 53, guiTop + 69, diFurnace.tank.getTankType().textureX() * FluidTank.x, diFurnace.tank.getTankType().textureY() * FluidTank.y, 16, 52);
-		diFurnace.tank.renderTank(this, guiLeft + 53 + 16, guiTop + 69, diFurnace.tank.getTankType().textureX() * FluidTank.x, diFurnace.tank.getTankType().textureY() * FluidTank.y, 16, 52);
-		diFurnace.tank.renderTank(this, guiLeft + 53 + 32, guiTop + 69, diFurnace.tank.getTankType().textureX() * FluidTank.x, diFurnace.tank.getTankType().textureY() * FluidTank.y, 2, 52);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+		FFUtils.drawLiquid(diFurnace.tank, guiLeft, guiTop, zLevel, 34, 52, 53, 69);
 	}
 }

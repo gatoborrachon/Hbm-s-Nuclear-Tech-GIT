@@ -4,25 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.hbm.blocks.ModBlocks;
-import com.hbm.entity.particle.EntityDSmokeFX;
-import com.hbm.entity.particle.EntityGasFlameFX;
 import com.hbm.entity.particle.EntitySSmokeFX;
 import com.hbm.entity.particle.EntityTSmokeFX;
-import com.hbm.handler.FluidTypeHandler.FluidType;
+import com.hbm.forgefluid.FFUtils;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
 import com.hbm.interfaces.ISource;
-import com.hbm.inventory.FluidTank;
 import com.hbm.items.ModItems;
-import com.hbm.items.special.ItemBattery;
 import com.hbm.lib.Library;
 import com.hbm.lib.ModDamageSource;
 import com.hbm.packet.AuxElectricityPacket;
 import com.hbm.packet.LoopedSoundPacket;
 import com.hbm.packet.PacketDispatcher;
-import com.hbm.packet.TEIGeneratorPacket;
 import com.hbm.packet.TETurbofanPacket;
 
 import cpw.mods.fml.relauncher.Side;
@@ -30,14 +23,25 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidContainerItem;
+import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityMachineTurbofan extends TileEntity implements ISidedInventory, ISource, IFluidContainer, IFluidAcceptor {
+public class TileEntityMachineTurbofan extends TileEntity implements ISidedInventory, ISource, IFluidHandler {
 
 	private ItemStack slots[];
 
@@ -45,12 +49,13 @@ public class TileEntityMachineTurbofan extends TileEntity implements ISidedInven
 	public int soundCycle = 0;
 	public static final long maxPower = 150000;
 	public int age = 0;
-	public List<IConsumer> list = new ArrayList();
+	public List<IConsumer> list = new ArrayList<IConsumer>();
 	public FluidTank tank;
 	Random rand = new Random();
 	public int afterburner;
 	public boolean isRunning;
 	public int spin;
+	public boolean needsUpdate = false;
 
 	private static final int[] slots_top = new int[] { 0 };
 	private static final int[] slots_bottom = new int[] { 0, 0 };
@@ -60,7 +65,7 @@ public class TileEntityMachineTurbofan extends TileEntity implements ISidedInven
 
 	public TileEntityMachineTurbofan() {
 		slots = new ItemStack[3];
-		tank = new FluidTank(FluidType.KEROSENE, 64000, 0);
+		tank = new FluidTank(64000);
 	}
 
 	@Override
@@ -159,7 +164,7 @@ public class TileEntityMachineTurbofan extends TileEntity implements ISidedInven
 		NBTTagList list = nbt.getTagList("items", 10);
 
 		this.power = nbt.getLong("powerTime");
-		tank.readFromNBT(nbt, "fuel");
+		tank.readFromNBT(nbt);
 		slots = new ItemStack[getSizeInventory()];
 
 		for (int i = 0; i < list.tagCount(); i++) {
@@ -175,7 +180,7 @@ public class TileEntityMachineTurbofan extends TileEntity implements ISidedInven
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		nbt.setLong("powerTime", power);
-		tank.writeToNBT(nbt, "fuel");
+		tank.writeToNBT(nbt);
 		NBTTagList list = new NBTTagList();
 
 		for (int i = 0; i < slots.length; i++) {
@@ -208,6 +213,7 @@ public class TileEntityMachineTurbofan extends TileEntity implements ISidedInven
 		return (power * i) / maxPower;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void updateEntity() {
 		
@@ -234,6 +240,10 @@ public class TileEntityMachineTurbofan extends TileEntity implements ISidedInven
 		}
 		
 		if (!worldObj.isRemote) {
+			if (needsUpdate) {
+				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				needsUpdate = false;
+			}
 			age++;
 			if (age >= 20) {
 				age = 0;
@@ -243,13 +253,16 @@ public class TileEntityMachineTurbofan extends TileEntity implements ISidedInven
 				ffgeuaInit();
 
 			//Tank Management
-			tank.loadTank(0, 1, slots);
-			tank.updateTank(xCoord, yCoord, zCoord);
+			//Drillgon200: tank number doesn't matter, only one tank.
+			if(this.inputValidForTank(-1, 0))
+				if(FFUtils.fillFromFluidContainer(slots, tank, 0, 1))
+					needsUpdate = true;
 			
 			isRunning = false;
 				
-			if(tank.getFill() >= cnsp) {
-				tank.setFill(tank.getFill() - cnsp);
+			if(tank.getFluidAmount() >= cnsp) {
+				tank.drain(cnsp, true);
+				needsUpdate = true;
 				power += nrg;
 
 				isRunning = true;
@@ -483,6 +496,24 @@ public class TileEntityMachineTurbofan extends TileEntity implements ISidedInven
 			PacketDispatcher.wrapper.sendToAll(new AuxElectricityPacket(xCoord, yCoord, zCoord, power));
 		}
 	}
+	
+	protected boolean inputValidForTank(int tank, int slot){
+		if(slots[slot] != null){
+			if(slots[slot].getItem() instanceof IFluidContainerItem && isValidFluid(((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]))){
+				return true;	
+			}
+			if(FluidContainerRegistry.isFilledContainer(slots[slot]) && isValidFluid(FluidContainerRegistry.getFluidForFilledItem(slots[slot]))){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isValidFluid(FluidStack stack) {
+		if(stack == null)
+			return false;
+		return stack.getFluid() == ModForgeFluids.kerosene;
+	}
 
 	@Override
 	public void ffgeua(int x, int y, int z, boolean newTact) {
@@ -530,32 +561,6 @@ public class TileEntityMachineTurbofan extends TileEntity implements ISidedInven
 	public void clearList() {
 		this.list.clear();
 	}
-
-	@Override
-	public void setFillstate(int fill, int index) {
-		tank.setFill(fill);
-	}
-
-	@Override
-	public void setType(FluidType type, int index) {
-		tank.setTankType(type);
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		return type.name().equals(this.tank.getTankType().name()) ? tank.getMaxFill() : 0;
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		return type.name().equals(this.tank.getTankType().name()) ? tank.getFill() : 0;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tank.getTankType().name()))
-			tank.setFill(i);
-	}
 	
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
@@ -569,11 +574,57 @@ public class TileEntityMachineTurbofan extends TileEntity implements ISidedInven
 		return 65536.0D;
 	}
 
+
 	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tank);
-		
-		return list;
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		if (isValidFluid(resource)) {
+			needsUpdate = true;
+			return tank.fill(resource, doFill);
+		}
+		return 0;
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		return null;
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		return null;
+	}
+
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		return true;
+	}
+
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+
+		return tank.getFluidAmount() != 0;
+	}
+
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+
+		return new FluidTankInfo[] {tank.getInfo()};
+	}
+
+
+	@Override
+	public Packet getDescriptionPacket() {
+
+		NBTTagCompound tag = new NBTTagCompound();
+		writeToNBT(tag);
+
+		return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag);
+
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+
+		readFromNBT(pkt.func_148857_g());
 	}
 }
