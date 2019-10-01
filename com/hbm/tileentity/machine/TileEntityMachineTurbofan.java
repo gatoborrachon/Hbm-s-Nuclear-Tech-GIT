@@ -578,7 +578,8 @@ public class TileEntityMachineTurbofan extends TileEntity implements ISidedInven
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
 		if (isValidFluid(resource)) {
-			needsUpdate = true;
+			if(tank.fill(resource, false) > 0)
+				needsUpdate = true;
 			return tank.fill(resource, doFill);
 		}
 		return 0;
