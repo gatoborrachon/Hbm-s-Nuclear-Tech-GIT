@@ -21,8 +21,8 @@ public class ContainerMachineDiesel extends Container {
 		this.addSlotToContainer(new Slot(tedf, 0, 44, 17));
 		this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 1, 44, 53));
 		this.addSlotToContainer(new Slot(tedf, 2, 116, 53));
-		this.addSlotToContainer(new Slot(tedf, 3, 8, 17));
-		this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 4, 8, 53));
+		//this.addSlotToContainer(new Slot(tedf, 3, 8, 17));
+		//this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 4, 8, 53));
 		
 		for(int i = 0; i < 3; i++)
 		{

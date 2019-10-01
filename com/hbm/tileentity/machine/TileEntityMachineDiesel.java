@@ -53,7 +53,7 @@ public class TileEntityMachineDiesel extends TileEntity implements ISidedInvento
 	private String customName;
 
 	public TileEntityMachineDiesel() {
-		slots = new ItemStack[5];
+		slots = new ItemStack[3];
 		tank = new FluidTank(16000);
 	}
 
@@ -262,7 +262,7 @@ public class TileEntityMachineDiesel extends TileEntity implements ISidedInvento
 	}
 	
 	public int getHEFromFuel() {
-		Fluid type = tank.getFluid() == null ? null : tank.getFluid().getFluid();
+		Fluid type = tankType;
 		if(type == null)
 			return 0;
 		if(type == ModForgeFluids.diesel)
