@@ -1,8 +1,5 @@
 package com.hbm.tileentity.machine;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ISidedInventory;
@@ -25,13 +22,15 @@ import net.minecraftforge.fluids.IFluidHandler;
 import com.hbm.forgefluid.FFUtils;
 import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemBattery;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
 
-public class TileEntityMachineCMBFactory extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler {
+public class TileEntityMachineCMBFactory extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler, ITankPacketAcceptor {
 
 	private ItemStack slots[];
 	
@@ -297,7 +296,7 @@ public class TileEntityMachineCMBFactory extends TileEntity implements ISidedInv
 
 		if (!worldObj.isRemote) {
 			if (needsUpdate) {
-				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[] {tank}));
 				needsUpdate = false;
 			}
 			power = Library.chargeTEFromItems(slots, 0, power, maxPower);
@@ -409,5 +408,15 @@ public class TileEntityMachineCMBFactory extends TileEntity implements ISidedInv
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 
 		readFromNBT(pkt.func_148857_g());
+	}
+
+	@Override
+	public void recievePacket(NBTTagCompound[] tags) {
+		if(tags.length != 1) {
+			return;
+		} else {
+			tank.readFromNBT(tags[0]);
+		}
+		
 	}
 }

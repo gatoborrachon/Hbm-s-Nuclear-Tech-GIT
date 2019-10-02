@@ -1,7 +1,6 @@
 package com.hbm.blocks.machine;
 
 import com.hbm.packet.PacketDispatcher;
-import com.hbm.packet.TEFFPipeDestructorPacket;
 import com.hbm.tileentity.conductor.TileEntityFFDuctBase;
 import com.hbm.tileentity.conductor.TileEntityFFOilDuct;
 import com.hbm.tileentity.conductor.TileEntityOilDuct;

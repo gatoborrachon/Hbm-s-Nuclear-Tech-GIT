@@ -1,18 +1,17 @@
 package com.hbm.tileentity.machine;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.machine.MachineBoiler;
 import com.hbm.forgefluid.FFUtils;
 import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.inventory.MachineRecipes;
 import com.hbm.items.special.ItemBattery;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
 import com.hbm.packet.AuxGaugePacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -35,7 +34,7 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityMachineBoilerElectric extends TileEntity implements ISidedInventory, IFluidHandler, IConsumer {
+public class TileEntityMachineBoilerElectric extends TileEntity implements ISidedInventory, IFluidHandler, IConsumer, ITankPacketAcceptor {
 
 	private ItemStack slots[];
 	
@@ -248,7 +247,7 @@ public class TileEntityMachineBoilerElectric extends TileEntity implements ISide
 		boolean mark = false;
 		
 		if (needsUpdate) {
-			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+			PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[] {tanks[0], tanks[1]}));
 			needsUpdate = false;
 		}
 		
@@ -445,5 +444,16 @@ public class TileEntityMachineBoilerElectric extends TileEntity implements ISide
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 
 		readFromNBT(pkt.func_148857_g());
+	}
+
+	@Override
+	public void recievePacket(NBTTagCompound[] tags) {
+		if(tags.length != 2) {
+			return;
+		} else {
+			tanks[0].readFromNBT(tags[0]);
+			tanks[1].readFromNBT(tags[1]);
+		}
+		
 	}
 }

@@ -21,7 +21,6 @@ import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.interfaces.IFluidPipe;
 import com.hbm.lib.Library;
 import com.hbm.packet.PacketDispatcher;
-import com.hbm.packet.TEFFPipeDestructorPacket;
 import com.hbm.packet.TEFluidTypePacketTest;
 
 import cpw.mods.fml.relauncher.Side;

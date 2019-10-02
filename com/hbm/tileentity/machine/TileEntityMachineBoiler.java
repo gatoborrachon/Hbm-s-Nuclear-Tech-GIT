@@ -4,8 +4,10 @@ import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.machine.MachineBoiler;
 import com.hbm.forgefluid.FFUtils;
 import com.hbm.forgefluid.ModForgeFluids;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.inventory.MachineRecipes;
 import com.hbm.packet.AuxGaugePacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,7 +30,7 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityMachineBoiler extends TileEntity implements ISidedInventory, IFluidHandler {
+public class TileEntityMachineBoiler extends TileEntity implements ISidedInventory, IFluidHandler, ITankPacketAcceptor {
 
 	private ItemStack slots[];
 
@@ -253,7 +255,7 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 				needsUpdate = true;
 
 			if (needsUpdate) {
-				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[] {tanks[0], tanks[1]}));
 				needsUpdate = false;
 			}
 
@@ -426,6 +428,17 @@ public class TileEntityMachineBoiler extends TileEntity implements ISidedInvento
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 
 		readFromNBT(pkt.func_148857_g());
+	}
+
+	@Override
+	public void recievePacket(NBTTagCompound[] tags) {
+		if(tags.length != 2) {
+			return;
+		} else {
+			tanks[0].readFromNBT(tags[0]);
+			tanks[1].readFromNBT(tags[1]);
+		}
+		
 	}
 
 

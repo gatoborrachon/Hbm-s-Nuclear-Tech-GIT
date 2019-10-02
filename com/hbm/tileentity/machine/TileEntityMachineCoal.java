@@ -28,14 +28,16 @@ import com.hbm.blocks.machine.MachineCoal;
 import com.hbm.forgefluid.FFUtils;
 import com.hbm.interfaces.IConsumer;
 import com.hbm.interfaces.ISource;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemBattery;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
 import com.hbm.packet.AuxGaugePacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
 
-public class TileEntityMachineCoal extends TileEntity implements ISidedInventory, ISource, IFluidHandler {
+public class TileEntityMachineCoal extends TileEntity implements ISidedInventory, ISource, IFluidHandler, ITankPacketAcceptor {
 
 	private ItemStack slots[];
 	
@@ -243,7 +245,7 @@ public class TileEntityMachineCoal extends TileEntity implements ISidedInventory
 		if(!worldObj.isRemote)
 		{
 			if (needsUpdate) {
-				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[] {tank}));
 				needsUpdate = false;
 			}
 			//Water
@@ -432,6 +434,16 @@ public class TileEntityMachineCoal extends TileEntity implements ISidedInventory
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 
 		readFromNBT(pkt.func_148857_g());
+	}
+
+	@Override
+	public void recievePacket(NBTTagCompound[] tags) {
+		if(tags.length != 1) {
+			return;
+		} else {
+			tank.readFromNBT(tags[0]);
+		}
+		
 	}
 
 }
