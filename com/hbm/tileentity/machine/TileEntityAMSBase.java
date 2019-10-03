@@ -189,7 +189,7 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
 		NBTTagList list = nbt.getTagList("items", 10);
-		NBTTagList tanksList = nbt.getTagList("tanks", 10);
+		
 
 		power = nbt.getLong("power");
 		field = nbt.getInteger("field");
@@ -199,6 +199,7 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 		slots = new ItemStack[getSizeInventory()];
 		tanks = new FluidTank[4];
 		
+		NBTTagList tanksList = nbt.getTagList("tanks", 10);
 		for(int i = 0; i < tanksList.tagCount(); i ++){
 			NBTTagCompound tag = list.getCompoundTagAt(i);
 			byte b0 = tag.getByte("tank");

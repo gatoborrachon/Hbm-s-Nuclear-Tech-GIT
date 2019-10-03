@@ -4,13 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hbm.blocks.ModBlocks;
-import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
 import com.hbm.interfaces.IReactor;
 import com.hbm.interfaces.ISource;
-import com.hbm.inventory.FluidTank;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
@@ -25,8 +22,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityFusionMultiblock extends TileEntity implements ISidedInventory, IReactor, ISource, IFluidContainer, IFluidAcceptor {
+public class TileEntityFusionMultiblock extends TileEntity implements ISidedInventory, IReactor, ISource, IFluidHandler, ITankPacketAcceptor {
 
 	public long power;
 	public final static long maxPower = 100000000;
@@ -34,15 +38,22 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 	public int age = 0;
 	public List<IConsumer> list = new ArrayList();
 	public FluidTank tanks[];
+	public Fluid[] tankTypes;
+	public boolean needsUpdate;
 	
 	private String customName;
 
 	public TileEntityFusionMultiblock() {
+		needsUpdate = false;
 		slots = new ItemStack[12];
 		tanks = new FluidTank[3];
-		tanks[0] = new FluidTank(FluidType.WATER, 128000, 0);
-		tanks[1] = new FluidTank(FluidType.DEUTERIUM, 64000, 1);
-		tanks[2] = new FluidTank(FluidType.TRITIUM, 64000, 2);
+		tankTypes = new Fluid[3];
+		//water
+		tanks[0] = new FluidTank(128000);
+		//deuterium
+		tanks[1] = new FluidTank(64000);
+		//tritium
+		tanks[2] = new FluidTank(64000);
 	}
 	@Override
 	public int getSizeInventory() {
@@ -158,12 +169,17 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 		NBTTagList list = nbt.getTagList("items", 10);
 
 		power = nbt.getLong("power");
-		tanks[0].readFromNBT(nbt, "water");
-		tanks[1].readFromNBT(nbt, "deut");
-		tanks[2].readFromNBT(nbt, "trit");
 		
 		slots = new ItemStack[getSizeInventory()];
 		
+		NBTTagList tankList = nbt.getTagList("tanks", 10);
+		for(int i = 0; i < tankList.tagCount(); i ++){
+			NBTTagCompound tag = list.getCompoundTagAt(i);
+			byte b0 = tag.getByte("tank");
+			if(b0 >= 0 && b0 < tanks.length){
+				tanks[b0].readFromNBT(tag);
+			}
+		}
 		for(int i = 0; i < list.tagCount(); i++)
 		{
 			NBTTagCompound nbt1 = list.getCompoundTagAt(i);
@@ -180,12 +196,18 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 		super.writeToNBT(nbt);
 		
 		nbt.setLong("power", power);
-		tanks[0].writeToNBT(nbt, "water");
-		tanks[1].writeToNBT(nbt, "deut");
-		tanks[2].writeToNBT(nbt, "trit");
 		
+		NBTTagList tankList = new NBTTagList();
+		for(int i = 0; i < tanks.length; i ++){
+			if(tanks[i] != null){
+				NBTTagCompound tag = new NBTTagCompound();
+				tag.setByte("tank", (byte)i);
+				tanks[i].writeToNBT(tag);
+				tankList.appendTag(tag);
+			}
+		}
+		nbt.setTag("tanks", tankList);
 		NBTTagList list = new NBTTagList();
-		
 		for(int i = 0; i < slots.length; i++)
 		{
 			if(slots[i] != null)
@@ -1000,14 +1022,14 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 					this.slots[2] = null;
 				}
 
-				tanks[1].setFill(tanks[1].getFill() + 10000);
-				tanks[2].setFill(tanks[2].getFill() + 10000);
+				tanks[1].setFill(tanks[1].getFluidAmount() + 10000);
+				tanks[2].setFill(tanks[2].getFluidAmount() + 10000);
 				
-				if(tanks[1].getFill() > tanks[1].getMaxFill())
-					tanks[1].setFill(tanks[1].getMaxFill());
+				if(tanks[1].getFluidAmount() > tanks[1].getCapacity())
+					tanks[1].setFill(tanks[1].getCapacity());
 				
-				if(tanks[2].getFill() > tanks[2].getMaxFill())
-					tanks[2].setFill(tanks[2].getMaxFill());
+				if(tanks[2].getFluidAmount() > tanks[2].getCapacity())
+					tanks[2].setFill(tanks[2].getCapacity());
 			}
 			
 			if(slots[3] != null && slots[3].getItem() == ModItems.tritium_deuterium_cake)
@@ -1018,14 +1040,9 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 					this.slots[3] = null;
 				}
 
-				tanks[1].setFill(tanks[1].getFill() + 10000);
-				tanks[2].setFill(tanks[2].getFill() + 10000);
+				tanks[1].setFill(tanks[1].getFluidAmount() + 10000);
+				tanks[2].fill(tanks[2].getFluidAmount() + 10000);
 				
-				if(tanks[1].getFill() > tanks[1].getMaxFill())
-					tanks[1].setFill(tanks[1].getMaxFill());
-				
-				if(tanks[2].getFill() > tanks[2].getMaxFill())
-					tanks[2].setFill(tanks[2].getMaxFill());
 			}
 			
 			if(!isRunning() &&
@@ -1034,7 +1051,7 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 					slots[6] != null && (slots[6].getItem() == ModItems.fusion_core || slots[6].getItem() == ModItems.energy_core) && slots[6].getItemDamage() == 0 &&
 					slots[7] != null && (slots[7].getItem() == ModItems.fusion_core || slots[7].getItem() == ModItems.energy_core) && slots[7].getItemDamage() == 0 &&
 					hasFuse() &&
-					tanks[1].getFill() > 0 && tanks[2].getFill() > 0)
+					tanks[1].getFluidAmount() > 0 && tanks[2].getFluidAmount() > 0)
 			{
 				slots[4] = null;
 				slots[5] = null;
@@ -1044,12 +1061,12 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 			} else {
 				if(isStructureValid(worldObj) && isRunning())
 				{
-					tanks[1].setFill(tanks[1].getFill() - 1);
-					tanks[2].setFill(tanks[2].getFill() - 1);
+					tanks[1].setFill(tanks[1].getFluidAmount() - 1);
+					tanks[2].setFill(tanks[2].getFluidAmount() - 1);
 					
-					if(tanks[0].getFill() >= 20)
+					if(tanks[0].getFluidAmount() >= 20)
 					{
-						tanks[0].setFill(tanks[0].getFill() - 20);
+						tanks[0].setFill(tanks[0].getFluidAmount() - 20);
 						power += 100000;
 						
 						if(isCoatingValid(worldObj))
@@ -1074,7 +1091,7 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 				emptyPlasma();
 			}
 			
-			if(tanks[1].getFill() <= 0 || tanks[2].getFill() <= 0)
+			if(tanks[1].getFluidAmount() <= 0 || tanks[2].getFluidAmount() <= 0)
 			{
 				emptyPlasma();
 			}
@@ -1248,59 +1265,39 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 	}
 
 	@Override
-	public void setFillstate(int fill, int index) {
-		if(index < 3 && tanks[index] != null)
-			tanks[index].setFill(fill);
-	}
-
-	@Override
-	public void setType(FluidType type, int index) {
-		if(index < 3 && tanks[index] != null)
-			tanks[index].setTankType(type);
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			tanks[0].setFill(i);
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			tanks[1].setFill(i);
-		else if(type.name().equals(tanks[2].getTankType().name()))
-			tanks[2].setFill(i);
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getFill();
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getFill();
-		else if(type.name().equals(tanks[2].getTankType().name()))
-			return tanks[2].getFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getMaxFill();
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getMaxFill();
-		else if(type.name().equals(tanks[2].getTankType().name()))
-			return tanks[2].getMaxFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tanks[0]);
-		list.add(tanks[1]);
-		list.add(tanks[2]);
+	public void recievePacket(NBTTagCompound[] tags) {
+		// TODO Auto-generated method stub
 		
-		return list;
+	}
+	@Override
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
