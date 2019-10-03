@@ -7,10 +7,12 @@ import com.hbm.forgefluid.FFUtils;
 import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.interfaces.IConsumer;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemBattery;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
 
 import cpw.mods.fml.relauncher.Side;
@@ -34,7 +36,7 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityMachineRefinery extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler {
+public class TileEntityMachineRefinery extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler, ITankPacketAcceptor {
 
 	private ItemStack slots[];
 
@@ -278,7 +280,7 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 
 		if (!worldObj.isRemote) {
 			if(needsUpdate){
-				worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[] {tanks[0], tanks[1], tanks[2], tanks[3], tanks[4]}));
 				needsUpdate = false;
 			}
 			power = Library.chargeTEFromItems(slots, 0, power, maxPower);
@@ -510,5 +512,19 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 
 		readFromNBT(pkt.func_148857_g());
+	}
+
+	@Override
+	public void recievePacket(NBTTagCompound[] tags) {
+		if(tags.length != 5){
+			return;
+		} else {
+			tanks[0].readFromNBT(tags[0]);
+			tanks[1].readFromNBT(tags[1]);
+			tanks[2].readFromNBT(tags[2]);
+			tanks[3].readFromNBT(tags[3]);
+			tanks[4].readFromNBT(tags[4]);
+		}
+		
 	}
 }

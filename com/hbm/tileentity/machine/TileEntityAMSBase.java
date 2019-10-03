@@ -3,17 +3,12 @@ package com.hbm.tileentity.machine;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hbm.blocks.ModBlocks;
 import com.hbm.entity.effect.EntityCloudFleijaRainbow;
 import com.hbm.entity.logic.EntityNukeExplosionMK4;
-import com.hbm.entity.particle.EntityGasFlameFX;
-import com.hbm.explosion.ExplosionLarge;
-import com.hbm.handler.FluidTypeHandler.FluidType;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
 import com.hbm.interfaces.ISource;
-import com.hbm.inventory.FluidTank;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemAMSCore;
 import com.hbm.items.special.ItemCatalyst;
@@ -22,8 +17,8 @@ import com.hbm.lib.Library;
 import com.hbm.lib.ModDamageSource;
 import com.hbm.packet.AuxElectricityPacket;
 import com.hbm.packet.AuxGaugePacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
-import com.hbm.saveddata.SatelliteSaveStructure;
 import com.hbm.saveddata.SatelliteSaveStructure.SatelliteType;
 import com.hbm.saveddata.SatelliteSavedData;
 
@@ -37,10 +32,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentText;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 import scala.util.Random;
 
-public class TileEntityAMSBase extends TileEntity implements ISidedInventory, ISource, IFluidContainer, IFluidAcceptor {
+public class TileEntityAMSBase extends TileEntity implements ISidedInventory, ISource, IFluidHandler, ITankPacketAcceptor {
 
 	private ItemStack slots[];
 
@@ -57,8 +58,10 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 	public int mode = 0;
 	public boolean locked = false;
 	public FluidTank[] tanks;
-	public List<IConsumer> list = new ArrayList();
+	public Fluid[] tankTypes;
+	public List<IConsumer> list = new ArrayList<IConsumer>();
 	public int color = -1;
+	public boolean needsUpdate;
 	
 	Random rand = new Random();
 
@@ -68,13 +71,25 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 	
 	private String customName;
 	
+	
+	//Drillgon200: This is getting replaced anyway so I really don't care if I do a crappy job.
 	public TileEntityAMSBase() {
 		slots = new ItemStack[16];
 		tanks = new FluidTank[4];
-		tanks[0] = new FluidTank(FluidType.COOLANT, 8000, 0);
-		tanks[1] = new FluidTank(FluidType.CRYOGEL, 8000, 1);
-		tanks[2] = new FluidTank(FluidType.DEUTERIUM, 8000, 2);
-		tanks[3] = new FluidTank(FluidType.TRITIUM, 8000, 3);
+		tankTypes = new Fluid[4];
+		needsUpdate = false;
+		//coolant
+		tanks[0] = new FluidTank(8000);
+		tankTypes[0] = ModForgeFluids.coolant;
+		//cryogel
+		tanks[1] = new FluidTank(8000);
+		tankTypes[1] = ModForgeFluids.cryogel;
+		//deuterium
+		tanks[2] = new FluidTank(8000);
+		tankTypes[2] = ModForgeFluids.deuterium;
+		//tritium
+		tanks[3] = new FluidTank(8000);
+		tankTypes[3] = ModForgeFluids.tritium;
 	}
 
 	@Override
@@ -174,17 +189,24 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
 		NBTTagList list = nbt.getTagList("items", 10);
+		NBTTagList tanksList = nbt.getTagList("tanks", 10);
 
 		power = nbt.getLong("power");
-		tanks[0].readFromNBT(nbt, "coolant1");
-		tanks[1].readFromNBT(nbt, "coolant2");
-		tanks[2].readFromNBT(nbt, "fuel1");
-		tanks[3].readFromNBT(nbt, "fuel2");
 		field = nbt.getInteger("field");
 		efficiency = nbt.getInteger("efficiency");
 		heat = nbt.getInteger("heat");
 		locked = nbt.getBoolean("locked");
 		slots = new ItemStack[getSizeInventory()];
+		tanks = new FluidTank[4];
+		
+		for(int i = 0; i < tanksList.tagCount(); i ++){
+			NBTTagCompound tag = list.getCompoundTagAt(i);
+			byte b0 = tag.getByte("tank");
+			if(b0 >= 0 && b0 < tanks.length){
+				tanks[b0].readFromNBT(tag);
+				tankTypes[b0] = FluidRegistry.getFluid(tag.getInteger("fluidTankType"));
+			}
+		}
 		
 		for(int i = 0; i < list.tagCount(); i++)
 		{
@@ -195,21 +217,32 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 				slots[b0] = ItemStack.loadItemStackFromNBT(nbt1);
 			}
 		}
+		tankTypes[0] = ModForgeFluids.coolant;
+		tankTypes[1] = ModForgeFluids.cryogel;
+		tankTypes[2] = ModForgeFluids.deuterium;
+		tankTypes[3] = ModForgeFluids.tritium;
 	}
 	
 	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		nbt.setLong("power", power);
-		tanks[0].writeToNBT(nbt, "coolant1");
-		tanks[1].writeToNBT(nbt, "coolant2");
-		tanks[2].writeToNBT(nbt, "fuel1");
-		tanks[3].writeToNBT(nbt, "fuel2");
 		nbt.setInteger("field", field);
 		nbt.setInteger("efficiency", efficiency);
 		nbt.setInteger("heat", heat);
 		nbt.setBoolean("locked", locked);
 		NBTTagList list = new NBTTagList();
+		NBTTagList tankList = new NBTTagList();
+		
+		for(int i = 0; i < tanks.length; i ++){
+			if(tanks[i] != null){
+				NBTTagCompound tag = new NBTTagCompound();
+				tag.setByte("tank", (byte)i);
+				tanks[i].writeToNBT(tag);
+				tankList.appendTag(tag);
+				tag.setInteger("fluidTankType", FluidRegistry.getFluidID(tankTypes[i]));
+			}
+		}
 		
 		for(int i = 0; i < slots.length; i++)
 		{
@@ -221,6 +254,7 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 				list.appendTag(nbt1);
 			}
 		}
+		nbt.setTag("tanks", tankList);
 		nbt.setTag("items", list);
 	}
 	
@@ -244,9 +278,16 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 	public void updateEntity() {
 
 		if (!worldObj.isRemote) {
+			if(needsUpdate){
+				PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[] {tanks[0], tanks[1], tanks[2], tanks[3]}));
+				needsUpdate = false;
+			}
+				
 			
-			for(int i = 0; i < tanks.length; i++)
-				tanks[i].setFill(tanks[i].getMaxFill());
+			for(int i = 0; i < tanks.length; i++){
+				tanks[i].fill(new FluidStack(tankTypes[i], tanks[i].getCapacity()), true);
+				needsUpdate = true;
+			}
 			
 			if(!locked) {
 				
@@ -258,14 +299,7 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 				
 				if(age == 9 || age == 19)
 					ffgeuaInit();
-
-				tanks[0].setType(0, 1, slots);
-				tanks[1].setType(2, 3, slots);
-				tanks[2].setType(4, 5, slots);
-				tanks[3].setType(6, 7, slots);
 				
-				for(int i = 0; i < 4; i++)
-					tanks[i].updateTank(xCoord, yCoord, zCoord);
 				
 				int f1 = 0, f2 = 0, f3 = 0, f4 = 0;
 				int booster = 0;
@@ -358,18 +392,14 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 					heatBase *= Math.pow(1.25F, booster);
 					heatBase *= (100 - field);
 					
-					if(this.getFuelPower(tanks[2].getTankType()) > 0 && this.getFuelPower(tanks[3].getTankType()) > 0 &&
-							tanks[2].getFill() > 0 && tanks[3].getFill() > 0) {
+					if(this.getFuelPower(tanks[2].getFluid()) > 0 && this.getFuelPower(tanks[3].getFluid()) > 0 &&
+							tanks[2].getFluidAmount() > 0 && tanks[3].getFluidAmount() > 0) {
 
-						power += (powerBase * powerMod * gauss(1, (heat - (maxHeat / 2)) / maxHeat)) / 1000 * getFuelPower(tanks[2].getTankType()) * getFuelPower(tanks[3].getTankType());
-						System.out.println((powerBase * powerMod * gauss(1, (heat - (maxHeat / 2)) / maxHeat)) / 1000 * getFuelPower(tanks[2].getTankType()) * getFuelPower(tanks[3].getTankType()));
+						power += (powerBase * powerMod * gauss(1, (heat - (maxHeat / 2)) / maxHeat)) / 1000 * getFuelPower(tanks[2].getFluid()) * getFuelPower(tanks[3].getFluid());
+						System.out.println((powerBase * powerMod * gauss(1, (heat - (maxHeat / 2)) / maxHeat)) / 1000 * getFuelPower(tanks[2].getFluid()) * getFuelPower(tanks[3].getFluid()));
 						heat += (heatBase * heatMod) / (float)(this.field / 100F);
-						tanks[2].setFill((int)(tanks[2].getFill() - fuelBase * fuelMod));
-						tanks[3].setFill((int)(tanks[3].getFill() - fuelBase * fuelMod));
-						if(tanks[2].getFill() <= 0)
-							tanks[2].setFill(0);
-						if(tanks[3].getFill() <= 0)
-							tanks[3].setFill(0);
+						tanks[2].drain((int)(fuelBase * fuelMod), true);
+						tanks[3].drain((int)(fuelBase * fuelMod), true);
 						
 						radiation();
 
@@ -387,16 +417,11 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 					power = maxPower;
 				
 				
-				if(heat > 0 && tanks[0].getFill() > 0 && tanks[1].getFill() > 0) {
-					heat -= (this.getCoolingStrength(tanks[0].getTankType()) * this.getCoolingStrength(tanks[1].getTankType()));
+				if(heat > 0 && tanks[0].getFluidAmount() > 0 && tanks[1].getFluidAmount() > 0) {
+					heat -= (this.getCoolingStrength(tanks[0].getFluid()) * this.getCoolingStrength(tanks[1].getFluid()));
 
-					tanks[0].setFill(tanks[0].getFill() - 10);
-					tanks[1].setFill(tanks[1].getFill() - 10);
-
-					if(tanks[0].getFill() < 0)
-						tanks[0].setFill(0);
-					if(tanks[1].getFill() < 0)
-						tanks[1].setFill(0);
+					tanks[0].drain(10, true);
+					tanks[1].drain(10, true);
 					
 					if(heat < 0)
 						heat = 0;
@@ -422,7 +447,7 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 		double maxSize = 5;
 		double minSize = 0.5;
 		double scale = minSize;
-		scale += ((((double)this.tanks[2].getFill()) / ((double)this.tanks[2].getMaxFill())) + (((double)this.tanks[3].getFill()) / ((double)this.tanks[3].getMaxFill()))) * ((maxSize - minSize) / 2);
+		scale += ((((double)this.tanks[2].getFluidAmount()) / ((double)this.tanks[2].getCapacity())) + (((double)this.tanks[3].getFluidAmount()) / ((double)this.tanks[3].getCapacity()))) * ((maxSize - minSize) / 2);
 
 		scale *= 0.60;
 		
@@ -456,7 +481,7 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 	    		this.worldObj.spawnEntityInWorld(cloud);
 			}
 			
-			int radius = (int)(50 + (double)(tanks[2].getFill() + tanks[3].getFill()) / 16000D * 150);
+			int radius = (int)(50 + (double)(tanks[2].getFluidAmount() + tanks[3].getFluidAmount()) / 16000D * 150);
 			
 			worldObj.spawnEntityInWorld(EntityNukeExplosionMK4.statFacExperimental(worldObj, radius, xCoord, yCoord, zCoord));
 			
@@ -464,28 +489,30 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 		}
 	}
 	
-	private int getCoolingStrength(FluidType type) {
-		switch(type) {
-		case WATER:
+	private int getCoolingStrength(FluidStack type) {
+		if(type == null)
+			return 0;
+		else if(type.getFluid() == FluidRegistry.WATER){
 			return 5;
-		case OIL:
+		} else if(type.getFluid() == ModForgeFluids.oil){
 			return 15;
-		case COOLANT:
+		} else if(type.getFluid() == ModForgeFluids.coolant){
 			return this.heat / 250;
-		case CRYOGEL:
+		} else if(type.getFluid() == ModForgeFluids.cryogel){
 			return this.heat > heat/2 ? 25 : 5;
-		default:
+		} else {
 			return 0;
 		}
 	}
 	
-	private int getFuelPower(FluidType type) {
-		switch(type) {
-		case DEUTERIUM:
+	private int getFuelPower(FluidStack type) {
+		if(type == null)
+			return 0;
+		else if(type.getFluid() == ModForgeFluids.deuterium){
 			return 50;
-		case TRITIUM:
+		} else if(type.getFluid() == ModForgeFluids.tritium){
 			return 75;
-		default:
+		} else {
 			return 0;
 		}
 	}
@@ -565,57 +592,6 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 		return true;
 	}
 
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getMaxFill();
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getMaxFill();
-		else if(type.name().equals(tanks[2].getTankType().name()))
-			return tanks[2].getMaxFill();
-		else if(type.name().equals(tanks[3].getTankType().name()))
-			return tanks[3].getMaxFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			tanks[0].setFill(i);
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			tanks[1].setFill(i);
-		else if(type.name().equals(tanks[2].getTankType().name()))
-			tanks[2].setFill(i);
-		else if(type.name().equals(tanks[3].getTankType().name()))
-			tanks[3].setFill(i);
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getFill();
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getFill();
-		else if(type.name().equals(tanks[2].getTankType().name()))
-			return tanks[2].getFill();
-		else if(type.name().equals(tanks[3].getTankType().name()))
-			return tanks[3].getFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public void setFillstate(int fill, int index) {
-		if(index < 4 && tanks[index] != null)
-			tanks[index].setFill(fill);
-	}
-
-	@Override
-	public void setType(FluidType type, int index) {
-		if(index < 4 && tanks[index] != null)
-			tanks[index].setTankType(type);
-	}
 
 	@Override
 	public void ffgeua(int x, int y, int z, boolean newTact) {
@@ -675,13 +651,51 @@ public class TileEntityAMSBase extends TileEntity implements ISidedInventory, IS
 	}
 
 	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tanks[0]);
-		list.add(tanks[1]);
-		list.add(tanks[2]);
-		list.add(tanks[3]);
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void recievePacket(NBTTagCompound[] tags) {
+		if(tags.length != 4){
+			return;
+		} else {
+			tanks[0].readFromNBT(tags[0]);
+			tanks[1].readFromNBT(tags[1]);
+			tanks[2].readFromNBT(tags[2]);
+			tanks[3].readFromNBT(tags[3]);
+		}
 		
-		return list;
 	}
 }

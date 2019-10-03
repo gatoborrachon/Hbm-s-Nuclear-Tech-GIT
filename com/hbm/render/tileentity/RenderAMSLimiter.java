@@ -84,22 +84,22 @@ public class RenderAMSLimiter extends TileEntitySpecialRenderer {
         if(meta == 2 && tileEntity.getWorldObj().getTileEntity(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord - 6) instanceof TileEntityAMSBase && !limiter.locked) {
         	flag = true;
         	TileEntityAMSBase base = (TileEntityAMSBase)tileEntity.getWorldObj().getTileEntity(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord - 6);
-        	maxSize += ((((double)base.tanks[2].getFill()) / ((double)base.tanks[2].getMaxFill())) + (((double)base.tanks[3].getFill()) / ((double)base.tanks[3].getMaxFill()))) * ((maxSize - minSize) / 2);
+        	maxSize += ((((double)base.tanks[2].getFluidAmount()) / ((double)base.tanks[2].getCapacity())) + (((double)base.tanks[3].getFluidAmount()) / ((double)base.tanks[3].getCapacity()))) * ((maxSize - minSize) / 2);
         }
         if(meta == 3 && tileEntity.getWorldObj().getTileEntity(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord + 6) instanceof TileEntityAMSBase && !limiter.locked) {
         	flag = true;
         	TileEntityAMSBase base = (TileEntityAMSBase)tileEntity.getWorldObj().getTileEntity(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord + 6);
-        	maxSize += ((((double)base.tanks[2].getFill()) / ((double)base.tanks[2].getMaxFill())) + (((double)base.tanks[3].getFill()) / ((double)base.tanks[3].getMaxFill()))) * ((maxSize - minSize) / 2);
+        	maxSize += ((((double)base.tanks[2].getFluidAmount()) / ((double)base.tanks[2].getCapacity())) + (((double)base.tanks[3].getFluidAmount()) / ((double)base.tanks[3].getCapacity()))) * ((maxSize - minSize) / 2);
         }
         if(meta == 4 && tileEntity.getWorldObj().getTileEntity(tileEntity.xCoord - 6, tileEntity.yCoord, tileEntity.zCoord) instanceof TileEntityAMSBase && !limiter.locked) {
         	flag = true;
         	TileEntityAMSBase base = (TileEntityAMSBase)tileEntity.getWorldObj().getTileEntity(tileEntity.xCoord - 6, tileEntity.yCoord, tileEntity.zCoord);
-        	maxSize += ((((double)base.tanks[2].getFill()) / ((double)base.tanks[2].getMaxFill())) + (((double)base.tanks[3].getFill()) / ((double)base.tanks[3].getMaxFill()))) * ((maxSize - minSize) / 2);
+        	maxSize += ((((double)base.tanks[2].getFluidAmount()) / ((double)base.tanks[2].getCapacity())) + (((double)base.tanks[3].getFluidAmount()) / ((double)base.tanks[3].getCapacity()))) * ((maxSize - minSize) / 2);
         }
         if(meta == 5 && tileEntity.getWorldObj().getTileEntity(tileEntity.xCoord + 6, tileEntity.yCoord, tileEntity.zCoord) instanceof TileEntityAMSBase && !limiter.locked) {
         	flag = true;
         	TileEntityAMSBase base = (TileEntityAMSBase)tileEntity.getWorldObj().getTileEntity(tileEntity.xCoord + 6, tileEntity.yCoord, tileEntity.zCoord);
-        	maxSize += ((((double)base.tanks[2].getFill()) / ((double)base.tanks[2].getMaxFill())) + (((double)base.tanks[3].getFill()) / ((double)base.tanks[3].getMaxFill()))) * ((maxSize - minSize) / 2);
+        	maxSize += ((((double)base.tanks[2].getFluidAmount()) / ((double)base.tanks[2].getCapacity())) + (((double)base.tanks[3].getFluidAmount()) / ((double)base.tanks[3].getCapacity()))) * ((maxSize - minSize) / 2);
         }
         
         if(flag) {

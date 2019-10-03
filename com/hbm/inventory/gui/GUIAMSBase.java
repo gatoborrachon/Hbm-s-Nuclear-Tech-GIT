@@ -2,11 +2,13 @@ package com.hbm.inventory.gui;
 
 import org.lwjgl.opengl.GL11;
 
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.container.ContainerAMSBase;
 import com.hbm.lib.RefStrings;
 import com.hbm.tileentity.machine.TileEntityAMSBase;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -28,10 +30,10 @@ public class GUIAMSBase extends GuiInfoContainer {
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
 
-		base.tanks[0].renderTankInfo(this, mouseX, mouseY, guiLeft + 26, guiTop + 70 - 52, 16, 52);
-		base.tanks[1].renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 70 - 52, 16, 52);
-		base.tanks[2].renderTankInfo(this, mouseX, mouseY, guiLeft + 26, guiTop + 124 - 52, 16, 52);
-		base.tanks[3].renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 124 - 52, 16, 52);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 26, guiTop + 70 - 52, 16, 52, base.tanks[0]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 70 - 52, 16, 52, base.tanks[1]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 26, guiTop + 124 - 52, 16, 52, base.tanks[2]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 124 - 52, 16, 52, base.tanks[3]);
 		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 116, guiTop + 124 - 104, 7, 104, base.power, TileEntityAMSBase.maxPower);
 		this.drawCustomInfo(this, mouseX, mouseY, guiLeft + 44, guiTop + 124 - 106, 7, 106, new String[] { "Restriction Field:", base.field + "%" });
 		this.drawCustomInfo(this, mouseX, mouseY, guiLeft + 53, guiTop + 124 - 106, 7, 106, new String[] { "Efficiency:", base.efficiency + "%" });
@@ -89,16 +91,10 @@ public class GUIAMSBase extends GuiInfoContainer {
 		if(!base.hasResonators())
 			this.drawInfoPanel(guiLeft - 16, guiTop + 36, 16, 16, 6);
 
-		Minecraft.getMinecraft().getTextureManager().bindTexture(base.tanks[0].getSheet());
-		base.tanks[0].renderTank(this, guiLeft + 26, guiTop + 70, base.tanks[0].getTankType().textureX() * FluidTank.x, base.tanks[0].getTankType().textureY() * FluidTank.y, 16, 52);
-		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(base.tanks[1].getSheet());
-		base.tanks[1].renderTank(this, guiLeft + 134, guiTop + 70, base.tanks[1].getTankType().textureX() * FluidTank.x, base.tanks[1].getTankType().textureY() * FluidTank.y, 16, 52);
-		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(base.tanks[2].getSheet());
-		base.tanks[2].renderTank(this, guiLeft + 26, guiTop + 124, base.tanks[2].getTankType().textureX() * FluidTank.x, base.tanks[2].getTankType().textureY() * FluidTank.y, 16, 52);
-		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(base.tanks[3].getSheet());
-		base.tanks[3].renderTank(this, guiLeft + 134, guiTop + 124, base.tanks[3].getTankType().textureX() * FluidTank.x, base.tanks[3].getTankType().textureY() * FluidTank.y, 16, 52);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+		FFUtils.drawLiquid(base.tanks[0], guiLeft, guiTop, zLevel, 16, 52, 26, 70);
+		FFUtils.drawLiquid(base.tanks[1], guiLeft, guiTop, zLevel, 16, 52, 134, 70);
+		FFUtils.drawLiquid(base.tanks[2], guiLeft, guiTop, zLevel, 16, 52, 26, 124);
+		FFUtils.drawLiquid(base.tanks[3], guiLeft, guiTop, zLevel, 16, 52, 134, 124);
 	}
 }

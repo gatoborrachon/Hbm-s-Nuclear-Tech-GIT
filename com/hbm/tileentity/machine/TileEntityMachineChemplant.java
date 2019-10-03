@@ -1,12 +1,11 @@
 package com.hbm.tileentity.machine;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.hbm.entity.particle.EntityGasFlameFX;
 import com.hbm.forgefluid.FFUtils;
 import com.hbm.interfaces.IConsumer;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.inventory.MachineRecipes;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemBattery;
@@ -14,6 +13,7 @@ import com.hbm.items.tool.ItemChemistryTemplate;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
 import com.hbm.packet.AuxParticlePacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.LoopedSoundPacket;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.packet.TEChemplantPacket;
@@ -22,7 +22,6 @@ import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
@@ -47,7 +46,7 @@ import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class TileEntityMachineChemplant extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler {
+public class TileEntityMachineChemplant extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler, ITankPacketAcceptor {
 
 	private ItemStack slots[];
 
@@ -326,19 +325,21 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 			}
 		}
 		
-		if(needsUpdate){
-			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-			needsUpdate = false;
-			needsTankTypeUpdate = false;
-		}
+
 		
 		if(speed < 25)
 			speed = 25;
 		if(consumption < 10)
 			consumption = 10;
-
+		if(this.needsTankTypeUpdate)
+			setContainers();
+		
 		if(!worldObj.isRemote)
 		{
+			if(needsUpdate){
+				PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[] {tanks[0], tanks[1], tanks[2], tanks[3]}));
+				needsUpdate = false;
+			}
 			int meta = worldObj.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord);
 			isProgressing = false;
 			
@@ -353,7 +354,7 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 				fillFluidInit(tanks[3]);
 			}
 			
-			setContainers();
+			
 	
 			power = Library.chargeTEFromItems(slots, 0, power, maxPower);
 			if(inputValidForTank(0, 17))
@@ -1103,6 +1104,19 @@ public class TileEntityMachineChemplant extends TileEntity implements ISidedInve
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 
 		readFromNBT(pkt.func_148857_g());
+	}
+
+	@Override
+	public void recievePacket(NBTTagCompound[] tags) {
+		if(tags.length != 4){
+			return;
+		} else {
+			tanks[0].readFromNBT(tags[0]);
+			tanks[1].readFromNBT(tags[1]);
+			tanks[2].readFromNBT(tags[2]);
+			tanks[3].readFromNBT(tags[3]);
+		}
+		
 	}
 
 }

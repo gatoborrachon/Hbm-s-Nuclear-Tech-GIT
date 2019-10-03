@@ -53,7 +53,7 @@ public class RenderAMSBase extends TileEntitySpecialRenderer {
 		double maxSize = 5;
 		double minSize = 0.5;
 		double scale = minSize;
-		scale += ((((double)base.tanks[2].getFill()) / ((double)base.tanks[2].getMaxFill())) + (((double)base.tanks[3].getFill()) / ((double)base.tanks[3].getMaxFill()))) * ((maxSize - minSize) / 2);
+		scale += ((((double)base.tanks[2].getFluidAmount()) / ((double)base.tanks[2].getCapacity())) + (((double)base.tanks[3].getFluidAmount()) / ((double)base.tanks[3].getCapacity()))) * ((maxSize - minSize) / 2);
 		GL11.glScaled(scale, scale, scale);
 
 		//bindTexture(new ResourceLocation(RefStrings.MODID, "textures/models/EMPBlast.png"));
@@ -88,7 +88,7 @@ public class RenderAMSBase extends TileEntitySpecialRenderer {
 		double maxSize = 5;
 		double minSize = 0.5;
 		double scale = minSize;
-		scale += ((((double)base.tanks[2].getFill()) / ((double)base.tanks[2].getMaxFill())) + (((double)base.tanks[3].getFill()) / ((double)base.tanks[3].getMaxFill()))) * ((maxSize - minSize) / 2);
+		scale += ((((double)base.tanks[2].getFluidAmount()) / ((double)base.tanks[2].getCapacity())) + (((double)base.tanks[3].getFluidAmount()) / ((double)base.tanks[3].getCapacity()))) * ((maxSize - minSize) / 2);
 		GL11.glScaled(scale, scale, scale);
 		
 		GL11.glColor3ub((byte)((base.color & 0xFF0000) >> 16), (byte)((base.color & 0x00FF00) >> 8), (byte)((base.color & 0x0000FF) >> 0));
