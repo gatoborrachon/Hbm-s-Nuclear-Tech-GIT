@@ -2,13 +2,13 @@ package com.hbm.inventory.gui;
 
 import org.lwjgl.opengl.GL11;
 
-import com.hbm.inventory.FluidTank;
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.inventory.container.ContainerMachineGasFlare;
 import com.hbm.lib.RefStrings;
 import com.hbm.tileentity.machine.TileEntityMachineGasFlare;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -30,8 +30,8 @@ public class GUIMachineGasFlare extends GuiInfoContainer {
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
 
-		flare.tank.renderTankInfo(this, mouseX, mouseY, guiLeft + 80, guiTop + 69 - 52, 34, 52);
-		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 8, guiTop + 69 - 52, 16, 52, flare.power, flare.maxPower);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 80, guiTop + 69 - 52, 34, 52, flare.tank, flare.tankType);
+		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 8, guiTop + 69 - 52, 16, 52, flare.power, TileEntityMachineGasFlare.maxPower);
 	}
 
 	@Override
@@ -51,9 +51,7 @@ public class GUIMachineGasFlare extends GuiInfoContainer {
 		int j = (int)flare.getPowerScaled(52);
 		drawTexturedModalRect(guiLeft + 8, guiTop + 69 - j, 176, 52 - j, 16, j);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(flare.tank.getSheet());
-		flare.tank.renderTank(this, guiLeft + 80, guiTop + 69, flare.tank.getTankType().textureX() * FluidTank.x, flare.tank.getTankType().textureY() * FluidTank.y, 16, 52);
-		flare.tank.renderTank(this, guiLeft + 80 + 16, guiTop + 69, flare.tank.getTankType().textureX() * FluidTank.x, flare.tank.getTankType().textureY() * FluidTank.y, 16, 52);
-		flare.tank.renderTank(this, guiLeft + 80 + 32, guiTop + 69, flare.tank.getTankType().textureX() * FluidTank.x, flare.tank.getTankType().textureY() * FluidTank.y, 2, 52);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+		FFUtils.drawLiquid(flare.tank, guiLeft, guiTop, zLevel, 34, 52, 80, 69);
 	}
 }
