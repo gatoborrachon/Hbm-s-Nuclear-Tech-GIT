@@ -53,6 +53,7 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 			//this.checkOtherNetworks();
 			//this.network.addPipe(this);
 			//this.checkFluidHandlers();
+			this.checkOtherNetworks();
 			if(this.network == null) {
 				FFPipeNetwork.buildNewNetwork(this);
 				System.out.println("here");

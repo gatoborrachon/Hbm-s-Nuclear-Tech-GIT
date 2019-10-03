@@ -439,6 +439,7 @@ public class MainRegistry
 		GameRegistry.registerTileEntity(TileEntityCoreTitanium.class, "tileentity_core_titanium");
 		GameRegistry.registerTileEntity(TileEntityCoreAdvanced.class, "tileentity_core_advanced");
 		GameRegistry.registerTileEntity(TileEntityFusionMultiblock.class, "tileentity_fusion_multiblock");
+		GameRegistry.registerTileEntity(TileEntityFusionHatch.class, "tileentity_fusion_hatch");
 		GameRegistry.registerTileEntity(TileEntityCrashedBomb.class, "tileentity_crashed_balefire");
 		GameRegistry.registerTileEntity(TileEntityCable.class, "tileentity_cable");
 		GameRegistry.registerTileEntity(TileEntityConverterHeRf.class, "tileentity_converter_herf");
