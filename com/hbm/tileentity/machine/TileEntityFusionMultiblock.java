@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hbm.blocks.ModBlocks;
+import com.hbm.forgefluid.FFUtils;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
 import com.hbm.interfaces.IReactor;
 import com.hbm.interfaces.ISource;
@@ -11,6 +13,7 @@ import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,10 +27,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
 public class TileEntityFusionMultiblock extends TileEntity implements ISidedInventory, IReactor, ISource, IFluidHandler, ITankPacketAcceptor {
@@ -36,7 +41,7 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 	public final static long maxPower = 100000000;
 	private ItemStack slots[];
 	public int age = 0;
-	public List<IConsumer> list = new ArrayList();
+	public List<IConsumer> list = new ArrayList<IConsumer>();
 	public FluidTank tanks[];
 	public Fluid[] tankTypes;
 	public boolean needsUpdate;
@@ -50,10 +55,13 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 		tankTypes = new Fluid[3];
 		//water
 		tanks[0] = new FluidTank(128000);
+		tankTypes[0] = FluidRegistry.WATER;
 		//deuterium
 		tanks[1] = new FluidTank(64000);
+		tankTypes[1] = ModForgeFluids.deuterium;
 		//tritium
 		tanks[2] = new FluidTank(64000);
+		tankTypes[2] = ModForgeFluids.tritium;
 	}
 	@Override
 	public int getSizeInventory() {
@@ -189,6 +197,9 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 				slots[b0] = ItemStack.loadItemStackFromNBT(nbt1);
 			}
 		}
+		tankTypes[0] = FluidRegistry.WATER;
+		tankTypes[1] = ModForgeFluids.deuterium;
+		tankTypes[2] = ModForgeFluids.tritium;
 	}
 	
 	@Override
@@ -1007,12 +1018,20 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 		
 		if(!worldObj.isRemote)
 		{
-			tanks[0].loadTank(0, 9, slots);
-			tanks[1].loadTank(2, 10, slots);
-			tanks[2].loadTank(3, 11, slots);
+			if(needsUpdate){
+				PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[] {tanks[0], tanks[1], tanks[2]}));
+				needsUpdate = false;
+			}
+			if(this.inputValidForTank(0, 0))
+				if(FFUtils.fillFromFluidContainer(slots, tanks[0], 0, 9))
+					needsUpdate = true;
+			if(this.inputValidForTank(1, 2))
+				if(FFUtils.fillFromFluidContainer(slots, tanks[1], 2, 10))
+					needsUpdate = true;
+			if(this.inputValidForTank(2, 3))
+				if(FFUtils.fillFromFluidContainer(slots, tanks[2], 3, 11))
+					needsUpdate = true;
 			
-			for(int i = 0; i < 3; i++)
-				tanks[i].updateTank(xCoord, yCoord, zCoord);
 			
 			if(slots[2] != null && slots[2].getItem() == ModItems.tritium_deuterium_cake)
 			{
@@ -1022,14 +1041,9 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 					this.slots[2] = null;
 				}
 
-				tanks[1].setFill(tanks[1].getFluidAmount() + 10000);
-				tanks[2].setFill(tanks[2].getFluidAmount() + 10000);
-				
-				if(tanks[1].getFluidAmount() > tanks[1].getCapacity())
-					tanks[1].setFill(tanks[1].getCapacity());
-				
-				if(tanks[2].getFluidAmount() > tanks[2].getCapacity())
-					tanks[2].setFill(tanks[2].getCapacity());
+				tanks[1].fill(new FluidStack(tankTypes[1],10000), true);
+				tanks[2].fill(new FluidStack(tankTypes[2], 10000), true);
+				needsUpdate = true;
 			}
 			
 			if(slots[3] != null && slots[3].getItem() == ModItems.tritium_deuterium_cake)
@@ -1040,9 +1054,9 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 					this.slots[3] = null;
 				}
 
-				tanks[1].setFill(tanks[1].getFluidAmount() + 10000);
-				tanks[2].fill(tanks[2].getFluidAmount() + 10000);
-				
+				tanks[1].fill(new FluidStack(tankTypes[1], 10000), true);
+				tanks[2].fill(new FluidStack(tankTypes[2], 10000), true);
+				needsUpdate = true;
 			}
 			
 			if(!isRunning() &&
@@ -1061,12 +1075,12 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 			} else {
 				if(isStructureValid(worldObj) && isRunning())
 				{
-					tanks[1].setFill(tanks[1].getFluidAmount() - 1);
-					tanks[2].setFill(tanks[2].getFluidAmount() - 1);
+					tanks[1].drain(1, true);
+					tanks[2].drain(1, true);
 					
 					if(tanks[0].getFluidAmount() >= 20)
 					{
-						tanks[0].setFill(tanks[0].getFluidAmount() - 20);
+						tanks[0].drain(20, true);
 						power += 100000;
 						
 						if(isCoatingValid(worldObj))
@@ -1222,6 +1236,23 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 			worldObj.setBlock(x, y, z, Blocks.air);
 	}
 
+	protected boolean inputValidForTank(int tank, int slot){
+		if(slots[slot] != null && tanks[tank] != null){
+			if(slots[slot].getItem() instanceof IFluidContainerItem && isValidFluidForTank(tank, ((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]))){
+				return true;
+			}
+			if(FluidContainerRegistry.isFilledContainer(slots[slot]) && isValidFluidForTank(tank, FluidContainerRegistry.getFluidForFilledItem(slots[slot]))){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isValidFluidForTank(int tank, FluidStack stack) {
+		if(stack == null || tanks[tank] == null)
+			return false;
+		return stack.getFluid() == tankTypes[tank];
+	}
 	@Override
 	public void ffgeua(int x, int y, int z, boolean newTact) {
 		
@@ -1266,7 +1297,13 @@ public class TileEntityFusionMultiblock extends TileEntity implements ISidedInve
 
 	@Override
 	public void recievePacket(NBTTagCompound[] tags) {
-		// TODO Auto-generated method stub
+		if(tags.length != 3){
+			return;
+		} else {
+			tanks[0].readFromNBT(tags[0]);
+			tanks[1].readFromNBT(tags[1]);
+			tanks[2].readFromNBT(tags[2]);
+		}
 		
 	}
 	@Override
