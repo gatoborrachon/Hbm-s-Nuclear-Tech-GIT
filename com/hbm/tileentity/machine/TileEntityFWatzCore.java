@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.hbm.handler.FluidTypeHandler.FluidType;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
 import com.hbm.interfaces.IReactor;
 import com.hbm.interfaces.ISource;
-import com.hbm.inventory.FluidTank;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
@@ -25,29 +23,43 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, IReactor, ISource, IFluidContainer, IFluidAcceptor {
+public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, IReactor, ISource, IFluidHandler, ITankPacketAcceptor {
 
 	public long power;
 	public final static long maxPower = 10000000000L;
 	public boolean cooldown = false;
 
 	public FluidTank tanks[];
+	public Fluid[] tankTypes;
+	public boolean needsUpdate;
 	
 	Random rand = new Random();
 	
 	private ItemStack slots[];
 	public int age = 0;
-	public List<IConsumer> list = new ArrayList();
+	public List<IConsumer> list = new ArrayList<IConsumer>();
 	
 	private String customName;
 
 	public TileEntityFWatzCore() {
 		slots = new ItemStack[7];
 		tanks = new FluidTank[3];
-		tanks[0] = new FluidTank(FluidType.COOLANT, 128000, 0);
-		tanks[1] = new FluidTank(FluidType.AMAT, 64000, 1);
-		tanks[2] = new FluidTank(FluidType.ASCHRAB, 64000, 2);
+		tankTypes = new Fluid[3];
+		tanks[0] = new FluidTank(128000);
+		tankTypes[0] = ModForgeFluids.coolant;
+		tanks[1] = new FluidTank(64000);
+		tankTypes[1] = ModForgeFluids.amat;
+		tanks[2] = new FluidTank(64000);
+		tankTypes[2] = ModForgeFluids.aschrab;
+		needsUpdate = false;
 	}
 	@Override
 	public int getSizeInventory() {
@@ -163,9 +175,7 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 		NBTTagList list = nbt.getTagList("items", 10);
 
 		power = nbt.getLong("power");
-		tanks[0].readFromNBT(nbt, "cool");
-		tanks[1].readFromNBT(nbt, "amat");
-		tanks[2].readFromNBT(nbt, "aschrab");
+
 		
 		slots = new ItemStack[getSizeInventory()];
 		
@@ -178,6 +188,17 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 				slots[b0] = ItemStack.loadItemStackFromNBT(nbt1);
 			}
 		}
+		NBTTagList tankList = nbt.getTagList("tanks", 10);
+		for(int i = 0; i < tankList.tagCount(); i ++){
+			NBTTagCompound tag = list.getCompoundTagAt(i);
+			byte b0 = tag.getByte("tank");
+			if(b0 >= 0 && b0 < tanks.length){
+				tanks[b0].readFromNBT(tag);
+			}
+		}
+		tankTypes[0] = ModForgeFluids.coolant;
+		tankTypes[1] = ModForgeFluids.amat;
+		tankTypes[2] = ModForgeFluids.aschrab;
 	}
 	
 	@Override
@@ -185,9 +206,6 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 		super.writeToNBT(nbt);
 
 		nbt.setLong("power", power);
-		tanks[0].writeToNBT(nbt, "cool");
-		tanks[1].writeToNBT(nbt, "amat");
-		tanks[2].writeToNBT(nbt, "aschrab");
 		
 		NBTTagList list = new NBTTagList();
 		
@@ -202,6 +220,16 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 			}
 		}
 		nbt.setTag("items", list);
+		NBTTagList tankList = new NBTTagList();
+		for(int i = 0; i < tanks.length; i ++){
+			if(tanks[i] != null){
+				NBTTagCompound tag = new NBTTagCompound();
+				tag.setByte("tank", (byte)i);
+				tanks[i].writeToNBT(tag);
+				tankList.appendTag(tag);
+			}
+		}
+		nbt.setTag("tanks", tankList);
 	}
 
 	@Override
@@ -297,42 +325,35 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 				} else {
 					int i = getSingularityType();
 					
-					boolean isWorking = false;
-
 					if(i == 1 && tanks[1].getFill() - 75 >= 0 && tanks[2].getFill() - 75 >= 0) {
 						tanks[0].setFill(tanks[0].getFill() - 150);
 						tanks[1].setFill(tanks[1].getFill() - 75);
 						tanks[2].setFill(tanks[2].getFill() - 75);
 						power += 5000000;
-						isWorking = true;
 					}
 					if(i == 2 && tanks[1].getFill() - 75 >= 0 && tanks[2].getFill() - 35 >= 0) {
 						tanks[0].setFill(tanks[0].getFill() - 75);
 						tanks[1].setFill(tanks[1].getFill() - 35);
 						tanks[2].setFill(tanks[2].getFill() - 30);
 						power += 2500000;
-						isWorking = true;
 					}
 					if(i == 3 && tanks[1].getFill() - 75 >= 0 && tanks[2].getFill() - 140 >= 0) {
 						tanks[0].setFill(tanks[0].getFill() - 300);
 						tanks[1].setFill(tanks[1].getFill() - 75);
 						tanks[2].setFill(tanks[2].getFill() - 140);
 						power += 10000000;
-						isWorking = true;
 					}
 					if(i == 4 && tanks[1].getFill() - 100 >= 0 && tanks[2].getFill() - 100 >= 0) {
 						tanks[0].setFill(tanks[0].getFill() - 100);
 						tanks[1].setFill(tanks[1].getFill() - 100);
 						tanks[2].setFill(tanks[2].getFill() - 100);
 						power += 10000000;
-						isWorking = true;
 					}
 					if(i == 5 && tanks[1].getFill() - 15 >= 0 && tanks[2].getFill() - 15 >= 0) {
 						tanks[0].setFill(tanks[0].getFill() - 150);
 						tanks[1].setFill(tanks[1].getFill() - 15);
 						tanks[2].setFill(tanks[2].getFill() - 15);
 						power += 100000000;
-						isWorking = true;
 					}
 					
 					if(power > maxPower)
@@ -472,5 +493,40 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 		list.add(tanks[2]);
 		
 		return list;
+	}
+	@Override
+	public void recievePacket(NBTTagCompound[] tags) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
