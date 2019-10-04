@@ -9,15 +9,14 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityFusionHatch extends TileEntity implements IFluidHandler {
-
+public class TileEntityFWatzHatch extends TileEntity implements IFluidHandler {
 	@Override
 	public void updateEntity(){
 		super.updateEntity();
 	}
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-		TileEntityFusionMultiblock fillable = this.getReactorTE(worldObj, xCoord, yCoord, zCoord);
+		TileEntityFWatzCore fillable = this.getReactorTE(worldObj, xCoord, yCoord, zCoord);
 		if(fillable != null)
 			return fillable.fill(from, resource, doFill);
 		return 0;
@@ -25,7 +24,7 @@ public class TileEntityFusionHatch extends TileEntity implements IFluidHandler {
 
 	@Override
 	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
-		TileEntityFusionMultiblock fillable = this.getReactorTE(worldObj, xCoord, yCoord, zCoord);
+		TileEntityFWatzCore fillable = this.getReactorTE(worldObj, xCoord, yCoord, zCoord);
 		if(fillable != null)
 			return fillable.drain(from, resource, doDrain);
 		return null;
@@ -33,7 +32,7 @@ public class TileEntityFusionHatch extends TileEntity implements IFluidHandler {
 
 	@Override
 	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		TileEntityFusionMultiblock fillable = this.getReactorTE(worldObj, xCoord, yCoord, zCoord);
+		TileEntityFWatzCore fillable = this.getReactorTE(worldObj, xCoord, yCoord, zCoord);
 		if(fillable != null)
 			return fillable.drain(from, maxDrain, doDrain);
 		return null;
@@ -41,7 +40,7 @@ public class TileEntityFusionHatch extends TileEntity implements IFluidHandler {
 
 	@Override
 	public boolean canFill(ForgeDirection from, Fluid fluid) {
-		TileEntityFusionMultiblock fillable = this.getReactorTE(worldObj, xCoord, yCoord, zCoord);
+		TileEntityFWatzCore fillable = this.getReactorTE(worldObj, xCoord, yCoord, zCoord);
 		if(fillable != null)
 			return fillable.canFill(from, fluid);
 		return false;
@@ -49,7 +48,7 @@ public class TileEntityFusionHatch extends TileEntity implements IFluidHandler {
 
 	@Override
 	public boolean canDrain(ForgeDirection from, Fluid fluid) {
-		TileEntityFusionMultiblock fillable = this.getReactorTE(worldObj, xCoord, yCoord, zCoord);
+		TileEntityFWatzCore fillable = this.getReactorTE(worldObj, xCoord, yCoord, zCoord);
 		if(fillable != null)
 			return fillable.canDrain(from, fluid);
 		return false;
@@ -57,7 +56,7 @@ public class TileEntityFusionHatch extends TileEntity implements IFluidHandler {
 
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-		TileEntityFusionMultiblock fillable = this.getReactorTE(worldObj, xCoord, yCoord, zCoord);
+		TileEntityFWatzCore fillable = this.getReactorTE(worldObj, xCoord, yCoord, zCoord);
 		if(fillable != null)
 			return fillable.getTankInfo(from);
 		return null;
@@ -72,14 +71,14 @@ public class TileEntityFusionHatch extends TileEntity implements IFluidHandler {
 		super.readFromNBT(tag);
 	}
 
-	private TileEntityFusionMultiblock getReactorTE(World world, int x, int y, int z) {
+	private TileEntityFWatzCore getReactorTE(World world, int x, int y, int z) {
 		if(world.getBlockMetadata(x, y, z) == 2)
 		{
-			if(world.getTileEntity(x, y, z + 8) != null && world.getTileEntity(x, y, z + 8) instanceof TileEntityFusionMultiblock)
+			if(world.getTileEntity(x, y + 11, z + 9) != null && world.getTileEntity(x, y + 11, z + 9) instanceof TileEntityFWatzCore)
 			{
-				if(((TileEntityFusionMultiblock)world.getTileEntity(x, y, z + 8)).isStructureValid(world))
+				if(((TileEntityFWatzCore)world.getTileEntity(x, y + 11, z + 9)).isStructureValid(world))
 				{
-					return (TileEntityFusionMultiblock)world.getTileEntity(x, y, z + 8);
+					return (TileEntityFWatzCore)world.getTileEntity(x, y + 11, z + 9);
 				} else {
 					return null;
 				}
@@ -89,11 +88,11 @@ public class TileEntityFusionHatch extends TileEntity implements IFluidHandler {
 		}
 		if(world.getBlockMetadata(x, y, z) == 3)
 		{
-			if(world.getTileEntity(x, y, z - 8) != null && world.getTileEntity(x, y, z - 8) instanceof TileEntityFusionMultiblock)
+			if(world.getTileEntity(x, y + 11, z - 9) != null && world.getTileEntity(x, y + 11, z - 9) instanceof TileEntityFWatzCore)
 			{
-				if(((TileEntityFusionMultiblock)world.getTileEntity(x, y, z - 8)).isStructureValid(world))
+				if(((TileEntityFWatzCore)world.getTileEntity(x, y + 11, z - 9)).isStructureValid(world))
 				{
-					return (TileEntityFusionMultiblock)world.getTileEntity(x, y, z - 8);
+					return (TileEntityFWatzCore)world.getTileEntity(x, y + 11, z - 9);
 				} else {
 					return null;
 				}
@@ -103,11 +102,11 @@ public class TileEntityFusionHatch extends TileEntity implements IFluidHandler {
 		}
 		if(world.getBlockMetadata(x, y, z) == 4)
 		{
-			if(world.getTileEntity(x + 8, y, z) != null && world.getTileEntity(x + 8, y, z) instanceof TileEntityFusionMultiblock)
+			if(world.getTileEntity(x + 9, y + 11, z) != null && world.getTileEntity(x + 9, y + 11, z) instanceof TileEntityFWatzCore)
 			{
-				if(((TileEntityFusionMultiblock)world.getTileEntity(x + 8, y, z)).isStructureValid(world))
+				if(((TileEntityFWatzCore)world.getTileEntity(x + 9, y + 11, z)).isStructureValid(world))
 				{
-					return (TileEntityFusionMultiblock)world.getTileEntity(x + 8, y, z);
+					return (TileEntityFWatzCore)world.getTileEntity(x + 9, y + 11, z);
 				} else {
 					return null;
 				}
@@ -117,11 +116,11 @@ public class TileEntityFusionHatch extends TileEntity implements IFluidHandler {
 		}
 		if(world.getBlockMetadata(x, y, z) == 5)
 		{
-			if(world.getTileEntity(x - 8, y, z) != null && world.getTileEntity(x - 8, y, z) instanceof TileEntityFusionMultiblock)
+			if(world.getTileEntity(x - 9, y + 11, z) != null && world.getTileEntity(x - 9, y + 11, z) instanceof TileEntityFWatzCore)
 			{
-				if(((TileEntityFusionMultiblock)world.getTileEntity(x - 8, y, z)).isStructureValid(world))
+				if(((TileEntityFWatzCore)world.getTileEntity(x - 9, y + 11, z)).isStructureValid(world))
 				{
-					return (TileEntityFusionMultiblock)world.getTileEntity(x - 8, y, z);
+					return (TileEntityFWatzCore)world.getTileEntity(x - 9, y + 11, z);
 				} else {
 					return null;
 				}

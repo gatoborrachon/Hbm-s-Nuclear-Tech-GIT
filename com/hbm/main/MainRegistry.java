@@ -450,6 +450,7 @@ public class MainRegistry
 		GameRegistry.registerTileEntity(TileEntityMachineShredder.class, "tileentity_machine_shredder");
 		GameRegistry.registerTileEntity(TileEntityMachineCMBFactory.class, "tileentity_machine_cmb");
 		GameRegistry.registerTileEntity(TileEntityFWatzCore.class, "tileentity_fwatz_multiblock");
+		GameRegistry.registerTileEntity(TileEntityFWatzHatch.class, "tileentity_fwatz_hatch");
 		GameRegistry.registerTileEntity(TileEntityMachineTeleporter.class, "tileentity_teleblock");
 		GameRegistry.registerTileEntity(TileEntityNukeCustom.class, "tileentity_nuke_custom");
 		GameRegistry.registerTileEntity(TileEntityHatch.class, "tileentity_seal_lid");

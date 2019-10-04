@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
 import com.hbm.interfaces.IReactor;
@@ -12,6 +13,7 @@ import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.world.FWatz;
 
@@ -25,13 +27,16 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, IReactor, ISource, IFluidHandler, ITankPacketAcceptor {
+public class TileEntityFWatzCore extends TileEntity implements ISidedInventory,
+		IReactor, ISource, IFluidHandler, ITankPacketAcceptor {
 
 	public long power;
 	public final static long maxPower = 10000000000L;
@@ -40,13 +45,13 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 	public FluidTank tanks[];
 	public Fluid[] tankTypes;
 	public boolean needsUpdate;
-	
+
 	Random rand = new Random();
-	
+
 	private ItemStack slots[];
 	public int age = 0;
 	public List<IConsumer> list = new ArrayList<IConsumer>();
-	
+
 	private String customName;
 
 	public TileEntityFWatzCore() {
@@ -61,6 +66,7 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 		tankTypes[2] = ModForgeFluids.aschrab;
 		needsUpdate = false;
 	}
+
 	@Override
 	public int getSizeInventory() {
 		return slots.length;
@@ -73,35 +79,34 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 
 	@Override
 	public ItemStack getStackInSlotOnClosing(int i) {
-		if(slots[i] != null)
-		{
+		if (slots[i] != null) {
 			ItemStack itemStack = slots[i];
 			slots[i] = null;
 			return itemStack;
 		} else {
-		return null;
+			return null;
 		}
 	}
 
 	@Override
 	public void setInventorySlotContents(int i, ItemStack itemStack) {
 		slots[i] = itemStack;
-		if(itemStack != null && itemStack.stackSize > getInventoryStackLimit())
-		{
+		if (itemStack != null && itemStack.stackSize > getInventoryStackLimit()) {
 			itemStack.stackSize = getInventoryStackLimit();
 		}
 	}
 
 	@Override
 	public String getInventoryName() {
-		return this.hasCustomInventoryName() ? this.customName : "container.fusionaryWatzPlant";
+		return this.hasCustomInventoryName() ? this.customName
+				: "container.fusionaryWatzPlant";
 	}
 
 	@Override
 	public boolean hasCustomInventoryName() {
 		return this.customName != null && this.customName.length() > 0;
 	}
-	
+
 	public void setCustomName(String name) {
 		this.customName = name;
 	}
@@ -113,41 +118,39 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player) {
-		if(worldObj.getTileEntity(xCoord, yCoord, zCoord) != this)
-		{
+		if (worldObj.getTileEntity(xCoord, yCoord, zCoord) != this) {
 			return false;
-		}else{
+		} else {
 			return true;
 		}
 	}
-	
+
 	@Override
-	public void openInventory() {}
-	
+	public void openInventory() {
+	}
+
 	@Override
-	public void closeInventory() {}
+	public void closeInventory() {
+	}
 
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemStack) {
 		return true;
 	}
-	
+
 	@Override
 	public ItemStack decrStackSize(int i, int j) {
-		if(slots[i] != null)
-		{
-			if(slots[i].stackSize <= j)
-			{
+		if (slots[i] != null) {
+			if (slots[i].stackSize <= j) {
 				ItemStack itemStack = slots[i];
 				slots[i] = null;
 				return itemStack;
 			}
 			ItemStack itemStack1 = slots[i].splitStack(j);
-			if (slots[i].stackSize == 0)
-			{
+			if (slots[i].stackSize == 0) {
 				slots[i] = null;
 			}
-			
+
 			return itemStack1;
 		} else {
 			return null;
@@ -160,15 +163,17 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 	}
 
 	@Override
-	public boolean canInsertItem(int p_102007_1_, ItemStack p_102007_2_, int p_102007_3_) {
+	public boolean canInsertItem(int p_102007_1_, ItemStack p_102007_2_,
+			int p_102007_3_) {
 		return false;
 	}
 
 	@Override
-	public boolean canExtractItem(int p_102008_1_, ItemStack p_102008_2_, int p_102008_3_) {
+	public boolean canExtractItem(int p_102008_1_, ItemStack p_102008_2_,
+			int p_102008_3_) {
 		return false;
 	}
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
@@ -176,23 +181,20 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 
 		power = nbt.getLong("power");
 
-		
 		slots = new ItemStack[getSizeInventory()];
-		
-		for(int i = 0; i < list.tagCount(); i++)
-		{
+
+		for (int i = 0; i < list.tagCount(); i++) {
 			NBTTagCompound nbt1 = list.getCompoundTagAt(i);
 			byte b0 = nbt1.getByte("slot");
-			if(b0 >= 0 && b0 < slots.length)
-			{
+			if (b0 >= 0 && b0 < slots.length) {
 				slots[b0] = ItemStack.loadItemStackFromNBT(nbt1);
 			}
 		}
 		NBTTagList tankList = nbt.getTagList("tanks", 10);
-		for(int i = 0; i < tankList.tagCount(); i ++){
+		for (int i = 0; i < tankList.tagCount(); i++) {
 			NBTTagCompound tag = list.getCompoundTagAt(i);
 			byte b0 = tag.getByte("tank");
-			if(b0 >= 0 && b0 < tanks.length){
+			if (b0 >= 0 && b0 < tanks.length) {
 				tanks[b0].readFromNBT(tag);
 			}
 		}
@@ -200,31 +202,29 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 		tankTypes[1] = ModForgeFluids.amat;
 		tankTypes[2] = ModForgeFluids.aschrab;
 	}
-	
+
 	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 
 		nbt.setLong("power", power);
-		
+
 		NBTTagList list = new NBTTagList();
-		
-		for(int i = 0; i < slots.length; i++)
-		{
-			if(slots[i] != null)
-			{
+
+		for (int i = 0; i < slots.length; i++) {
+			if (slots[i] != null) {
 				NBTTagCompound nbt1 = new NBTTagCompound();
-				nbt1.setByte("slot", (byte)i);
+				nbt1.setByte("slot", (byte) i);
 				slots[i].writeToNBT(nbt1);
 				list.appendTag(nbt1);
 			}
 		}
 		nbt.setTag("items", list);
 		NBTTagList tankList = new NBTTagList();
-		for(int i = 0; i < tanks.length; i ++){
-			if(tanks[i] != null){
+		for (int i = 0; i < tanks.length; i++) {
+			if (tanks[i] != null) {
 				NBTTagCompound tag = new NBTTagCompound();
-				tag.setByte("tank", (byte)i);
+				tag.setByte("tank", (byte) i);
 				tanks[i].writeToNBT(tag);
 				tankList.appendTag(tag);
 			}
@@ -246,46 +246,47 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 
 	@Override
 	public boolean hasFuse() {
-		return slots[1] != null && (slots[1].getItem() == ModItems.fuse || slots[1].getItem() == ModItems.screwdriver);
+		return slots[1] != null
+				&& (slots[1].getItem() == ModItems.fuse || slots[1].getItem() == ModItems.screwdriver);
 	}
-	
+
 	@Override
 	public int getCoolantScaled(int i) {
 		return 0;
 	}
-	
+
 	@Override
 	public long getPowerScaled(long i) {
-		return (power/100 * i) / (maxPower/100);
+		return (power / 100 * i) / (maxPower / 100);
 	}
-	
+
 	@Override
 	public int getWaterScaled(int i) {
 		return 0;
 	}
-	
+
 	@Override
 	public int getHeatScaled(int i) {
 		return 0;
 	}
-	
+
 	public int getSingularityType() {
-		
-		if(slots[2] != null) {
+
+		if (slots[2] != null) {
 			Item item = slots[2].getItem();
 
-			if(item == ModItems.singularity)
+			if (item == ModItems.singularity)
 				return 1;
-			if(item == ModItems.singularity_counter_resonant)
+			if (item == ModItems.singularity_counter_resonant)
 				return 2;
-			if(item == ModItems.singularity_super_heated)
+			if (item == ModItems.singularity_super_heated)
 				return 3;
-			if(item == ModItems.black_hole)
+			if (item == ModItems.black_hole)
 				return 4;
-			if(item == ModItems.overfuse)
+			if (item == ModItems.overfuse)
 				return 5;
 		}
-		
+
 		return 0;
 	}
 
@@ -300,110 +301,157 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 
 			if (age == 9 || age == 19)
 				ffgeuaInit();
+			if (!worldObj.isRemote) {
+				if (hasFuse() && getSingularityType() > 0) {
+					if (cooldown) {
 
-			if (hasFuse() && getSingularityType() > 0) {
-				if(cooldown) {
-					
-					int i = getSingularityType();
+						int i = getSingularityType();
 
-					if(i == 1)
-						tanks[0].setFill(tanks[0].getFill() + 1500);
-					if(i == 2)
-						tanks[0].setFill(tanks[0].getFill() + 3000);
-					if(i == 3)
-						tanks[0].setFill(tanks[0].getFill() + 750);
-					if(i == 4)
-						tanks[0].setFill(tanks[0].getFill() + 7500);
-					if(i == 5)
-						tanks[0].setFill(tanks[0].getFill() + 15000);
-					
-					if(tanks[0].getFill() >= tanks[0].getMaxFill()) {
-						cooldown = false;
-						tanks[0].setFill(tanks[0].getMaxFill());
-					}
-					
-				} else {
-					int i = getSingularityType();
-					
-					if(i == 1 && tanks[1].getFill() - 75 >= 0 && tanks[2].getFill() - 75 >= 0) {
-						tanks[0].setFill(tanks[0].getFill() - 150);
-						tanks[1].setFill(tanks[1].getFill() - 75);
-						tanks[2].setFill(tanks[2].getFill() - 75);
-						power += 5000000;
-					}
-					if(i == 2 && tanks[1].getFill() - 75 >= 0 && tanks[2].getFill() - 35 >= 0) {
-						tanks[0].setFill(tanks[0].getFill() - 75);
-						tanks[1].setFill(tanks[1].getFill() - 35);
-						tanks[2].setFill(tanks[2].getFill() - 30);
-						power += 2500000;
-					}
-					if(i == 3 && tanks[1].getFill() - 75 >= 0 && tanks[2].getFill() - 140 >= 0) {
-						tanks[0].setFill(tanks[0].getFill() - 300);
-						tanks[1].setFill(tanks[1].getFill() - 75);
-						tanks[2].setFill(tanks[2].getFill() - 140);
-						power += 10000000;
-					}
-					if(i == 4 && tanks[1].getFill() - 100 >= 0 && tanks[2].getFill() - 100 >= 0) {
-						tanks[0].setFill(tanks[0].getFill() - 100);
-						tanks[1].setFill(tanks[1].getFill() - 100);
-						tanks[2].setFill(tanks[2].getFill() - 100);
-						power += 10000000;
-					}
-					if(i == 5 && tanks[1].getFill() - 15 >= 0 && tanks[2].getFill() - 15 >= 0) {
-						tanks[0].setFill(tanks[0].getFill() - 150);
-						tanks[1].setFill(tanks[1].getFill() - 15);
-						tanks[2].setFill(tanks[2].getFill() - 15);
-						power += 100000000;
-					}
-					
-					if(power > maxPower)
-						power = maxPower;
-					
-					if(tanks[0].getFill() <= 0) {
-						cooldown = true;
-						tanks[0].setFill(0);
+						if (i == 1)
+							tanks[0].fill(new FluidStack(tankTypes[0], 1500),
+									true);
+						if (i == 2)
+							tanks[0].fill(new FluidStack(tankTypes[0], 3000),
+									true);
+						if (i == 3)
+							tanks[0].fill(new FluidStack(tankTypes[0], 750),
+									true);
+						if (i == 4)
+							tanks[0].fill(new FluidStack(tankTypes[0], 500),
+									true);
+						if (i == 5)
+							tanks[0].fill(new FluidStack(tankTypes[0], 15000),
+									true);
+
+						if (tanks[0].getFluidAmount() >= tanks[0].getCapacity()) {
+							cooldown = false;
+						}
+
+					} else {
+						int i = getSingularityType();
+
+						if (i == 1 && tanks[1].getFluidAmount() - 75 >= 0
+								&& tanks[2].getFluidAmount() - 75 >= 0) {
+							tanks[0].drain(150, true);
+							tanks[1].drain(75, true);
+							tanks[2].drain(75, true);
+							needsUpdate = true;
+							power += 5000000;
+						}
+						if (i == 2 && tanks[1].getFluidAmount() - 75 >= 0
+								&& tanks[2].getFluidAmount() - 35 >= 0) {
+							tanks[0].drain(75, true);
+							tanks[1].drain(35, true);
+							tanks[2].drain(30, true);
+							needsUpdate = true;
+							power += 2500000;
+						}
+						if (i == 3 && tanks[1].getFluidAmount() - 75 >= 0
+								&& tanks[2].getFluidAmount() - 140 >= 0) {
+							tanks[0].drain(300, true);
+							tanks[1].drain(75, true);
+							tanks[2].drain(140, true);
+							needsUpdate = true;
+							power += 10000000;
+						}
+						if (i == 4 && tanks[1].getFluidAmount() - 100 >= 0
+								&& tanks[2].getFluidAmount() - 100 >= 0) {
+							tanks[0].drain(100, true);
+							tanks[1].drain(100, true);
+							tanks[2].drain(100, true);
+							needsUpdate = true;
+							power += 10000000;
+						}
+						if (i == 5 && tanks[1].getFluidAmount() - 15 >= 0
+								&& tanks[2].getFluidAmount() - 15 >= 0) {
+							tanks[0].drain(150, true);
+							tanks[1].drain(15, true);
+							tanks[2].drain(15, true);
+							needsUpdate = true;
+							power += 100000000;
+						}
+
+						if (power > maxPower)
+							power = maxPower;
+
+						if (tanks[0].getFluidAmount() <= 0) {
+							cooldown = true;
+						}
 					}
 				}
+
+				if (power > maxPower)
+					power = maxPower;
+
+				power = Library.chargeItemsFromTE(slots, 0, power, maxPower);
+
+				if(this.inputValidForTank(1, 3))
+					if(FFUtils.fillFromFluidContainer(slots, tanks[1], 3, 5))
+						needsUpdate = true;
+				if(this.inputValidForTank(2, 4))
+					if(FFUtils.fillFromFluidContainer(slots, tanks[2], 4, 6))
+						needsUpdate = true;
+				if (needsUpdate) {
+					PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(
+							xCoord, yCoord, zCoord, new FluidTank[] { tanks[0],
+									tanks[1], tanks[2] }));
+					needsUpdate = false;
+				}
 			}
-			
-			if(power > maxPower)
-				power = maxPower;
-			
-			power = Library.chargeItemsFromTE(slots, 0, power, maxPower);
-			
-			tanks[1].loadTank(3, 5, slots);
-			tanks[2].loadTank(4, 6, slots);
-			
-			for(int i = 0; i < 3; i++)
-				tanks[i].updateTank(xCoord, yCoord, zCoord);
+
 		}
-		
-		if(this.isRunning() && (tanks[1].getFill() <= 0 || tanks[2].getFill() <= 0 || !hasFuse() || getSingularityType() == 0) || cooldown || !this.isStructureValid(worldObj))
+
+		if (this.isRunning()
+				&& (tanks[1].getFluidAmount() <= 0
+						|| tanks[2].getFluidAmount() <= 0 || !hasFuse() || getSingularityType() == 0)
+				|| cooldown || !this.isStructureValid(worldObj))
 			this.emptyPlasma();
-		
-		if(!this.isRunning() && tanks[1].getFill() >= 100 && tanks[2].getFill() >= 100 && hasFuse() && getSingularityType() > 0 && !cooldown && this.isStructureValid(worldObj))
+
+		if (!this.isRunning() && tanks[1].getFluidAmount() >= 100
+				&& tanks[2].getFluidAmount() >= 100 && hasFuse()
+				&& getSingularityType() > 0 && !cooldown
+				&& this.isStructureValid(worldObj))
 			this.fillPlasma();
 
-		PacketDispatcher.wrapper.sendToAll(new AuxElectricityPacket(xCoord, yCoord, zCoord, power));
-	}
-	
-	public void fillPlasma() {
-		if(!this.worldObj.isRemote)
-			FWatz.fillPlasma(worldObj, this.xCoord, this.yCoord, this.zCoord);
-	}
-	
-	public void emptyPlasma() {
-		if(!this.worldObj.isRemote)
-			FWatz.emptyPlasma(worldObj, this.xCoord, this.yCoord, this.zCoord);
-	}
-	
-	public boolean isRunning() {
-		return FWatz.getPlasma(worldObj, this.xCoord, this.yCoord, this.zCoord) && this.isStructureValid(worldObj);
+		PacketDispatcher.wrapper.sendToAll(new AuxElectricityPacket(xCoord,
+				yCoord, zCoord, power));
 	}
 
+	public void fillPlasma() {
+		if (!this.worldObj.isRemote)
+			FWatz.fillPlasma(worldObj, this.xCoord, this.yCoord, this.zCoord);
+	}
+
+	public void emptyPlasma() {
+		if (!this.worldObj.isRemote)
+			FWatz.emptyPlasma(worldObj, this.xCoord, this.yCoord, this.zCoord);
+	}
+
+	public boolean isRunning() {
+		return FWatz.getPlasma(worldObj, this.xCoord, this.yCoord, this.zCoord)
+				&& this.isStructureValid(worldObj);
+	}
+
+	protected boolean inputValidForTank(int tank, int slot){
+		if(slots[slot] != null && tanks[tank] != null){
+			if(slots[slot].getItem() instanceof IFluidContainerItem && isValidFluidForTank(tank, ((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]))){
+				return true;
+			}
+			if(FluidContainerRegistry.isFilledContainer(slots[slot]) && isValidFluidForTank(tank, FluidContainerRegistry.getFluidForFilledItem(slots[slot]))){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isValidFluidForTank(int tank, FluidStack stack) {
+		if(stack == null || tanks[tank] == null)
+			return false;
+		return stack.getFluid() == tankTypes[tank];
+	}
 	@Override
 	public void ffgeua(int x, int y, int z, boolean newTact) {
-		
+
 		Library.ffgeua(x, y, z, newTact, this, worldObj);
 	}
 
@@ -414,14 +462,13 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 		ffgeua(this.xCoord, this.yCoord - 11, this.zCoord + 10, getTact());
 		ffgeua(this.xCoord, this.yCoord - 11, this.zCoord - 10, getTact());
 	}
-	
+
 	@Override
 	public boolean getTact() {
-		if(age >= 0 && age < 10)
-		{
+		if (age >= 0 && age < 10) {
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -446,87 +493,54 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory, 
 	}
 
 	@Override
-	public void setFillstate(int fill, int index) {
-		if(index < 3 && tanks[index] != null)
-			tanks[index].setFill(fill);
-	}
-
-	@Override
-	public void setType(FluidType type, int index) {
-		if(index < 3 && tanks[index] != null)
-			tanks[index].setTankType(type);
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tanks[1].getTankType().name()))
-			tanks[1].setFill(i);
-		else if(type.name().equals(tanks[2].getTankType().name()))
-			tanks[2].setFill(i);
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if(type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getFill();
-		else if(type.name().equals(tanks[2].getTankType().name()))
-			return tanks[2].getFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		if(type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getMaxFill();
-		else if(type.name().equals(tanks[2].getTankType().name()))
-			return tanks[2].getMaxFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tanks[0]);
-		list.add(tanks[1]);
-		list.add(tanks[2]);
-		
-		return list;
-	}
-	@Override
 	public void recievePacket(NBTTagCompound[] tags) {
-		// TODO Auto-generated method stub
-		
+		if (tags.length != 3) {
+			return;
+		} else {
+			tanks[0].readFromNBT(tags[0]);
+			tanks[1].readFromNBT(tags[1]);
+			tanks[2].readFromNBT(tags[2]);
+		}
+
 	}
+
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-		// TODO Auto-generated method stub
-		return 0;
+		if(resource == null){
+			return 0;
+		} else if(resource.getFluid() == tankTypes[0]){
+			return tanks[0].fill(resource, doFill);
+		} else if(resource.getFluid() == tankTypes[1]){
+			return tanks[1].fill(resource, doFill);
+		} else if(resource.getFluid() == tankTypes[2]){
+			return tanks[2].fill(resource, doFill);
+		} else {
+			return 0;
+		}
 	}
+
 	@Override
 	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
-		// TODO Auto-generated method stub
 		return null;
 	}
+
 	@Override
 	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		// TODO Auto-generated method stub
 		return null;
 	}
+
 	@Override
 	public boolean canFill(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
-		return false;
+		return fluid == tankTypes[0] || fluid == tankTypes[1] || fluid == tankTypes[2];
 	}
+
 	@Override
 	public boolean canDrain(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
 		return false;
 	}
+
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-		// TODO Auto-generated method stub
-		return null;
+		return new FluidTankInfo[]{tanks[0].getInfo(), tanks[1].getInfo(), tanks[2].getInfo()};
 	}
 }
