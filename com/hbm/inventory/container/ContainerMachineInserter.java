@@ -1,13 +1,9 @@
 package com.hbm.inventory.container;
 
-import com.hbm.inventory.SlotMachineOutput;
 import com.hbm.tileentity.machine.TileEntityMachineInserter;
-import com.hbm.tileentity.machine.TileEntityMachineTurbofan;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
@@ -19,14 +15,14 @@ public class ContainerMachineInserter extends Container {
 		diFurnace = tedf;
 
 		this.addSlotToContainer(new Slot(tedf, 0, 8, 17));
-		this.addSlotToContainer(new Slot(tedf, 1, 26, 17));
-		this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 2, 26, 53));
+	//	this.addSlotToContainer(new Slot(tedf, 1, 26, 17));
+		//this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 2, 26, 53));
 		this.addSlotToContainer(new Slot(tedf, 3, 62, 17));
-		this.addSlotToContainer(new Slot(tedf, 4, 80, 17));
-		this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 5, 80, 53));
+	//	this.addSlotToContainer(new Slot(tedf, 4, 80, 17));
+		//this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 5, 80, 53));
 		this.addSlotToContainer(new Slot(tedf, 6, 116, 17));
-		this.addSlotToContainer(new Slot(tedf, 7, 134, 17));
-		this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 8, 134, 53));
+		//this.addSlotToContainer(new Slot(tedf, 7, 134, 17));
+		//this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 8, 134, 53));
 		
 		for(int i = 0; i < 3; i++)
 		{

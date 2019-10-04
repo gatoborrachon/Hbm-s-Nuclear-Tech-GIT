@@ -509,10 +509,13 @@ public class TileEntityFWatzCore extends TileEntity implements ISidedInventory,
 		if(resource == null){
 			return 0;
 		} else if(resource.getFluid() == tankTypes[0]){
+			needsUpdate = true;
 			return tanks[0].fill(resource, doFill);
 		} else if(resource.getFluid() == tankTypes[1]){
+			needsUpdate = true;
 			return tanks[1].fill(resource, doFill);
 		} else if(resource.getFluid() == tankTypes[2]){
+			needsUpdate = true;
 			return tanks[2].fill(resource, doFill);
 		} else {
 			return 0;

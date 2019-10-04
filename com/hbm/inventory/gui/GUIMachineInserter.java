@@ -2,6 +2,7 @@ package com.hbm.inventory.gui;
 
 import org.lwjgl.opengl.GL11;
 
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.container.ContainerMachineInserter;
 import com.hbm.inventory.container.ContainerMachineTurbofan;
@@ -10,6 +11,7 @@ import com.hbm.tileentity.machine.TileEntityMachineInserter;
 import com.hbm.tileentity.machine.TileEntityMachineTurbofan;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -31,9 +33,9 @@ public class GUIMachineInserter extends GuiInfoContainer {
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
 
-		diFurnace.tanks[0].renderTankInfo(this, mouseX, mouseY, guiLeft + 44, guiTop + 69 - 52, 16, 52);
-		diFurnace.tanks[1].renderTankInfo(this, mouseX, mouseY, guiLeft + 98, guiTop + 69 - 52, 16, 52);
-		diFurnace.tanks[2].renderTankInfo(this, mouseX, mouseY, guiLeft + 152, guiTop + 69 - 52, 16, 52);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 44, guiTop + 69 - 52, 16, 52, diFurnace.tanks[0]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 98, guiTop + 69 - 52, 16, 52, diFurnace.tanks[1]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 152, guiTop + 69 - 52, 16, 52, diFurnace.tanks[2]);
 	}
 	
 	@Override
@@ -50,13 +52,9 @@ public class GUIMachineInserter extends GuiInfoContainer {
 		Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
 		drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tanks[0].getSheet());
-		diFurnace.tanks[0].renderTank(this, guiLeft + 44, guiTop + 69, diFurnace.tanks[0].getTankType().textureX() * FluidTank.x, diFurnace.tanks[0].getTankType().textureY() * FluidTank.y, 16, 52);
-		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tanks[1].getSheet());
-		diFurnace.tanks[1].renderTank(this, guiLeft + 98, guiTop + 69, diFurnace.tanks[1].getTankType().textureX() * FluidTank.x, diFurnace.tanks[1].getTankType().textureY() * FluidTank.y, 16, 52);
-		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tanks[2].getSheet());
-		diFurnace.tanks[2].renderTank(this, guiLeft + 152, guiTop + 69, diFurnace.tanks[2].getTankType().textureX() * FluidTank.x, diFurnace.tanks[2].getTankType().textureY() * FluidTank.y, 16, 52);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+		FFUtils.drawLiquid(diFurnace.tanks[0], guiLeft, guiTop, zLevel, 16, 52, 44, 69);
+		FFUtils.drawLiquid(diFurnace.tanks[1], guiLeft, guiTop, zLevel, 16, 52, 98, 69);
+		FFUtils.drawLiquid(diFurnace.tanks[2], guiLeft, guiTop, zLevel, 16, 52, 152, 69);
 	}
 }
