@@ -237,7 +237,7 @@ public class TileEntityMachineGasFlare extends TileEntity implements ISidedInven
 				needsUpdate = false;
 			}
 
-			if(this.inputValidForTank(-1, 0))
+			if(this.inputValidForTank(-1, 1))
 				if(FFUtils.fillFromFluidContainer(slots, tank, 1, 2))
 					needsUpdate = true;
 			

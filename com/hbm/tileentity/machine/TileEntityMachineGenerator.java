@@ -511,19 +511,19 @@ public class TileEntityMachineGenerator extends TileEntity implements ISidedInve
 					((slots[7] != null && !(slots[7].getItem() instanceof ItemFuelRod)) || slots[7] == null) && 
 					((slots[8] != null && !(slots[8].getItem() instanceof ItemFuelRod)) || slots[8] == null))
 			{
-				if(this.heat - 10 >= 0 && tanks[1].getFill() - 2 >= 0)
+				if(this.heat - 10 >= 0 && tanks[1].getFluidAmount() - 2 >= 0)
 				{
 					this.heat -= 10;
-					this.tanks[1].setFill(tanks[1].getFill() - 2);
+					tanks[1].drain(2, true);
 				}
 				
-				if(this.heat < 10 && heat != 0 && this.tanks[1].getFill() != 0)
+				if(this.heat < 10 && heat != 0 && this.tanks[1].getFluidAmount() != 0)
 				{
 					this.heat--;
-					this.tanks[1].setFill(tanks[1].getFill() - 1);
+					tanks[1].drain(1, true);
 				}
 				
-				if(this.heat != 0 && this.tanks[1].getFill() == 0)
+				if(this.heat != 0 && this.tanks[1].getFluidAmount() == 0)
 				{
 					this.heat--;
 				}
@@ -563,12 +563,13 @@ public class TileEntityMachineGenerator extends TileEntity implements ISidedInve
 		
 		int j = (int) Math.ceil(i / 100);
 		
-		if(this.tanks[0].getFill() - j >= 0)
+		if(this.tanks[0].getFluidAmount() - j >= 0)
 		{
 			this.power += i;
 			if(j > tanks[0].getCapacity() / 25)
 				j = tanks[0].getCapacity() / 25;
-			this.tanks[0].setFill(tanks[0].getFill() - j);
+			tanks[0].drain(j, true);
+			needsUpdate = true;
 		}
 	}
 	
@@ -577,9 +578,10 @@ public class TileEntityMachineGenerator extends TileEntity implements ISidedInve
 		
 		int j = rand.nextInt(i + 1);
 		
-		if(this.tanks[1].getFill() - j >= 0)
+		if(this.tanks[1].getFluidAmount() - j >= 0)
 		{
-			this.tanks[1].setFill(tanks[1].getFill() - j);
+			tanks[1].drain(j, true);
+			needsUpdate = true;
 		} else {
 			this.heat += i;
 		}
@@ -643,93 +645,53 @@ public class TileEntityMachineGenerator extends TileEntity implements ISidedInve
 	}
 
 	@Override
-	public int getMaxFluidFill(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getCapacity();
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getCapacity();
-		else
-			return 0;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			tanks[0].setFill(i);
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			tanks[1].setFill(i);
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getFill();
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public void setFillstate(int fill, int index) {
-		if(index < 2 && tanks[index] != null)
-			tanks[index].setFill(fill);
-	}
-
-	@Override
-	public void setType(FluidType type, int index) {
-		if(index < 2 && tanks[index] != null)
-			tanks[index].setTankType(type);
-	}
-
-	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tanks[0]);
-		list.add(tanks[1]);
-		
-		return list;
-	}
-
-	@Override
 	public void recievePacket(NBTTagCompound[] tags) {
-		// TODO Auto-generated method stub
+		if(tags.length != 2){
+			return;
+		} else {
+			tanks[0].readFromNBT(tags[0]);
+			tanks[1].readFromNBT(tags[1]);
+		}
 		
 	}
 
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-		// TODO Auto-generated method stub
+		if(resource == null){
+			return 0;
+		} else if (resource.getFluid() == FluidRegistry.WATER){
+			needsUpdate = true;
+			return tanks[0].fill(resource, doFill);
+		} else if (resource.getFluid() == ModForgeFluids.coolant){
+			needsUpdate = true;
+			return tanks[1].fill(resource, doFill);
+		} else {
 		return 0;
+		}
 	}
 
 	@Override
 	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean canFill(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
-		return false;
+		return fluid == FluidRegistry.WATER || fluid == ModForgeFluids.coolant;
 	}
 
 	@Override
 	public boolean canDrain(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-		// TODO Auto-generated method stub
-		return null;
+		return new FluidTankInfo[]{tanks[0].getInfo(), tanks[1].getInfo()};
 	}
 }

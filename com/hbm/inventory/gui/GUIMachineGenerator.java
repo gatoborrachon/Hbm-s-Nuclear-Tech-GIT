@@ -2,12 +2,14 @@ package com.hbm.inventory.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.container.ContainerGenerator;
 import com.hbm.lib.RefStrings;
@@ -30,17 +32,17 @@ public class GUIMachineGenerator extends GuiInfoContainer {
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
 
-		diFurnace.tanks[0].renderTankInfo(this, mouseX, mouseY, guiLeft + 8, guiTop + 88 - 52, 16, 52);
-		diFurnace.tanks[1].renderTankInfo(this, mouseX, mouseY, guiLeft + 26, guiTop + 88 - 52, 16, 52);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 8, guiTop + 88 - 52, 16, 52, diFurnace.tanks[0], diFurnace.tankTypes[0]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 26, guiTop + 88 - 52, 16, 52, diFurnace.tanks[1], diFurnace.tankTypes[1]);
 		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 62, guiTop + 88 - 52, 16, 52, diFurnace.power, diFurnace.powerMax);
 
-		if(diFurnace.tanks[0].getFill() <= 0) {
+		if(diFurnace.tanks[0].getFluidAmount() <= 0) {
 			String[] text = new String[] { "Error: Water is required for",
 					"the reactor to function properly!" };
 			this.drawCustomInfoStat(mouseX, mouseY, guiLeft - 16, guiTop + 36, 16, 16, guiLeft - 8, guiTop + 36 + 16, text);
 		}
 
-		if(diFurnace.tanks[1].getFill() <= 0) {
+		if(diFurnace.tanks[1].getFluidAmount() <= 0) {
 			String[] text1 = new String[] { "Use of coolant is advised." };
 			this.drawCustomInfoStat(mouseX, mouseY, guiLeft - 16, guiTop + 36 + 16, 16, 16, guiLeft - 8, guiTop + 36 + 16, text1);
 		}
@@ -70,16 +72,15 @@ public class GUIMachineGenerator extends GuiInfoContainer {
 			drawTexturedModalRect(guiLeft + 98, guiTop + 88 - i, 208, 52 - i, 16, i);
 		}
 		
-		if(diFurnace.tanks[0].getFill() <= 0)
+		if(diFurnace.tanks[0].getFluidAmount() <= 0)
 			this.drawInfoPanel(guiLeft - 16, guiTop + 36, 16, 16, 6);
 		
-		if(diFurnace.tanks[1].getFill() <= 0)
+		if(diFurnace.tanks[1].getFluidAmount() <= 0)
 			this.drawInfoPanel(guiLeft - 16, guiTop + 36 + 16, 16, 16, 7);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tanks[0].getSheet());
-		diFurnace.tanks[0].renderTank(this, guiLeft + 8, guiTop + 88, diFurnace.tanks[0].getTankType().textureX() * FluidTank.x, diFurnace.tanks[0].getTankType().textureY() * FluidTank.y, 16, 52);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tanks[0].getSheet());
-		diFurnace.tanks[1].renderTank(this, guiLeft + 26, guiTop + 88, diFurnace.tanks[1].getTankType().textureX() * FluidTank.x, diFurnace.tanks[1].getTankType().textureY() * FluidTank.y, 16, 52);
+		FFUtils.drawLiquid(diFurnace.tanks[0], guiLeft, guiTop, zLevel, 16, 52, 8, 88);
+		FFUtils.drawLiquid(diFurnace.tanks[1], guiLeft, guiTop, zLevel, 16, 52, 26, 88);
 	}
 }

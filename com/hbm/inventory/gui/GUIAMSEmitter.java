@@ -2,6 +2,7 @@ package com.hbm.inventory.gui;
 
 import org.lwjgl.opengl.GL11;
 
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.container.ContainerAMSEmitter;
 import com.hbm.inventory.container.ContainerAMSLimiter;
@@ -10,6 +11,7 @@ import com.hbm.tileentity.machine.TileEntityAMSEmitter;
 import com.hbm.tileentity.machine.TileEntityAMSLimiter;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -31,8 +33,8 @@ public class GUIAMSEmitter extends GuiInfoContainer {
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
 
-		emitter.tank.renderTankInfo(this, mouseX, mouseY, guiLeft + 26, guiTop + 69 - 52, 16, 52);
-		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 69 - 52, 16, 52, emitter.power, emitter.maxPower);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 26, guiTop + 69 - 52, 16, 52, emitter.tank, emitter.tankType);
+		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 69 - 52, 16, 52, emitter.power, TileEntityAMSEmitter.maxPower);
 		this.drawCustomInfo(this, mouseX, mouseY, guiLeft + 152, guiTop + 69 - 52, 16, 52, new String[] { "Power:", emitter.efficiency + "%" });
 		this.drawCustomInfo(this, mouseX, mouseY, guiLeft + 8, guiTop + 69 - 52, 16, 52, new String[] { "Heat:", emitter.heat + "/" + emitter.maxHeat });
 	}
@@ -64,8 +66,8 @@ public class GUIAMSEmitter extends GuiInfoContainer {
 		if(m > 0)
 			drawTexturedModalRect(guiLeft + 80, guiTop + 17, 176, 36 + 16 * m, 16, 16);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(emitter.tank.getSheet());
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 
-		emitter.tank.renderTank(this, guiLeft + 26, guiTop + 69, emitter.tank.getTankType().textureX() * FluidTank.x, emitter.tank.getTankType().textureY() * FluidTank.y, 16, 52);
+		FFUtils.drawLiquid(emitter.tank, guiLeft, guiTop, zLevel, 16, 52, 26, 69);
 	}
 }

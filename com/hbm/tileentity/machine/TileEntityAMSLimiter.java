@@ -5,17 +5,14 @@ import java.util.List;
 
 import com.hbm.entity.particle.EntityGasFlameFX;
 import com.hbm.explosion.ExplosionLarge;
-import com.hbm.handler.FluidTypeHandler.FluidType;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
-import com.hbm.interfaces.IFluidSource;
-import com.hbm.inventory.FluidTank;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
-import com.hbm.items.special.ItemBattery;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
 import com.hbm.packet.AuxGaugePacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
 
 import cpw.mods.fml.relauncher.Side;
@@ -27,9 +24,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 import scala.util.Random;
 
-public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory, IConsumer, IFluidContainer, IFluidAcceptor {
+public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler, ITankPacketAcceptor {
 
 	private ItemStack slots[];
 
@@ -44,6 +48,8 @@ public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory,
 	public int mode = 0;
 	public boolean locked = false;
 	public FluidTank tank;
+	public Fluid tankType;
+	public boolean needsUpdate;
 	
 	Random rand = new Random();
 
@@ -55,7 +61,9 @@ public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory,
 	
 	public TileEntityAMSLimiter() {
 		slots = new ItemStack[4];
-		tank = new FluidTank(FluidType.COOLANT, 8000, 0);
+		tank = new FluidTank(8000);
+		tankType = ModForgeFluids.coolant;
+		needsUpdate = false;
 	}
 
 	@Override
@@ -157,7 +165,7 @@ public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory,
 		NBTTagList list = nbt.getTagList("items", 10);
 
 		power = nbt.getLong("power");
-		tank.readFromNBT(nbt, "coolant");
+		tank.readFromNBT(nbt);
 		efficiency = nbt.getInteger("efficiency");
 		heat = nbt.getInteger("heat");
 		locked = nbt.getBoolean("locked");
@@ -178,7 +186,7 @@ public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory,
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		nbt.setLong("power", power);
-		tank.writeToNBT(nbt, "coolant");
+		tank.writeToNBT(nbt);
 		nbt.setInteger("efficiency", efficiency);
 		nbt.setInteger("heat", heat);
 		nbt.setBoolean("locked", locked);
@@ -219,9 +227,10 @@ public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory,
 		if (!worldObj.isRemote) {
 			
 			if(!locked) {
-				
-				tank.setType(0, 1, slots);
-				tank.updateTank(xCoord, yCoord, zCoord);
+				if(needsUpdate){
+					PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[]{tank}));
+					needsUpdate = false;
+				}
 				
 				if(power > 0) {
 					//" - (maxHeat / 2)" offsets center to 50% instead of 0%
@@ -233,11 +242,13 @@ public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory,
 					warning = 1;
 				}
 				
-				if(tank.getTankType().name().equals(FluidType.CRYOGEL.name())) {
+				if(tankType == ModForgeFluids.cryogel) {
 					
-					if(tank.getFill() >= 5) {
-						if(heat > 0)
-							tank.setFill(tank.getFill() - 5);
+					if(tank.getFluidAmount() >= 5) {
+						if(heat > 0){
+							tank.drain(5, true);
+							needsUpdate = true;
+						}
 
 						if(heat <= maxHeat / 2)
 							if(efficiency > 0)
@@ -253,11 +264,13 @@ public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory,
 					} else {
 						heat += efficiency;
 					}
-				} else if(tank.getTankType().name().equals(FluidType.COOLANT.name())) {
+				} else if(tankType == ModForgeFluids.coolant) {
 					
-					if(tank.getFill() >= 5) {
-						if(heat > 0)
-							tank.setFill(tank.getFill() - 5);
+					if(tank.getFluidAmount() >= 5) {
+						if(heat > 0){
+							tank.drain(5, true);
+							needsUpdate = true;
+						}
 
 						if(heat <= maxHeat / 4)
 							if(efficiency > 0)
@@ -273,11 +286,13 @@ public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory,
 					} else {
 						heat += efficiency;
 					}
-				} else if(tank.getTankType().name().equals(FluidType.WATER.name())) {
+				} else if(tankType == FluidRegistry.WATER) {
 					
-					if(tank.getFill() >= 15) {
-						if(heat > 0)
-							tank.setFill(tank.getFill() - 15);
+					if(tank.getFluidAmount() >= 15) {
+						if(heat > 0){
+							tank.drain(15, true);
+							needsUpdate = true;
+						}
 
 						if(heat <= maxHeat * 0.85)
 							if(efficiency > 0)
@@ -313,7 +328,7 @@ public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory,
 					this.warning = 2;
 				}
 				
-				if(tank.getFill() <= 5 || heat > maxHeat * 0.9)
+				if(tank.getFluidAmount() <= 5 || heat > maxHeat * 0.9)
 					warning = 2;
 				
 				if(heat > maxHeat) {
@@ -346,8 +361,9 @@ public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory,
 				warning = 3;
 			}
 			
-			tank.setTankType(FluidType.CRYOGEL);
-			tank.setFill(tank.getMaxFill());
+			tankType = ModForgeFluids.cryogel;
+			tank.drain(tank.getCapacity(), true);
+			tank.fill(new FluidStack(ModForgeFluids.cryogel, tank.getCapacity()), true);
 
 			PacketDispatcher.wrapper.sendToAll(new AuxElectricityPacket(xCoord, yCoord, zCoord, power));
 			PacketDispatcher.wrapper.sendToAll(new AuxGaugePacket(xCoord, yCoord, zCoord, locked ? 1 : 0, 0));
@@ -397,38 +413,6 @@ public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory,
 	}
 
 	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tank.getTankType().name()))
-			tank.setFill(i);
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if(type.name().equals(tank.getTankType().name()))
-			return tank.getFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		if(type.name().equals(tank.getTankType().name()))
-			return tank.getMaxFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public void setFillstate(int fill, int index) {
-			tank.setFill(fill);
-	}
-
-	@Override
-	public void setType(FluidType type, int index) {
-			tank.setTankType(type);
-	}
-	
-	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
 		return TileEntity.INFINITE_EXTENT_AABB;
 	}
@@ -439,13 +423,56 @@ public class TileEntityAMSLimiter extends TileEntity implements ISidedInventory,
 	{
 		return 65536.0D;
 	}
+	
+	public boolean isValidFluid(Fluid fluid){
+		if(fluid != null && (fluid == FluidRegistry.WATER || fluid == ModForgeFluids.coolant || fluid == ModForgeFluids.cryogel))
+			return true;
+		return false;
+	}
 
 	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tank);
+	public void recievePacket(NBTTagCompound[] tags) {
+		if(tags.length != 1){
+			return;
+		} else {
+			tank.readFromNBT(tags[0]);
+		}
 		
-		return list;
+	}
+
+	@Override
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		if(resource == null){
+			return 0;
+		} else if ((tank.getFluid() == null && this.isValidFluid(resource.getFluid())) || (tank.getFluid() != null && tank.getFluid().getFluid() == resource.getFluid())){
+			return tank.fill(resource, doFill);
+		}
+		return 0;
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		return null;
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		return null;
+	}
+
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		return (tank.getFluid() == null && this.isValidFluid(fluid)) || (tank.getFluid() != null && tank.getFluid().getFluid() == fluid);
+	}
+
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		return false;
+	}
+
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		return new FluidTankInfo[]{tank.getInfo()};
 	}
 
 }
