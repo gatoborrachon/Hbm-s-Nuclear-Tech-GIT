@@ -547,6 +547,7 @@ public class MainRegistry
 		GameRegistry.registerTileEntity(TileEntityMultiblock.class, "tileentity_multi_core");
 		GameRegistry.registerTileEntity(TileEntityChlorineSeal.class, "tileentity_chlorine_seal");
 		GameRegistry.registerTileEntity(TileEntityCableSwitch.class, "tileentity_he_switch");
+		GameRegistry.registerTileEntity(TileEntityReactorHatch.class, "tileentity_reactor_hatch");
 		//Forge fluid pipe tile entities.
 		GameRegistry.registerTileEntity(TileEntityFFOilDuct.class, "tileentity_ff_oil_duct");
 		GameRegistry.registerTileEntity(TileEntityFFGasDuct.class, "tileentity_ff_gas_duct");

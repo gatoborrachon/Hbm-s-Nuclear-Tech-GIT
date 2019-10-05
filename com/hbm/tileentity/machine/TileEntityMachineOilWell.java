@@ -7,20 +7,15 @@ import java.util.Random;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.entity.particle.EntityGasFX;
 import com.hbm.explosion.ExplosionLarge;
-import com.hbm.handler.FluidTypeHandler.FluidType;
+import com.hbm.forgefluid.FFUtils;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
-import com.hbm.interfaces.IFluidSource;
-import com.hbm.interfaces.IGasAcceptor;
-import com.hbm.interfaces.IGasSource;
-import com.hbm.interfaces.IOilAcceptor;
-import com.hbm.interfaces.IOilSource;
-import com.hbm.inventory.FluidTank;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemBattery;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
 
 import cpw.mods.fml.relauncher.Side;
@@ -34,9 +29,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class TileEntityMachineOilWell extends TileEntity implements ISidedInventory, IConsumer, IFluidContainer, IFluidSource {
+public class TileEntityMachineOilWell extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler, ITankPacketAcceptor {
 
 	private ItemStack slots[];
 
@@ -46,9 +47,9 @@ public class TileEntityMachineOilWell extends TileEntity implements ISidedInvent
 	public static final long maxPower = 100000;
 	public int age = 0;
 	public int age2 = 0;
-	public List<IFluidAcceptor> list1 = new ArrayList();
-	public List<IFluidAcceptor> list2 = new ArrayList();
 	public FluidTank[] tanks;
+	public Fluid[] tankTypes;
+	public boolean needsUpdate;
 	
 	private static final int[] slots_top = new int[] {1};
 	private static final int[] slots_bottom = new int[] {2, 0};
@@ -60,8 +61,12 @@ public class TileEntityMachineOilWell extends TileEntity implements ISidedInvent
 	public TileEntityMachineOilWell() {
 		slots = new ItemStack[6];
 		tanks = new FluidTank[2];
-		tanks[0] = new FluidTank(FluidType.OIL, 64000, 0);
-		tanks[1] = new FluidTank(FluidType.GAS, 64000, 1);
+		tankTypes = new Fluid[2];
+		tanks[0] = new FluidTank(64000);
+		tankTypes[0] = ModForgeFluids.oil;
+		tanks[1] = new FluidTank(64000);
+		tankTypes[1] = ModForgeFluids.gas;
+		needsUpdate = false;
 	}
 
 	@Override
@@ -172,8 +177,16 @@ public class TileEntityMachineOilWell extends TileEntity implements ISidedInvent
 		this.power = nbt.getLong("powerTime");
 		this.age = nbt.getInteger("age");
 
-		this.tanks[0].readFromNBT(nbt, "oil");
-		this.tanks[1].readFromNBT(nbt, "gas");
+		NBTTagList tankList = nbt.getTagList("tanks", 10);
+		for (int i = 0; i < tankList.tagCount(); i++) {
+			NBTTagCompound tag = list.getCompoundTagAt(i);
+			byte b0 = tag.getByte("tank");
+			if (b0 >= 0 && b0 < tanks.length) {
+				tanks[b0].readFromNBT(tag);
+			}
+		}
+		tankTypes[0] = ModForgeFluids.oil;
+		tankTypes[1] = ModForgeFluids.gas;
 		
 		slots = new ItemStack[getSizeInventory()];
 		
@@ -193,9 +206,6 @@ public class TileEntityMachineOilWell extends TileEntity implements ISidedInvent
 		super.writeToNBT(nbt);
 		nbt.setLong("powerTime", power);
 		nbt.setInteger("age", age);
-
-		this.tanks[0].writeToNBT(nbt, "oil");
-		this.tanks[1].writeToNBT(nbt, "gas");
 		
 		NBTTagList list = new NBTTagList();
 		
@@ -210,6 +220,16 @@ public class TileEntityMachineOilWell extends TileEntity implements ISidedInvent
 			}
 		}
 		nbt.setTag("items", list);
+		NBTTagList tankList = new NBTTagList();
+		for (int i = 0; i < tanks.length; i++) {
+			if (tanks[i] != null) {
+				NBTTagCompound tag = new NBTTagCompound();
+				tag.setByte("tank", (byte) i);
+				tanks[i].writeToNBT(tag);
+				tankList.appendTag(tag);
+			}
+		}
+		nbt.setTag("tanks", tankList);
 	}
 	
 	@Override
@@ -243,20 +263,23 @@ public class TileEntityMachineOilWell extends TileEntity implements ISidedInvent
 			age -= timer;
 		if(age2 >= 20)
 			age2 -= 20;
+		if(!worldObj.isRemote) {
 		if(age2 == 9 || age2 == 19) {
-			fillFluidInit(tanks[0].getTankType());
-			fillFluidInit(tanks[1].getTankType());
+			fillFluidInit(tanks[0]);
+			fillFluidInit(tanks[1]);
 		}
 		
-		if(!worldObj.isRemote) {
-
-			this.tanks[0].unloadTank(1, 2, slots);
-			this.tanks[1].unloadTank(3, 4, slots);
+		
 			
-			for(int i = 0; i < 2; i++) {
-				tanks[i].updateTank(xCoord, yCoord, zCoord);
-			}
+			if(FFUtils.fillFluidContainer(slots, tanks[0], 1, 2))
+				needsUpdate = true;
+			if(FFUtils.fillFluidContainer(slots, tanks[1], 3, 4))
+				needsUpdate = true;
 
+			if(needsUpdate){
+				PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[]{tanks[0], tanks[1]}));
+				needsUpdate = false;
+			}
 			power = Library.chargeTEFromItems(slots, 0, power, maxPower);
 			
 			if(power >= 100) {
@@ -294,17 +317,12 @@ public class TileEntityMachineOilWell extends TileEntity implements ISidedInvent
 								warning = 2;
 							break;
 							
-						} else if((b == ModBlocks.ore_oil || b == ModBlocks.ore_oil_empty) && this.tanks[0].getFill() < this.tanks[0].getMaxFill() && this.tanks[1].getFill() < this.tanks[1].getMaxFill()) {
+						} else if((b == ModBlocks.ore_oil || b == ModBlocks.ore_oil_empty) && this.tanks[0].getFluidAmount() < this.tanks[0].getCapacity() && this.tanks[1].getFluidAmount() < this.tanks[1].getCapacity()) {
 							if(succ(this.xCoord, i, this.zCoord)) {
 								
-								this.tanks[0].setFill(this.tanks[0].getFill() + 500);
-								if(this.tanks[0].getFill() > this.tanks[0].getMaxFill())
-									this.tanks[0].setFill(tanks[0].getMaxFill());
-								
-
-								this.tanks[1].setFill(this.tanks[1].getFill() + (100 + rand.nextInt(401)));
-								if(this.tanks[1].getFill() > this.tanks[1].getMaxFill())
-									this.tanks[1].setFill(tanks[1].getMaxFill());
+								this.tanks[0].fill(new FluidStack(tankTypes[0], 500), true);
+								this.tanks[1].fill(new FluidStack(tankTypes[1], (100 + rand.nextInt(401))), true);
+								needsUpdate = true;
 								
 								ExplosionLarge.spawnOilSpills(worldObj, xCoord + 0.5F, yCoord + 5.5F, zCoord + 0.5F, 3);
 								worldObj.playSoundEffect(this.xCoord, this.yCoord, this.zCoord, "game.neutral.swim.splash", 2.0F, 0.5F);
@@ -331,12 +349,11 @@ public class TileEntityMachineOilWell extends TileEntity implements ISidedInvent
 			}
 
 			warning2 = 0;
-			if(tanks[1].getFill() > 0) {
+			if(tanks[1].getFluidAmount() > 0) {
 				if(slots[5] != null && (slots[5].getItem() == ModItems.fuse || slots[5].getItem() == ModItems.screwdriver)) {
 					warning2 = 2;
-					tanks[1].setFill(tanks[1].getFill() - 50);
-					if(tanks[1].getFill() <= 0)
-						tanks[1].setFill(0);
+					tanks[1].drain(50, true);
+					needsUpdate = true;
 		    		worldObj.spawnEntityInWorld(new EntityGasFX(worldObj, this.xCoord + 0.5F, this.yCoord + 6.5F, this.zCoord + 0.5F, 0.0, 0.0, 0.0));
 				} else {
 					warning2 = 1;
@@ -454,82 +471,68 @@ public class TileEntityMachineOilWell extends TileEntity implements ISidedInvent
 		return 65536.0D;
 	}
 
+	public void fillFluidInit(FluidTank tank) {
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 2, this.yCoord, this.zCoord, 2000) || needsUpdate;
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 2, this.yCoord, this.zCoord, 2000) || needsUpdate;
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord - 2, 2000) || needsUpdate;
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord + 2, 2000) || needsUpdate;
+	}
+
 	@Override
-	public boolean getTact() {
-		if (age2 >= 0 && age2 < 10) {
-			return true;
+	public void recievePacket(NBTTagCompound[] tags) {
+		if(tags.length != 2){
+			return;
+		} else {
+			tanks[0].readFromNBT(tags[0]);
+			tanks[1].readFromNBT(tags[1]);
 		}
-
-		return false;
+		
 	}
 
 	@Override
-	public void fillFluidInit(FluidType type) {
-		fillFluid(this.xCoord - 2, this.yCoord, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord + 2, this.yCoord, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord - 2, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord + 2, getTact(), type);
-	}
-
-	@Override
-	public void fillFluid(int x, int y, int z, boolean newTact, FluidType type) {
-		Library.transmitFluid(x, y, z, newTact, this, worldObj, type);
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getFill();
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getFill();
-	
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		// can't be filled
 		return 0;
 	}
 
 	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			tanks[0].setFill(i);
-		else if(type.name().equals(tanks[1].getTankType().name()))
-			tanks[1].setFill(i);
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		if(resource == null){
+			return null;
+		} else if(resource.getFluid() == tankTypes[0]){
+			return tanks[0].drain(resource.amount, doDrain);
+		} else if(resource.getFluid() == tankTypes[1]){
+			return tanks[1].drain(resource.amount, doDrain);
+		} else {
+			return null;
+		}
 	}
 
 	@Override
-	public List<IFluidAcceptor> getFluidList(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			return this.list1;
-		if(type.name().equals(tanks[1].getTankType().name()))
-			return this.list2;
-		return new ArrayList<IFluidAcceptor>();
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		if(tanks[0].getFluidAmount() > 0){
+			return tanks[0].drain(maxDrain, doDrain);
+		} else if(tanks[1].getFluidAmount() > 0){
+			return tanks[1].drain(maxDrain, doDrain);
+		} else {
+			return null;
+		}
 	}
 
 	@Override
-	public void clearFluidList(FluidType type) {
-		if(type.name().equals(tanks[0].getTankType().name()))
-			list1.clear();
-		if(type.name().equals(tanks[1].getTankType().name()))
-			list2.clear();
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		// can't be filled
+		return false;
 	}
 
 	@Override
-	public void setFillstate(int fill, int index) {
-		if(index < 2 && tanks[index] != null)
-			tanks[index].setFill(fill);
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		return fluid == tankTypes[0] || fluid == tankTypes[1];
 	}
 
 	@Override
-	public void setType(FluidType type, int index) {
-		if(index < 2 && tanks[index] != null)
-			tanks[index].setTankType(type);
-	}
-
-	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tanks[0]);
-		list.add(tanks[1]);
-		
-		return list;
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		return new FluidTankInfo[]{tanks[0].getInfo(), tanks[1].getInfo()};
 	}
 
 }

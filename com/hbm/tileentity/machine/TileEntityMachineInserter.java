@@ -268,12 +268,12 @@ public class TileEntityMachineInserter extends TileEntity implements ISidedInven
 	}
 
 	public void fillFluidInit(FluidTank tank) {
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord, 4000);
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord, 4000);
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord + 1, this.zCoord, 4000);
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord - 1, this.zCoord, 4000);
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord + 1, 4000);
-		FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord - 1, 4000);
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 1, this.yCoord, this.zCoord, 4000) || needsUpdate;
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 1, this.yCoord, this.zCoord, 4000) || needsUpdate;
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord + 1, this.zCoord, 4000) || needsUpdate;
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord - 1, this.zCoord, 4000) || needsUpdate;
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord + 1, 4000) || needsUpdate;
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord - 1, 4000) || needsUpdate;
 	}
 
 	@Override

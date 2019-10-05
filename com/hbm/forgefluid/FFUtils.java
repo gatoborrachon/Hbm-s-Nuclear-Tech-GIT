@@ -1,31 +1,14 @@
 package com.hbm.forgefluid;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-
-import javax.imageio.ImageIO;
-
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-
 import com.hbm.interfaces.IFluidPipe;
 import com.hbm.inventory.gui.GuiInfoContainer;
-import com.hbm.main.MainRegistry;
 import com.hbm.tileentity.machine.TileEntityDummy;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -404,5 +387,15 @@ public class FFUtils {
 			}
 		}
 		return false;
+	}
+
+	public static FluidTank changeTankSize(FluidTank fluidTank, int i) {
+		FluidTank newTank = new FluidTank(i);
+		if(fluidTank.getFluid() == null){
+			return newTank;
+		} else {
+			newTank.fill(fluidTank.getFluid(), true);
+			return newTank;
+		}
 	}
 }
