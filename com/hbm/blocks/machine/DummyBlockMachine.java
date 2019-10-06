@@ -5,9 +5,8 @@ import java.util.Random;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.interfaces.IDummy;
 import com.hbm.main.MainRegistry;
-import com.hbm.tileentity.machine.TileEntityAMSBase;
-import com.hbm.tileentity.machine.TileEntityAMSEmitter;
 import com.hbm.tileentity.machine.TileEntityDummy;
+import com.hbm.tileentity.machine.TileEntityDummyFluidPort;
 
 import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -59,7 +58,11 @@ public class DummyBlockMachine extends BlockContainer implements IDummy {
 
 	@Override
 	public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
-		return new TileEntityDummy();
+		if(this == ModBlocks.dummy_port_reactor_small){
+			return new TileEntityDummyFluidPort();
+		} else {
+			return new TileEntityDummy();
+		}
 	}
 
     @Override

@@ -2,18 +2,16 @@ package com.hbm.inventory.gui;
 
 import org.lwjgl.opengl.GL11;
 
-import com.hbm.handler.FluidTypeHandler.FluidType;
-import com.hbm.inventory.FluidTank;
+import com.hbm.forgefluid.FFUtils;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.inventory.container.ContainerMachineReactorSmall;
-import com.hbm.inventory.container.ContainerMachineSelenium;
 import com.hbm.lib.RefStrings;
 import com.hbm.packet.AuxButtonPacket;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.tileentity.machine.TileEntityMachineReactorSmall;
-import com.hbm.tileentity.machine.TileEntityMachineSeleniumEngine;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -33,14 +31,13 @@ public class GUIMachineReactorSmall extends GuiInfoContainer {
 		this.ySize = 222;
 	}
 	
-	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
 
-		diFurnace.tanks[0].renderTankInfo(this, mouseX, mouseY, guiLeft + 8, guiTop + 36, 16, 52);
-		diFurnace.tanks[1].renderTankInfo(this, mouseX, mouseY, guiLeft + 26, guiTop + 36, 16, 52);
-		diFurnace.tanks[2].renderTankInfo(this, mouseX, mouseY, guiLeft + 80, guiTop + 108, 88, 4);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 8, guiTop + 36, 16, 52, diFurnace.tanks[0], diFurnace.tankTypes[0]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 26, guiTop + 36, 16, 52, diFurnace.tanks[1], diFurnace.tankTypes[1]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 80, guiTop + 108, 88, 4, diFurnace.tanks[2], diFurnace.tankTypes[2]);
 		this.drawCustomInfo(this, mouseX, mouseY, guiLeft + 80, guiTop + 114, 88, 4, new String[] { "Hull Temperature:", "   " + Math.round((diFurnace.hullHeat) * 0.00001 * 980 + 20) + "°C" });
 		this.drawCustomInfo(this, mouseX, mouseY, guiLeft + 80, guiTop + 120, 88, 4, new String[] { "Core Temperature:", "   " + Math.round((diFurnace.coreHeat) * 0.00002 * 980 + 20) + "°C" });
 		
@@ -62,13 +59,13 @@ public class GUIMachineReactorSmall extends GuiInfoContainer {
 				"fluid gauges." };
 		this.drawCustomInfoStat(mouseX, mouseY, guiLeft - 16, guiTop + 36 + 16, 16, 16, guiLeft - 8, guiTop + 36 + 16, text1);
 
-		if(diFurnace.tanks[0].getFill() <= 0) {
+		if(diFurnace.tanks[0].getFluidAmount() <= 0) {
 			String[] text2 = new String[] { "Error: Water is required for",
 					"the reactor to function properly!" };
 			this.drawCustomInfoStat(mouseX, mouseY, guiLeft - 16, guiTop + 36 + 32, 16, 16, guiLeft - 8, guiTop + 36 + 32 + 16, text2);
 		}
 
-		if(diFurnace.tanks[1].getFill() <= 0) {
+		if(diFurnace.tanks[1].getFluidAmount() <= 0) {
 			String[] text3 = new String[] { "Error: Coolant is required for",
 					"the reactor to function properly!" };
 			this.drawCustomInfoStat(mouseX, mouseY, guiLeft - 16, guiTop + 36 + 32 + 16, 16, 16, guiLeft - 8, guiTop + 36 + 32 + 16, text3);
@@ -76,10 +73,12 @@ public class GUIMachineReactorSmall extends GuiInfoContainer {
 		
 		String s = "0";
 		
-		switch(diFurnace.tanks[2].getTankType()) {
-		case STEAM: s = "1x"; break;
-		case HOTSTEAM:s = "10x"; break;
-		case SUPERHOTSTEAM: s = "100x"; break;
+		if(diFurnace.tankTypes[2] == ModForgeFluids.steam){
+			s = "1x";
+		} else if(diFurnace.tankTypes[2] == ModForgeFluids.hotsteam){
+			s = "10x";
+		} else if(diFurnace.tankTypes[2] == ModForgeFluids.superhotsteam){
+			s = "100x";
 		}
 		
 		String[] text4 = new String[] { "Steam compression switch",
@@ -98,7 +97,6 @@ public class GUIMachineReactorSmall extends GuiInfoContainer {
 		this.fontRendererObj.drawString(I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
 	}
 
-    @SuppressWarnings("incomplete-switch")
 	protected void mouseClicked(int x, int y, int i) {
     	super.mouseClicked(x, y, i);
 		
@@ -113,17 +111,21 @@ public class GUIMachineReactorSmall extends GuiInfoContainer {
 			mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
 			int c = 0;
 			
-			switch(diFurnace.tanks[2].getTankType()) {
-			case STEAM: c = 0; break;
-			case HOTSTEAM: c = 1; break;
-			case SUPERHOTSTEAM: c = 2; break;
+			if(diFurnace.tankTypes[2] == ModForgeFluids.steam){
+				diFurnace.tankTypes[2] = ModForgeFluids.hotsteam;
+				c = 1;
+			} else if(diFurnace.tankTypes[2] == ModForgeFluids.hotsteam){
+				diFurnace.tankTypes[2] = ModForgeFluids.superhotsteam;
+				c = 2;
+			} else if(diFurnace.tankTypes[2] == ModForgeFluids.superhotsteam){
+				diFurnace.tankTypes[2] = ModForgeFluids.steam;
+				c = 0;
 			}
 			
     		PacketDispatcher.wrapper.sendToServer(new AuxButtonPacket(diFurnace.xCoord, diFurnace.yCoord, diFurnace.zCoord, c, 1));
     	}
     }
 
-	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float p_146976_1_, int p_146976_2_, int p_146976_3_) {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -135,16 +137,17 @@ public class GUIMachineReactorSmall extends GuiInfoContainer {
 		
 		drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 		
-		if(diFurnace.tanks[2].getFill() > 0) {
+		if(diFurnace.tanks[2].getFluidAmount() > 0) {
 			int i = diFurnace.getSteamScaled(88);
 			
 			//i = (int) Math.min(i, 160);
 			
 			int offset = 234;
 			
-			switch(diFurnace.tanks[2].getTankType()) {
-			case HOTSTEAM: offset += 4; break;
-			case SUPERHOTSTEAM: offset += 8; break;
+			if(diFurnace.tankTypes[2] == ModForgeFluids.hotsteam){
+				offset += 4;
+			} else if(diFurnace.tankTypes[2] == ModForgeFluids.superhotsteam){
+				offset += 8;
 			}
 			
 			drawTexturedModalRect(guiLeft + 80, guiTop + 108, 0, offset, i, 4);
@@ -185,25 +188,26 @@ public class GUIMachineReactorSmall extends GuiInfoContainer {
 			}
 		}
 		
-		switch(diFurnace.tanks[2].getTankType()) {
-		case STEAM: drawTexturedModalRect(guiLeft + 63, guiTop + 107, 176, 18, 14, 18); break;
-		case HOTSTEAM: drawTexturedModalRect(guiLeft + 63, guiTop + 107, 190, 18, 14, 18); break;
-		case SUPERHOTSTEAM: drawTexturedModalRect(guiLeft + 63, guiTop + 107, 204, 18, 14, 18); break;
+		if(diFurnace.tankTypes[2] == ModForgeFluids.steam){
+			drawTexturedModalRect(guiLeft + 63, guiTop + 107, 176, 18, 14, 18);
+		} else if(diFurnace.tankTypes[2] == ModForgeFluids.hotsteam){
+			drawTexturedModalRect(guiLeft + 63, guiTop + 107, 190, 18, 14, 18);
+		} else if(diFurnace.tankTypes[2] == ModForgeFluids.superhotsteam){
+			drawTexturedModalRect(guiLeft + 63, guiTop + 107, 204, 18, 14, 18);
 		}
-		
 		this.drawInfoPanel(guiLeft - 16, guiTop + 36, 16, 16, 2);
 		this.drawInfoPanel(guiLeft - 16, guiTop + 36 + 16, 16, 16, 3);
 		
-		if(diFurnace.tanks[0].getFill() <= 0)
+		if(diFurnace.tanks[0].getFluidAmount() <= 0)
 			this.drawInfoPanel(guiLeft - 16, guiTop + 36 + 32, 16, 16, 6);
 		
-		if(diFurnace.tanks[1].getFill() <= 0)
+		if(diFurnace.tanks[1].getFluidAmount() <= 0)
 			this.drawInfoPanel(guiLeft - 16, guiTop + 36 + 32 + 16, 16, 16, 7);
 
-		Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tanks[0].getSheet());
-		diFurnace.tanks[0].renderTank(this, guiLeft + 8, guiTop + 88, diFurnace.tanks[0].getTankType().textureX() * FluidTank.x, diFurnace.tanks[0].getTankType().textureY() * FluidTank.y, 16, 52);
-		Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tanks[1].getSheet());
-		diFurnace.tanks[1].renderTank(this, guiLeft + 26, guiTop + 88, diFurnace.tanks[1].getTankType().textureX() * FluidTank.x, diFurnace.tanks[1].getTankType().textureY() * FluidTank.y, 16, 52);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+		
+		FFUtils.drawLiquid(diFurnace.tanks[0], guiLeft, guiTop, zLevel, 16, 52, 8, 88);
+		FFUtils.drawLiquid(diFurnace.tanks[1], guiLeft, guiTop, zLevel, 16, 52, 26, 88);
 	}
 	
     protected void keyTyped(char p_73869_1_, int p_73869_2_)

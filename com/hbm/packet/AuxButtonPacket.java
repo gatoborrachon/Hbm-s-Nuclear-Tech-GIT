@@ -1,37 +1,20 @@
 package com.hbm.packet;
 
-import com.hbm.explosion.ExplosionLarge;
-import com.hbm.forgefluid.ModForgeFluids;
-import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.items.weapon.ItemMissile.PartSize;
-import com.hbm.saveddata.SatelliteSaveStructure;
-import com.hbm.saveddata.SatelliteSavedData;
 import com.hbm.tileentity.bomb.TileEntityLaunchTable;
-import com.hbm.tileentity.bomb.TileEntityTurretCIWS;
-import com.hbm.tileentity.bomb.TileEntityTurretCheapo;
-import com.hbm.tileentity.machine.TileEntityAMSBase;
-import com.hbm.tileentity.machine.TileEntityAMSEmitter;
-import com.hbm.tileentity.machine.TileEntityAMSLimiter;
 import com.hbm.tileentity.machine.TileEntityForceField;
-import com.hbm.tileentity.machine.TileEntityMachineDiesel;
 import com.hbm.tileentity.machine.TileEntityMachineMissileAssembly;
 import com.hbm.tileentity.machine.TileEntityMachineReactorLarge;
 import com.hbm.tileentity.machine.TileEntityMachineReactorSmall;
-import com.hbm.tileentity.machine.TileEntityMachineSeleniumEngine;
 import com.hbm.tileentity.machine.TileEntityRadioRec;
 import com.hbm.tileentity.machine.TileEntityReactorControl;
 
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.fluids.Fluid;
 
 public class AuxButtonPacket implements IMessage {
 
@@ -90,23 +73,9 @@ public class AuxButtonPacket implements IMessage {
 						reactor.retracting = m.value == 1;
 					
 					if(m.id == 1) {
-						FluidType type = FluidType.STEAM;
-						int fill = reactor.tanks[2].getFill();
-						
-						switch(m.value) {
-						case 0: type = FluidType.HOTSTEAM; fill = (int)Math.floor(fill / 10D); break;
-						case 1: type = FluidType.SUPERHOTSTEAM; fill = (int)Math.floor(fill / 10D); break;
-						case 2: type = FluidType.STEAM; fill = (int)Math.floor(fill * 100); break;
-						}
-						
-						if(fill > reactor.tanks[2].getMaxFill())
-							fill = reactor.tanks[2].getMaxFill();
-						
-						reactor.tanks[2].setTankType(type);
-						reactor.tanks[2].setFill(fill);
+						reactor.compress(m.value);
 					}
 				}
-				
 				if (te instanceof TileEntityRadioRec) {
 					TileEntityRadioRec radio = (TileEntityRadioRec)te;
 					
@@ -131,35 +100,6 @@ public class AuxButtonPacket implements IMessage {
 					if(m.id == 1)
 						control.auto = m.value == 1;
 					
-					if(control.linkY > -1) {
-						TileEntity reac = p.worldObj.getTileEntity(control.linkX, control.linkY, control.linkZ);
-						
-						if (reac instanceof TileEntityMachineReactorSmall) {
-							TileEntityMachineReactorSmall reactor = (TileEntityMachineReactorSmall)reac;
-							
-							if(m.id == 0)
-								reactor.retracting = m.value == 0;
-							
-							if(m.id == 2) {
-								FluidType type = FluidType.STEAM;
-								int fill = reactor.tanks[2].getFill();
-								
-								switch(m.value) {
-								case 0: type = FluidType.STEAM; fill = (int)Math.floor(fill * 100); break;
-								case 1: type = FluidType.HOTSTEAM; fill = (int)Math.floor(fill / 10D); break;
-								case 2: type = FluidType.SUPERHOTSTEAM; fill = (int)Math.floor(fill / 10D); break;
-								}
-								
-								if(fill > reactor.tanks[2].getMaxFill())
-									fill = reactor.tanks[2].getMaxFill();
-								
-								reactor.tanks[2].setTankType(type);
-								reactor.tanks[2].setFill(fill);
-							}
-						}
-						
-
-					}
 				}
 				TileEntity reac = p.worldObj.getTileEntity(m.x, m.y, m.z);
 				if (reac instanceof TileEntityMachineReactorLarge) {

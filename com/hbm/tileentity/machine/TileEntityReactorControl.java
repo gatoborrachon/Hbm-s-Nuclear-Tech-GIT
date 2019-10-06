@@ -3,14 +3,12 @@ package com.hbm.tileentity.machine;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.items.ModItems;
-import com.hbm.items.tool.ItemKeyPin;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.packet.TEControlPacket;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneComparator;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -240,24 +238,23 @@ public class TileEntityReactorControl extends TileEntity implements ISidedInvent
         		hullHeat = reactor.hullHeat;
         		coreHeat = reactor.coreHeat;
         		fuel = reactor.getFuelPercent();
-        		water = reactor.tanks[0].getFill();
-        		cool = reactor.tanks[1].getFill();
-        		steam = reactor.tanks[2].getFill();
-        		maxWater = reactor.tanks[0].getMaxFill();
-        		maxCool = reactor.tanks[1].getMaxFill();
-        		maxSteam = reactor.tanks[2].getMaxFill();
+        		water = reactor.tanks[0].getFluidAmount();
+        		cool = reactor.tanks[1].getFluidAmount();
+        		steam = reactor.tanks[2].getFluidAmount();
+        		maxWater = reactor.tanks[0].getCapacity();
+        		maxCool = reactor.tanks[1].getCapacity();
+        		maxSteam = reactor.tanks[2].getCapacity();
         		rods = reactor.rods;
         		maxRods = reactor.rodsMax;
         		isOn = !reactor.retracting;
         		isLinked = true;
         		
-        		switch(reactor.tanks[2].getTankType()) {
-        		case HOTSTEAM: 
-            		compression = 1; break;
-        		case SUPERHOTSTEAM: 
-            		compression = 2; break;
-            	default:
-            		compression = 0; break;
+        		if(reactor.tankTypes[2] == ModForgeFluids.hotsteam){
+        			compression = 1;
+        		} else if(reactor.tankTypes[2] == ModForgeFluids.superhotsteam){
+        			compression = 2;
+        		} else {
+        			compression = 0;
         		}
         		
         		if(!redstoned) {
