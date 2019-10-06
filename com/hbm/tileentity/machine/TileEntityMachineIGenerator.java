@@ -45,7 +45,7 @@ public class TileEntityMachineIGenerator extends TileEntity implements ISidedInv
 	public static final int maxLubricant = 10000;
 	public static final int maxFuel = 50000;
 	public int age = 0;
-	public List<IConsumer> list = new ArrayList();
+	public List<IConsumer> list = new ArrayList<IConsumer>();
 
 	private static final int[] slots_top = new int[] { 0 };
 	private static final int[] slots_bottom = new int[] { 0, 0 };

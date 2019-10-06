@@ -6,32 +6,36 @@ import java.util.Random;
 
 import com.hbm.blocks.ModBlocks;
 import com.hbm.entity.logic.EntityNukeExplosionMK3;
-import com.hbm.handler.FluidTypeHandler.FluidType;
+import com.hbm.forgefluid.FFUtils;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
-import com.hbm.interfaces.IFluidSource;
 import com.hbm.interfaces.IReactor;
 import com.hbm.interfaces.ISource;
-import com.hbm.inventory.FluidTank;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.WatzFuel;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
 import com.hbm.packet.AuxElectricityPacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityWatzCore extends TileEntity implements ISidedInventory, IReactor, ISource, IFluidContainer, IFluidSource {
+public class TileEntityWatzCore extends TileEntity implements ISidedInventory, IReactor, ISource, IFluidHandler, ITankPacketAcceptor {
 
 	public long power;
 	public final static long maxPower = 100000000;
@@ -49,15 +53,18 @@ public class TileEntityWatzCore extends TileEntity implements ISidedInventory, I
 	
 	private ItemStack slots[];
 	public int age = 0;
-	public List<IConsumer> list = new ArrayList();
-	public List<IFluidAcceptor> list1 = new ArrayList();
+	public List<IConsumer> list = new ArrayList<IConsumer>();
 	public FluidTank tank;
+	public Fluid tankType;
+	public boolean needsUpdate;
 	
 	private String customName;
 
 	public TileEntityWatzCore() {
 		slots = new ItemStack[40];
-		tank = new FluidTank(FluidType.WATZ, 64000, 0);
+		tank = new FluidTank(64000);
+		tankType = ModForgeFluids.watz;
+		needsUpdate = false;
 	}
 	@Override
 	public int getSizeInventory() {
@@ -173,8 +180,8 @@ public class TileEntityWatzCore extends TileEntity implements ISidedInventory, I
 		NBTTagList list = nbt.getTagList("items", 10);
 
 		power = nbt.getLong("power");
-		tank.readFromNBT(nbt, "watz");
-		
+		tank.readFromNBT(nbt);
+		tankType = ModForgeFluids.watz;
 		slots = new ItemStack[getSizeInventory()];
 		
 		for(int i = 0; i < list.tagCount(); i++)
@@ -193,7 +200,7 @@ public class TileEntityWatzCore extends TileEntity implements ISidedInventory, I
 		super.writeToNBT(nbt);
 		
 		nbt.setLong("power", power);
-		tank.writeToNBT(nbt, "watz");
+		tank.writeToNBT(nbt);
 		
 		NBTTagList list = new NBTTagList();
 		
@@ -525,7 +532,7 @@ public class TileEntityWatzCore extends TileEntity implements ISidedInventory, I
 
 			if (age == 9 || age == 19) {
 				ffgeuaInit();
-				fillFluidInit(tank.getTankType());
+				fillFluidInit(tank);
 			}
 
 			powerMultiplier = 100;
@@ -564,35 +571,42 @@ public class TileEntityWatzCore extends TileEntity implements ISidedInventory, I
 			powerList /= 100;
 			power += powerList;
 
-			tank.setFill(tank.getFill() + ((decayMultiplier * heat) / 100) / 100);
+			tank.fill(new FluidStack(tankType, ((decayMultiplier * heat) / 100) / 100), true);
+			needsUpdate = true;
 			
 			if(power > maxPower)
 				power = maxPower;
 			
 			//Gets rid of 1/4 of the total waste, if at least one access hatch is not occupied
-			if(tank.getFill() > tank.getMaxFill())
+			if(tank.getFluidAmount() >= tank.getCapacity())
 				emptyWaste();
 			
 			power = Library.chargeItemsFromTE(slots, 37, power, maxPower);
 			
-			tank.updateTank(xCoord, yCoord, zCoord);
-			tank.unloadTank(36, 39, slots);
+			if(FFUtils.fillFluidContainer(slots, tank, 36, 39))
+				needsUpdate = true;
 			
 			if(slots[36] != null && slots[36].getItem() == ModItems.titanium_filter && slots[36].getItemDamage() + 100 <= slots[36].getMaxDamage())
 			{
-				if(tank.getFill() - 10 >= 0)
+				if(tank.getFluidAmount() - 10 >= 0)
 				{
-					tank.setFill(tank.getFill() - 10);
+					tank.drain(10, true);
 					slots[36].setItemDamage(slots[36].getItemDamage() + 100);
+					needsUpdate = true;
 				} else {
-					if(tank.getFill() > 0)
+					if(tank.getFluidAmount() > 0)
 					{
-						tank.setFill(0);
+						tank.drain(tank.getCapacity(), true);
 						slots[36].setItemDamage(slots[36].getItemDamage() + 100);
+						needsUpdate = true;
 					}
 				}
 			}
 
+			if(needsUpdate){
+				PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[]{tank}));
+				needsUpdate = false;
+			}
 			PacketDispatcher.wrapper.sendToAll(new AuxElectricityPacket(xCoord, yCoord, zCoord, power));
 		}
 	}
@@ -633,8 +647,8 @@ public class TileEntityWatzCore extends TileEntity implements ISidedInventory, I
 	}
 	
 	public void emptyWaste() {
-		tank.setFill(tank.getFill() / 4);
-		tank.setFill(tank.getFill() * 3);
+		tank.drain(tank.getFluidAmount() / 4, true);
+		needsUpdate = true;
 		if (!worldObj.isRemote) {
 			if (this.worldObj.getBlock(this.xCoord + 4, this.yCoord, this.zCoord) == Blocks.air)
 			{
@@ -725,55 +739,57 @@ public class TileEntityWatzCore extends TileEntity implements ISidedInventory, I
 		this.list.clear();
 	}
 
-	@Override
-	public void setFillstate(int fill, int index) {
-		tank.setFill(fill);
-	}
-
-	@Override
-	public void setType(FluidType type, int index) {
-		tank.setTankType(type);
-	}
-	
-	@Override
-	public void fillFluidInit(FluidType type) {
-		fillFluid(this.xCoord + 4, this.yCoord, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord - 4, this.yCoord, this.zCoord, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord + 4, getTact(), type);
-		fillFluid(this.xCoord, this.yCoord, this.zCoord - 4, getTact(), type);
+	public void fillFluidInit(FluidTank tank) {
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord + 4, this.yCoord, this.zCoord, 4000) || needsUpdate;
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord - 4, this.yCoord, this.zCoord, 4000) || needsUpdate;
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord + 4, 4000) || needsUpdate;
+		needsUpdate = FFUtils.fillFluid(this, tank, worldObj, this.xCoord, this.yCoord, this.zCoord - 4, 4000) || needsUpdate;
 		
 	}
 	
 	@Override
-	public void fillFluid(int x, int y, int z, boolean newTact, FluidType type) {
-		Library.transmitFluid(x, y, z, newTact, this, worldObj, type);
-	}
-	
-	@Override
-	public int getFluidFill(FluidType type) {
-		return tank.getFill();
-	}
-	
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		tank.setFill(i);
-	}
-	
-	@Override
-	public List<IFluidAcceptor> getFluidList(FluidType type) {
-		return list1;
-	}
-	
-	@Override
-	public void clearFluidList(FluidType type) {
-		list1.clear();
-	}
-
-	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tank);
+	public void recievePacket(NBTTagCompound[] tags) {
+		if(tags.length != 1){
+			return;
+		} else {
+			tank.readFromNBT(tags[0]);
+		}
 		
-		return list;
+	}
+	@Override
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		// can't fill
+		return 0;
+	}
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		if(resource != null && resource.getFluid() == tankType){
+			needsUpdate = true;
+			return tank.drain(resource.amount, doDrain);
+		} else {
+			return null;
+		}
+	}
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		if(tank.getFluidAmount() > 0){
+			needsUpdate = true;
+			return tank.drain(maxDrain, doDrain);
+		} else {
+			return null;
+		}
+	}
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		// can't fill
+		return false;
+	}
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		return fluid == tankType;
+	}
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		return new FluidTankInfo[]{tank.getInfo()};
 	}
 }

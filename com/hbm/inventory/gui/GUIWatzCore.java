@@ -2,6 +2,7 @@ package com.hbm.inventory.gui;
 
 import org.lwjgl.opengl.GL11;
 
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.container.ContainerWatzCore;
 import com.hbm.lib.RefStrings;
@@ -9,6 +10,7 @@ import com.hbm.tileentity.machine.TileEntityWatzCore;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -31,8 +33,8 @@ public class GUIWatzCore extends GuiInfoContainer {
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
 
-		diFurnace.tank.renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 106 - 18 - 70, 16, 70);
-		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 152, guiTop + 106 - 70, 16, 70 - 18, diFurnace.power, diFurnace.maxPower);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 106 - 18 - 70, 16, 70, diFurnace.tank, diFurnace.tankType);
+		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 152, guiTop + 106 - 70, 16, 70 - 18, diFurnace.power, TileEntityWatzCore.maxPower);
 	}
 	
 	@Override
@@ -58,7 +60,7 @@ public class GUIWatzCore extends GuiInfoContainer {
 		int l = (int)diFurnace.getPowerScaled(70);
 		drawTexturedModalRect(guiLeft + 152, guiTop + 106 - 18 - l, 192, 70 - l, 16, l);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tank.getSheet());
-		diFurnace.tank.renderTank(this, guiLeft + 134, guiTop + 106 - 18, diFurnace.tank.getTankType().textureX() * FluidTank.x, diFurnace.tank.getTankType().textureY() * FluidTank.y, 16, 70);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+		FFUtils.drawLiquid(diFurnace.tank, guiLeft, guiTop, zLevel, 16, 70, 134, 106 - 18);
 	}
 }

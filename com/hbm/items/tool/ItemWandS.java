@@ -95,12 +95,12 @@ public class ItemWandS extends Item {
 			switch(stack.stackTagCompound.getInteger("building"))
 			{
 			case 0:
-			//	new FactoryTitanium().generate(world, rand, x, up ? y - 2 : y, z);
-				world.setBlock(x, y + 1, z, Blocks.chest, 2, 3);
-				if(world.getBlock(x, y + 1, z) == Blocks.chest)
-				{
-					WeightedRandomChestContent.generateChestContents(rand, HbmChestContents.getLoot(1), (TileEntityChest)world.getTileEntity(x, y + 1, z), 10);
-				}
+				new FactoryTitanium().generate(world, rand, x, up ? y - 2 : y, z);
+				//world.setBlock(x, y + 1, z, Blocks.chest, 2, 3);
+				//if(world.getBlock(x, y + 1, z) == Blocks.chest)
+				//{
+				//	WeightedRandomChestContent.generateChestContents(rand, HbmChestContents.getLoot(1), (TileEntityChest)world.getTileEntity(x, y + 1, z), 10);
+				//}
 				break;
 			case 1:
 				new FactoryAdvanced().generate(world, rand, x, up ? y - 2 : y, z);
