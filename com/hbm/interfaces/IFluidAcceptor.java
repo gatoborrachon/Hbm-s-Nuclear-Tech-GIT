@@ -7,3 +7,5 @@ public interface IFluidAcceptor extends IFluidContainer {
 	int getMaxFluidFill(FluidType type);
 
 }
+
+

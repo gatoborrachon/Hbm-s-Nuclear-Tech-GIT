@@ -2,7 +2,6 @@ package com.hbm.render.tileentity;
 
 import org.lwjgl.opengl.GL11;
 
-import com.hbm.main.MainRegistry;
 import com.hbm.main.ResourceManager;
 import com.hbm.tileentity.machine.TileEntityMachineSeleniumEngine;
 
@@ -48,7 +47,7 @@ public class RenderSelenium extends TileEntitySpecialRenderer {
     		GL11.glRotatef(rot, 0, 0, 1);
         }
 		
-        if(count > 2 && ((TileEntityMachineSeleniumEngine)tileEntity).hasAcceptableFuel() && ((TileEntityMachineSeleniumEngine)tileEntity).tank.getFill() > 0)
+        if(count > 2 && ((TileEntityMachineSeleniumEngine)tileEntity).hasAcceptableFuel() && ((TileEntityMachineSeleniumEngine)tileEntity).tank.getFluidAmount() > 0)
         	GL11.glRotatef((System.currentTimeMillis() / 2) % 360, 0F, 0F, -1F);
 
         bindTexture(ResourceManager.selenium_rotor_tex);

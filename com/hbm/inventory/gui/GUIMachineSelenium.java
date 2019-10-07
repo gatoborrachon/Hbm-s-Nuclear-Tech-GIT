@@ -2,14 +2,13 @@ package com.hbm.inventory.gui;
 
 import org.lwjgl.opengl.GL11;
 
-import com.hbm.inventory.FluidTank;
-import com.hbm.inventory.container.ContainerMachineDiesel;
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.inventory.container.ContainerMachineSelenium;
 import com.hbm.lib.RefStrings;
-import com.hbm.tileentity.machine.TileEntityMachineDiesel;
 import com.hbm.tileentity.machine.TileEntityMachineSeleniumEngine;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -31,7 +30,7 @@ public class GUIMachineSelenium extends GuiInfoContainer {
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
 
-		diFurnace.tank.renderTankInfo(this, mouseX, mouseY, guiLeft + 116, guiTop + 18, 16, 52);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 116, guiTop + 18, 16, 52, diFurnace.tank, diFurnace.tankType);
 		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 8, guiTop + 108, 160, 16, diFurnace.power, diFurnace.powerCap);
 		
 		String[] text = new String[] { "Accepted Fuels:",
@@ -91,7 +90,7 @@ public class GUIMachineSelenium extends GuiInfoContainer {
 			drawTexturedModalRect(guiLeft + 8, guiTop + 108, 0, 222, i, 16);
 		}
 		
-		if(diFurnace.tank.getFill() > 0 && diFurnace.hasAcceptableFuel() && diFurnace.pistonCount > 2)
+		if(diFurnace.tank.getFluidAmount() > 0 && diFurnace.hasAcceptableFuel() && diFurnace.pistonCount > 2)
 		{
 			drawTexturedModalRect(guiLeft + 115, guiTop + 71, 192, 0, 18, 18);
 		}
@@ -111,7 +110,8 @@ public class GUIMachineSelenium extends GuiInfoContainer {
 		this.drawInfoPanel(guiLeft - 16, guiTop + 36, 16, 16, 2);
 		this.drawInfoPanel(guiLeft - 16, guiTop + 36 + 16, 16, 16, 3);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tank.getSheet());
-		diFurnace.tank.renderTank(this, guiLeft + 80 + 36, guiTop + 70, diFurnace.tank.getTankType().textureX() * FluidTank.x, diFurnace.tank.getTankType().textureY() * FluidTank.y, 16, 52);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+		
+		FFUtils.drawLiquid(diFurnace.tank, guiLeft, guiTop, zLevel, 16, 52, 80 + 36, 70);
 	}
 }

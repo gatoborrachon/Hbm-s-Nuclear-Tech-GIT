@@ -3,30 +3,36 @@ package com.hbm.tileentity.machine;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hbm.blocks.ModBlocks;
-import com.hbm.handler.FluidTypeHandler.FluidType;
+import com.hbm.forgefluid.FFUtils;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
 import com.hbm.interfaces.ISource;
-import com.hbm.inventory.FluidContainerRegistry;
-import com.hbm.inventory.FluidTank;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemBattery;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
 import com.hbm.packet.AuxGaugePacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidContainerItem;
+import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityMachineSeleniumEngine extends TileEntity implements ISidedInventory, ISource, IFluidContainer, IFluidAcceptor {
+public class TileEntityMachineSeleniumEngine extends TileEntity implements ISidedInventory, ISource, IFluidHandler, ITankPacketAcceptor {
 
 	private ItemStack slots[];
 
@@ -35,8 +41,10 @@ public class TileEntityMachineSeleniumEngine extends TileEntity implements ISide
 	public static final long maxPower = 250000;
 	public long powerCap = 250000;
 	public int age = 0;
-	public List<IConsumer> list = new ArrayList();
+	public List<IConsumer> list = new ArrayList<IConsumer>();
 	public FluidTank tank;
+	public Fluid tankType;
+	public boolean needsUpdate;
 	public int pistonCount = 0;
 
 	private static final int[] slots_top = new int[] { 0 };
@@ -47,7 +55,9 @@ public class TileEntityMachineSeleniumEngine extends TileEntity implements ISide
 
 	public TileEntityMachineSeleniumEngine() {
 		slots = new ItemStack[14];
-		tank = new FluidTank(FluidType.DIESEL, 16000, 0);
+		tank = new FluidTank(16000);
+		tankType = ModForgeFluids.diesel;
+		needsUpdate = false;
 	}
 
 	@Override
@@ -119,7 +129,7 @@ public class TileEntityMachineSeleniumEngine extends TileEntity implements ISide
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack stack) {
 		if (i == 9)
-			if (FluidContainerRegistry.getFluidContent(stack, tank.getTankType()) > 0)
+			if ((FluidContainerRegistry.isFilledContainer(stack) && isValidFluidForTank(-1, FluidContainerRegistry.getFluidForFilledItem(stack))) || (stack.getItem() instanceof IFluidContainerItem && isValidFluidForTank(-1, ((IFluidContainerItem)stack.getItem()).getFluid(stack))))
 				return true;
 		if (i == 13)
 			if (stack.getItem() instanceof ItemBattery)
@@ -154,7 +164,8 @@ public class TileEntityMachineSeleniumEngine extends TileEntity implements ISide
 
 		this.power = nbt.getLong("powerTime");
 		this.powerCap = nbt.getLong("powerCap");
-		tank.readFromNBT(nbt, "fuel");
+		tank.readFromNBT(nbt);
+		tankType = FluidRegistry.getFluid(nbt.getInteger("tankType"));
 		slots = new ItemStack[getSizeInventory()];
 
 		for (int i = 0; i < list.tagCount(); i++) {
@@ -171,7 +182,8 @@ public class TileEntityMachineSeleniumEngine extends TileEntity implements ISide
 		super.writeToNBT(nbt);
 		nbt.setLong("powerTime", power);
 		nbt.setLong("powerCap", powerCap);
-		tank.writeToNBT(nbt, "fuel");
+		tank.writeToNBT(nbt);
+		nbt.setInteger("tankType", FluidRegistry.getFluidID(tankType));
 		NBTTagList list = new NBTTagList();
 
 		for (int i = 0; i < slots.length; i++) {
@@ -213,7 +225,9 @@ public class TileEntityMachineSeleniumEngine extends TileEntity implements ISide
 
 	@Override
 	public void updateEntity() {
-		
+		if(tank.getFluid() != null){
+			tankType = tank.getFluid().getFluid();
+		}
 		if (!worldObj.isRemote) {
 			
 			age++;
@@ -227,12 +241,11 @@ public class TileEntityMachineSeleniumEngine extends TileEntity implements ISide
 			pistonCount = countPistons();
 
 			//Tank Management
-			tank.setType(11, 12, slots);
-			tank.loadTank(9, 10, slots);
-			tank.updateTank(xCoord, yCoord, zCoord);
+			if(inputValidForTank(-1, 9))
+				if(FFUtils.fillFromFluidContainer(slots, tank, 9, 10))
+					needsUpdate = true;
 
-			FluidType type = tank.getTankType();
-			if(type.name().equals(FluidType.NITAN.name()))
+			if(tankType == ModForgeFluids.nitan)
 				powerCap = maxPower * 10;
 			else
 				powerCap = maxPower;
@@ -243,6 +256,10 @@ public class TileEntityMachineSeleniumEngine extends TileEntity implements ISide
 			if(this.pistonCount > 2)
 				generate();
 
+			if(needsUpdate){
+				PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[]{tank}));
+				needsUpdate = false;
+			}
 			PacketDispatcher.wrapper.sendToAll(new AuxElectricityPacket(xCoord, yCoord, zCoord, power));
 			PacketDispatcher.wrapper.sendToAll(new AuxGaugePacket(xCoord, yCoord, zCoord, pistonCount, 0));
 			PacketDispatcher.wrapper.sendToAll(new AuxGaugePacket(xCoord, yCoord, zCoord, (int)powerCap, 1));
@@ -265,29 +282,28 @@ public class TileEntityMachineSeleniumEngine extends TileEntity implements ISide
 	}
 	
 	public int getHEFromFuel() {
-		FluidType type = tank.getTankType();
-		if(type.name().equals(FluidType.SMEAR.name()))
+		if(tankType == ModForgeFluids.smear)
 			return 50;
-		if(type.name().equals(FluidType.HEATINGOIL.name()))
+		if(tankType == ModForgeFluids.heatingoil)
 			return 75;
-		if(type.name().equals(FluidType.DIESEL.name()))
+		if(tankType == ModForgeFluids.diesel)
 			return 225;
-		if(type.name().equals(FluidType.KEROSENE.name()))
+		if(tankType == ModForgeFluids.kerosene)
 			return 300;
-		if(type.name().equals(FluidType.RECLAIMED.name()))
+		if(tankType == ModForgeFluids.reclaimed)
 			return 100;
-		if(type.name().equals(FluidType.PETROIL.name()))
+		if(tankType == ModForgeFluids.petroil)
 			return 125;
-		if(type.name().equals(FluidType.BIOFUEL.name()))
+		if(tankType == ModForgeFluids.biofuel)
 			return 200;
-		if(type.name().equals(FluidType.NITAN.name()))
+		if(tankType == ModForgeFluids.nitan)
 			return 2500;
 		return 0;
 	}
 
 	public void generate() {
 		if (hasAcceptableFuel()) {
-			if (tank.getFill() > 0) {
+			if (tank.getFluidAmount() > 0) {
 				if (soundCycle == 0) {
 					//if (tank.getTankType().name().equals(FluidType.) > 0)
 					//	this.worldObj.playSoundEffect(this.xCoord, this.yCoord, this.zCoord, "fireworks.blast", 1.0F, 1.0F);
@@ -299,9 +315,8 @@ public class TileEntityMachineSeleniumEngine extends TileEntity implements ISide
 				if (soundCycle >= 3)
 					soundCycle = 0;
 
-				tank.setFill(tank.getFill() - this.pistonCount * 5);
-				if (tank.getFill() < 0)
-					tank.setFill(0);
+				tank.drain(this.pistonCount * 5, true);
+				needsUpdate = true;
 
 				power += getHEFromFuel() * Math.pow(this.pistonCount, 1.15D);
 					
@@ -311,6 +326,24 @@ public class TileEntityMachineSeleniumEngine extends TileEntity implements ISide
 		}
 	}
 
+	protected boolean inputValidForTank(int tank, int slot){
+		if(slots[slot] != null && this.tank != null){
+			if(slots[slot].getItem() instanceof IFluidContainerItem && isValidFluidForTank(tank, ((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]))){
+				return true;
+			}
+			if(FluidContainerRegistry.isFilledContainer(slots[slot]) && isValidFluidForTank(tank, FluidContainerRegistry.getFluidForFilledItem(slots[slot]))){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isValidFluidForTank(int tank, FluidStack stack) {
+		if(stack == null || this.tank == null)
+			return false;
+		Fluid f = stack.getFluid();
+		return this.tank.getFluid() != null ? f == this.tank.getFluid().getFluid() :(f == ModForgeFluids.smear || f == ModForgeFluids.heatingoil || f == ModForgeFluids.diesel || f == ModForgeFluids.kerosene || f == ModForgeFluids.reclaimed || f == ModForgeFluids.petroil || f == ModForgeFluids.biofuel || f == ModForgeFluids.nitan);
+	}
 	@Override
 	public void ffgeua(int x, int y, int z, boolean newTact) {
 		
@@ -352,36 +385,49 @@ public class TileEntityMachineSeleniumEngine extends TileEntity implements ISide
 	}
 
 	@Override
-	public void setFillstate(int fill, int index) {
-		tank.setFill(fill);
-	}
-
-	@Override
-	public void setType(FluidType type, int index) {
-		tank.setTankType(type);
-	}
-
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		return type.name().equals(this.tank.getTankType().name()) ? tank.getMaxFill() : 0;
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		return type.name().equals(this.tank.getTankType().name()) ? tank.getFill() : 0;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tank.getTankType().name()))
-			tank.setFill(i);
-	}
-
-	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tank);
+	public void recievePacket(NBTTagCompound[] tags) {
+		if(tags.length != 1){
+			return;
+		} else {
+			tank.readFromNBT(tags[0]);
+		}
 		
-		return list;
+	}
+
+	@Override
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		if(isValidFluidForTank(-1, resource)){
+			needsUpdate = true;
+			return tank.fill(resource, doFill);
+		} else {
+			return 0;
+		}
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		// can't drain
+		return null;
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		// can't drain
+		return null;
+	}
+
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		return false;
+	}
+
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		return isValidFluidForTank(-1, new FluidStack(fluid, 0));
+	}
+
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		return new FluidTankInfo[]{tank.getInfo()};
 	}
 }

@@ -1,7 +1,6 @@
 package com.hbm.inventory.container;
 
 import com.hbm.inventory.SlotMachineOutput;
-import com.hbm.tileentity.bomb.TileEntityCelPrime;
 import com.hbm.tileentity.machine.TileEntityMachineSeleniumEngine;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -34,8 +33,9 @@ private TileEntityMachineSeleniumEngine seleniumEngine;
 		this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 10, 80, 54));
 		
 		//Fluid IDs
-		this.addSlotToContainer(new Slot(tedf, 11, 152, 18));
-		this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 12, 152, 54));
+		//Drillgon200 don't need this.
+		//this.addSlotToContainer(new Slot(tedf, 11, 152, 18));
+		//this.addSlotToContainer(new SlotMachineOutput(invPlayer.player, tedf, 12, 152, 54));
 		
 		//Battery
 		this.addSlotToContainer(new Slot(tedf, 13, 116, 90));
