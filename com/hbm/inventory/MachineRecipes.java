@@ -492,15 +492,16 @@ public class MachineRecipes {
 
 	}
 	
-	//return: FluidType, amount produced, amount required, HE produced
-	@SuppressWarnings("incomplete-switch")
-	public static Object[] getTurbineOutput(FluidType type) {
+	//return: Fluid, amount produced, amount required, HE produced
+	public static Object[] getTurbineOutput(Fluid type) {
 		
 		switch(type) {
 		case STEAM: return new Object[] { FluidType.WATER, 5, 500, 50 };
 		case HOTSTEAM: return new Object[] { FluidType.STEAM, 50, 5, 100 };
 		case SUPERHOTSTEAM: return new Object[] { FluidType.HOTSTEAM, 50, 5, 150 };
 		}
+		
+		if(type == ModForgeFluids.steam)
 		
 		return null;
 	}

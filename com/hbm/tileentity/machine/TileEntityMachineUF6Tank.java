@@ -1,12 +1,11 @@
 package com.hbm.tileentity.machine;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.hbm.handler.FluidTypeHandler.FluidType;
-import com.hbm.interfaces.IFluidContainer;
-import com.hbm.inventory.FluidTank;
+import com.hbm.forgefluid.FFUtils;
+import com.hbm.forgefluid.ModForgeFluids;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
+import com.hbm.packet.FluidTankPacket;
+import com.hbm.packet.PacketDispatcher;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -17,13 +16,20 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.IFluidContainerItem;
 
-public class TileEntityMachineUF6Tank extends TileEntity implements ISidedInventory, IFluidContainer {
+public class TileEntityMachineUF6Tank extends TileEntity implements ISidedInventory, ITankPacketAcceptor {
 
 	private ItemStack slots[];
 	
 	//public static final int maxFill = 64 * 3;
 	public FluidTank tank;
+	public Fluid tankType;
+	public boolean needsUpdate;
 
 	private static final int[] slots_top = new int[] {0};
 	private static final int[] slots_bottom = new int[] {1, 3};
@@ -33,7 +39,9 @@ public class TileEntityMachineUF6Tank extends TileEntity implements ISidedInvent
 	
 	public TileEntityMachineUF6Tank() {
 		slots = new ItemStack[4];
-		tank = new FluidTank(FluidType.UF6, 64000, 0);
+		tank = new FluidTank(64000);
+		tankType = ModForgeFluids.uf6;
+		needsUpdate = false;
 	}
 
 	@Override
@@ -140,8 +148,8 @@ public class TileEntityMachineUF6Tank extends TileEntity implements ISidedInvent
 		
 		slots = new ItemStack[getSizeInventory()];
 		
-		tank.readFromNBT(nbt, "content");
-		
+		tank.readFromNBT(nbt);
+		tankType = ModForgeFluids.uf6;
 		for(int i = 0; i < list.tagCount(); i++)
 		{
 			NBTTagCompound nbt1 = list.getCompoundTagAt(i);
@@ -158,7 +166,7 @@ public class TileEntityMachineUF6Tank extends TileEntity implements ISidedInvent
 		super.writeToNBT(nbt);
 		NBTTagList list = new NBTTagList();
 		
-		tank.writeToNBT(nbt, "content");
+		tank.writeToNBT(nbt);
 		
 		for(int i = 0; i < slots.length; i++)
 		{
@@ -194,12 +202,35 @@ public class TileEntityMachineUF6Tank extends TileEntity implements ISidedInvent
 
 		if(!worldObj.isRemote)
 		{
-			tank.loadTank(0, 1, slots);
-			tank.unloadTank(2, 3, slots);
-			tank.updateTank(xCoord, yCoord, zCoord);
+			if(inputValidForTank(-1, 0))
+				if(FFUtils.fillFromFluidContainer(slots, tank, 0, 1))
+					needsUpdate = true;
+			if(FFUtils.fillFluidContainer(slots, tank, 2, 3))
+				needsUpdate = true;
+			if(needsUpdate){
+				PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[]{tank}));
+				needsUpdate = false;
+			}
 		}
 	}
 	
+	protected boolean inputValidForTank(int irrelevant, int slot){
+		if(slots[slot] != null && tank != null){
+			if(slots[slot].getItem() instanceof IFluidContainerItem && isValidFluidForTank(irrelevant, ((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]))){
+				return true;
+			}
+			if(FluidContainerRegistry.isFilledContainer(slots[slot]) && isValidFluidForTank(irrelevant, FluidContainerRegistry.getFluidForFilledItem(slots[slot]))){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isValidFluidForTank(int irrelevant, FluidStack stack) {
+		if(stack == null || tank == null)
+			return false;
+		return stack.getFluid() == tankType;
+	}
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
 		return TileEntity.INFINITE_EXTENT_AABB;
@@ -213,31 +244,12 @@ public class TileEntityMachineUF6Tank extends TileEntity implements ISidedInvent
 	}
 
 	@Override
-	public void setFillstate(int fill, int index) {
-		tank.setFill(fill);
-	}
-
-	@Override
-	public void setType(FluidType type, int index) {
-		tank.setTankType(type);
-	}
-
-	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tank);
+	public void recievePacket(NBTTagCompound[] tags) {
+		if(tags.length != 1){
+			return;
+		} else {
+			tank.readFromNBT(tags[0]);
+		}
 		
-		return list;
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		return type.name().equals(this.tank.getTankType().name()) ? tank.getFill() : 0;
-	}
-
-	@Override
-	public void setFluidFill(int i, FluidType type) {
-		if(type.name().equals(tank.getTankType().name()))
-			tank.setFill(i);
 	}
 }
