@@ -2,13 +2,14 @@ package com.hbm.inventory.gui;
 
 import org.lwjgl.opengl.GL11;
 
-import com.hbm.handler.FluidTypeHandler.FluidType;
-import com.hbm.inventory.FluidTank;
+import com.hbm.forgefluid.FFUtils;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.inventory.container.ContainerMachineTurbine;
 import com.hbm.lib.RefStrings;
 import com.hbm.tileentity.machine.TileEntityMachineTurbine;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -30,16 +31,16 @@ public class GUIMachineTurbine extends GuiInfoContainer {
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
 
-		diFurnace.tanks[0].renderTankInfo(this, mouseX, mouseY, guiLeft + 62, guiTop + 69 - 52, 16, 52);
-		diFurnace.tanks[1].renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 69 - 52, 16, 52);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 62, guiTop + 69 - 52, 16, 52, diFurnace.tanks[0], diFurnace.tankTypes[0]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 69 - 52, 16, 52, diFurnace.tanks[1], diFurnace.tankTypes[1]);
 		
-		if(diFurnace.tanks[1].getTankType().name().equals(FluidType.NONE.name())) {
-			
-			String[] text2 = new String[] { "Error: Invalid fluid!" };
-			this.drawCustomInfoStat(mouseX, mouseY, guiLeft - 16, guiTop + 36 + 32, 16, 16, guiLeft - 8, guiTop + 36 + 16 + 32, text2);
-		}
+	//	if(diFurnace.tanks[1].getTankType().name().equals(FluidType.NONE.name())) {
+	//		
+	//		String[] text2 = new String[] { "Error: Invalid fluid!" };
+	//		this.drawCustomInfoStat(mouseX, mouseY, guiLeft - 16, guiTop + 36 + 32, 16, 16, guiLeft - 8, guiTop + 36 + 16 + 32, text2);
+	//	}
 		
-		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 123, guiTop + 69 - 34, 7, 34, diFurnace.power, diFurnace.maxPower);
+		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 123, guiTop + 69 - 34, 7, 34, diFurnace.power, TileEntityMachineTurbine.maxPower);
 	}
 	
 	@Override
@@ -56,27 +57,26 @@ public class GUIMachineTurbine extends GuiInfoContainer {
 		Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
 		drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 
-		if(diFurnace.tanks[0].getTankType().name().equals(FluidType.STEAM.name())) {
+		if(diFurnace.tankTypes[0] == ModForgeFluids.steam) {
 			drawTexturedModalRect(guiLeft + 99, guiTop + 18, 183, 0, 14, 14);
 		}
-		if(diFurnace.tanks[0].getTankType().name().equals(FluidType.HOTSTEAM.name())) {
+		if(diFurnace.tankTypes[0] == ModForgeFluids.hotsteam) {
 			drawTexturedModalRect(guiLeft + 99, guiTop + 18, 183, 14, 14, 14);
 		}
-		if(diFurnace.tanks[0].getTankType().name().equals(FluidType.SUPERHOTSTEAM.name())) {
+		if(diFurnace.tankTypes[0] == ModForgeFluids.superhotsteam) {
 			drawTexturedModalRect(guiLeft + 99, guiTop + 18, 183, 28, 14, 14);
 		}
 
 		int i = (int)diFurnace.getPowerScaled(34);
 		drawTexturedModalRect(guiLeft + 123, guiTop + 69 - i, 176, 34 - i, 7, i);
 		
-		if(diFurnace.tanks[1].getTankType().name().equals(FluidType.NONE.name())) {
-			this.drawInfoPanel(guiLeft - 16, guiTop + 36 + 32, 16, 16, 6);
-		}
+	//	if(diFurnace.tanks[1].getTankType().name().equals(FluidType.NONE.name())) {
+	//		this.drawInfoPanel(guiLeft - 16, guiTop + 36 + 32, 16, 16, 6);
+	//	}
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tanks[0].getSheet());
-		diFurnace.tanks[0].renderTank(this, guiLeft + 62, guiTop + 69, diFurnace.tanks[0].getTankType().textureX() * FluidTank.x, diFurnace.tanks[0].getTankType().textureY() * FluidTank.y, 16, 52);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(diFurnace.tanks[1].getSheet());
-		diFurnace.tanks[1].renderTank(this, guiLeft + 134, guiTop + 69, diFurnace.tanks[1].getTankType().textureX() * FluidTank.x, diFurnace.tanks[1].getTankType().textureY() * FluidTank.y, 16, 52);
+		FFUtils.drawLiquid(diFurnace.tanks[0], guiLeft, guiTop, zLevel, 16, 52, 62, 69);
+		FFUtils.drawLiquid(diFurnace.tanks[1], guiLeft, guiTop, zLevel, 16, 52, 134, 69);
 	}
 }

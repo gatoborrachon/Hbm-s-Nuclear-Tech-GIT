@@ -467,14 +467,6 @@ public class MachineRecipes {
 			return 100;
 	}
 	
-	private static List<ItemStack> addToListWithWeight(List<ItemStack> list, ItemStack stack, int weight) {
-		
-		for(int i = 0; i < weight; i++)
-			list.add(stack);
-		
-		return list;
-	}
-	
 	//return: FluidType, amount produced, amount required, heat required (°C * 100)
 	public static Object[] getBoilerOutput(Fluid type) {
 		
@@ -495,13 +487,13 @@ public class MachineRecipes {
 	//return: Fluid, amount produced, amount required, HE produced
 	public static Object[] getTurbineOutput(Fluid type) {
 		
-		switch(type) {
-		case STEAM: return new Object[] { FluidType.WATER, 5, 500, 50 };
-		case HOTSTEAM: return new Object[] { FluidType.STEAM, 50, 5, 100 };
-		case SUPERHOTSTEAM: return new Object[] { FluidType.HOTSTEAM, 50, 5, 150 };
+		if(type == ModForgeFluids.steam) {
+			return new Object[] {FluidRegistry.WATER, 5, 500, 50};
+		} else if(type == ModForgeFluids.hotsteam) {
+			return new Object[] {ModForgeFluids.steam, 50, 5, 100};
+		} else if(type == ModForgeFluids.superhotsteam) {
+			return new Object[] {ModForgeFluids.hotsteam, 50, 5, 150};
 		}
-		
-		if(type == ModForgeFluids.steam)
 		
 		return null;
 	}
@@ -4837,7 +4829,6 @@ public class MachineRecipes {
         			if(listIn.get(j) != null)
         				inputs[j + 2] = listIn.get(j).copy();
         	
-        	FluidStack[] fluidIn = MachineRecipes.getFluidInputFromTempate(inputs[6]);
         	/*for(int j = 0; j < fluidIn.length; j++)
         		if(fluidIn[j] != null)
         			inputs[j] = ItemFluidIcon.addQuantity(new ItemStack(ModItems.fluid_icon, 1, Arrays.asList(FluidType.values()).indexOf(fluidIn[j].type)), fluidIn[j].fill);
@@ -4846,12 +4837,6 @@ public class MachineRecipes {
         	for(int j = 0; j < listOut.length; j++)
         		if(listOut[j] != null)
         			outputs[j + 2] = listOut[j].copy();
-        	
-        	FluidStack[] fluidOut = MachineRecipes.getFluidOutputFromTempate(inputs[6]);
-        	//TODO Find a way to do this later
-        //	for(int j = 0; j < fluidOut.length; j++)
-        	//	if(fluidOut[j] != null)
-        	//		outputs[j] = ItemFluidIcon.addQuantity(new ItemStack(ModItems.fluid_icon, 1, Arrays.asList(FluidType.values()).indexOf(fluidOut[j].type)), fluidOut[j].fill);
         	
         	for(int j = 0; j < inputs.length; j++)
         		if(inputs[j] == null)

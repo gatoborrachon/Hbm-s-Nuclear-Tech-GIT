@@ -12,7 +12,6 @@ import com.hbm.inventory.MachineRecipes;
 import com.hbm.items.special.ItemBattery;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
-import com.hbm.packet.AuxGaugePacket;
 import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
 
@@ -22,7 +21,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
@@ -248,8 +246,17 @@ public class TileEntityMachineTurbine extends TileEntity implements ISidedInvent
 	@Override
 	public void updateEntity() {
 		
-		boolean mark = false;
+		if(tanks[0].getFluid() != null) {
+			tankTypes[0] = tanks[0].getFluid().getFluid();
+			Object[] duck = MachineRecipes.getTurbineOutput(tankTypes[0]);
+			if(duck != null) {
+				tankTypes[1] = (Fluid) duck[0];
+			}
+		}
 		
+		if(tanks[1].getFluid() != null) {
+			tankTypes[1] = tanks[1].getFluid().getFluid();
+		}
 		if(!worldObj.isRemote)
 		{
 			age++;
@@ -262,24 +269,36 @@ public class TileEntityMachineTurbine extends TileEntity implements ISidedInvent
 			ffgeuaInit();
 
 			if(inputValidForTank(0, 2))
-				if(FFUtils.fillFromFluidContainer(slots, tanks[0], 2, 3))
+				if(FFUtils.fillFromFluidContainer(slots, tanks[0], 2, 3)) {
 					needsUpdate = true;
+					if(tanks[0].getFluid() != null) {
+						tankTypes[0] = tanks[0].getFluid().getFluid();
+					}
+				}
 			
 			Object[] outs = MachineRecipes.getTurbineOutput(tanks[0].getFluid() == null ? null : tanks[0].getFluid().getFluid());
 			
 			if(outs == null) {
+				
 			} else {
 				tankTypes[1] = ((Fluid) outs[0]);
 				
 				for(int i = 0; i < 1200; i++) {
 					if(tanks[0].getFluidAmount() >= (Integer)outs[2] && tanks[1].getFluidAmount() + (Integer)outs[1] <= tanks[1].getCapacity()) {
 						tanks[0].drain((Integer)outs[2], true);
+						
+						// Empty tank if it doesn't match the machine recipe
+						if(tanks[1].getFluid() != null && tanks[1].getFluid().getFluid() != tankTypes[1]) {
+							tanks[1].drain(tanks[1].getCapacity(), true);
+						}
+						
 						tanks[1].fill(new FluidStack(tankTypes[1], (Integer)outs[1]), true);
 						
 						power += (Integer)outs[3];
 						
 						if(power > maxPower)
 							power = maxPower;
+						needsUpdate = true;
 					} else {
 						break;
 					}
@@ -313,7 +332,7 @@ public class TileEntityMachineTurbine extends TileEntity implements ISidedInvent
 	private boolean isValidFluidForTank(int tank, FluidStack stack) {
 		if(stack == null || tanks[tank] == null)
 			return false;
-		return stack.getFluid() == tankTypes[tank];
+		return stack.getFluid() == ModForgeFluids.steam || stack.getFluid() == ModForgeFluids.hotsteam || stack.getFluid() == ModForgeFluids.superhotsteam;
 	}
 
 	@Override
@@ -322,6 +341,15 @@ public class TileEntityMachineTurbine extends TileEntity implements ISidedInvent
 		Library.ffgeua(x, y, z, newTact, this, worldObj);
 	}
 
+	@Override
+	public boolean getTact() {
+		if(age == 0)
+		{
+			return true;
+		}
+		
+		return false;
+	}
 	@Override
 	public void ffgeuaInit() {
 		ffgeua(this.xCoord, this.yCoord + 1, this.zCoord, getTact());
@@ -375,38 +403,50 @@ public class TileEntityMachineTurbine extends TileEntity implements ISidedInvent
 
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-		// TODO Auto-generated method stub
-		return 0;
+		if(isValidFluidForTank(0, resource) && resource.amount > 0){
+			needsUpdate = true;
+			if(tanks[0].getFluid() != null) {
+				tankTypes[0] = tanks[0].getFluid().getFluid();
+			}
+			return tanks[0].fill(resource, doFill);
+		} else {
+			return 0;
+		}
 	}
 
 	@Override
-	public FluidStack drain(ForgeDirection from, FluidStack resource,
-			boolean doDrain) {
-		// TODO Auto-generated method stub
-		return null;
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		if(resource != null && resource.getFluid() == tankTypes[1] && resource.amount > 0) {
+			needsUpdate = true;
+			return tanks[1].drain(resource.amount, doDrain);
+		} else {
+			return null;
+		}
 	}
 
 	@Override
 	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		// TODO Auto-generated method stub
-		return null;
+		if(maxDrain > 0) {
+			needsUpdate = true;
+			return tanks[1].drain(maxDrain, doDrain);
+		} else {
+			return null;
+		}
 	}
 
 	@Override
 	public boolean canFill(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
-		return false;
+		return fluid == ModForgeFluids.hotsteam || fluid == ModForgeFluids.steam || fluid == ModForgeFluids.superhotsteam;
 	}
 
 	@Override
 	public boolean canDrain(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
-		return false;
+		return fluid == tankTypes[1];
 	}
 
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-		// TODO Auto-generated method stub
-		return null;
+		return new FluidTankInfo[] {tanks[0].getInfo(), tanks[1].getInfo()};
 	}
+
 }
