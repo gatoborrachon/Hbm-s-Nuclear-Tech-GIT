@@ -58,7 +58,7 @@ public class DummyBlockMachine extends BlockContainer implements IDummy {
 
 	@Override
 	public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
-		if(this == ModBlocks.dummy_port_reactor_small){
+		if(this == ModBlocks.dummy_port_reactor_small || this == ModBlocks.dummy_port_launch_table || this == ModBlocks.dummy_port_compact_launcher){
 			return new TileEntityDummyFluidPort();
 		} else {
 			return new TileEntityDummy();
