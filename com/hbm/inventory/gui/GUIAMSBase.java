@@ -3,7 +3,6 @@ package com.hbm.inventory.gui;
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.forgefluid.FFUtils;
-import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.container.ContainerAMSBase;
 import com.hbm.lib.RefStrings;
 import com.hbm.tileentity.machine.TileEntityAMSBase;

@@ -1,6 +1,5 @@
 package com.hbm.render.misc;
 
-import com.hbm.items.ModItems;
 import com.hbm.lib.Library;
 import com.hbm.lib.RefStrings;
 import com.hbm.main.MainRegistry;

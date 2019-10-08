@@ -11,7 +11,6 @@ import com.hbm.packet.AuxElectricityPacket;
 import com.hbm.packet.LoopedSoundPacket;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.packet.TEDrillPacket;
-import com.hbm.packet.TEDrillSoundPacket;
 import com.hbm.sound.SoundLoopMachine;
 
 import cpw.mods.fml.relauncher.Side;
@@ -28,7 +27,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class TileEntityMachineMiningDrill extends TileEntity implements ISidedInventory, IConsumer {
 

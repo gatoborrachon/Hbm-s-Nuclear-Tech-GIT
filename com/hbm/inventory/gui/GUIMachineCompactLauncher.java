@@ -2,22 +2,15 @@ package com.hbm.inventory.gui;
 
 import org.lwjgl.opengl.GL11;
 
-import com.hbm.inventory.FluidTank;
+import com.hbm.forgefluid.FFUtils;
 import com.hbm.inventory.container.ContainerCompactLauncher;
-import com.hbm.inventory.container.ContainerMachineMissileAssembly;
 import com.hbm.items.weapon.ItemCustomMissile;
-import com.hbm.items.weapon.ItemMissile;
 import com.hbm.lib.RefStrings;
-import com.hbm.packet.AuxButtonPacket;
-import com.hbm.packet.PacketDispatcher;
 import com.hbm.render.misc.MissileMultipart;
-import com.hbm.render.misc.MissilePart;
 import com.hbm.render.misc.MissilePronter;
 import com.hbm.tileentity.bomb.TileEntityCompactLauncher;
-import com.hbm.tileentity.machine.TileEntityMachineMissileAssembly;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -40,10 +33,11 @@ public class GUIMachineCompactLauncher extends GuiInfoContainer {
 	public void drawScreen(int mouseX, int mouseY, float f) {
 		super.drawScreen(mouseX, mouseY, f);
 
-		launcher.tanks[0].renderTankInfo(this, mouseX, mouseY, guiLeft + 116, guiTop + 88 - 52, 16, 52);
-		launcher.tanks[1].renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 88 - 52, 16, 52);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 116, guiTop + 88 - 52, 16, 52, launcher.tanks[0], launcher.tankTypes[0]);
+		FFUtils.renderTankInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 88 - 52, 16, 52, launcher.tanks[1], launcher.tankTypes[1]);
+		
 		this.drawCustomInfo(this, mouseX, mouseY, guiLeft + 152, guiTop + 88 - 52, 16, 52, new String[] { "Solid Fuel: " + launcher.solid + "l" });
-		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 113, 34, 6, launcher.power, launcher.maxPower);
+		this.drawElectricityInfo(this, mouseX, mouseY, guiLeft + 134, guiTop + 113, 34, 6, launcher.power, TileEntityCompactLauncher.maxPower);
 
 		String[] text = new String[] { "Only accepts custom missiles", "of size 10 and 10/15." };
 		this.drawCustomInfoStat(mouseX, mouseY, guiLeft - 16, guiTop + 36, 16, 16, guiLeft - 8, guiTop + 36 + 16, text);
@@ -96,11 +90,10 @@ public class GUIMachineCompactLauncher extends GuiInfoContainer {
 		this.drawInfoPanel(guiLeft - 16, guiTop + 36, 16, 16, 2);
 		this.drawInfoPanel(guiLeft - 16, guiTop + 36 + 16, 16, 16, 11);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(launcher.tanks[0].getSheet());
-		launcher.tanks[0].renderTank(this, guiLeft + 116, guiTop + 88, launcher.tanks[0].getTankType().textureX() * FluidTank.x, launcher.tanks[0].getTankType().textureY() * FluidTank.y, 16, 52);
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 		
-		Minecraft.getMinecraft().getTextureManager().bindTexture(launcher.tanks[1].getSheet());
-		launcher.tanks[1].renderTank(this, guiLeft + 134, guiTop + 88, launcher.tanks[1].getTankType().textureX() * FluidTank.x, launcher.tanks[1].getTankType().textureY() * FluidTank.y, 16, 52);
+		FFUtils.drawLiquid(launcher.tanks[0], guiLeft, guiTop, zLevel, 16, 52, 116, 88);
+		FFUtils.drawLiquid(launcher.tanks[1], guiLeft, guiTop, zLevel, 16, 52, 134, 88);
 		
 		/// DRAW MISSILE START
 		GL11.glPushMatrix();

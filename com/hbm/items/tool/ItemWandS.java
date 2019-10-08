@@ -3,43 +3,18 @@ package com.hbm.items.tool;
 import java.util.List;
 import java.util.Random;
 
-import com.hbm.blocks.ModBlocks;
-import com.hbm.lib.HbmChestContents;
-import com.hbm.tileentity.machine.TileEntitySafe;
-import com.hbm.world.Antenna;
-import com.hbm.world.Barrel;
-import com.hbm.world.Bunker;
-import com.hbm.world.CrashedVertibird;
-import com.hbm.world.DesertAtom001;
-import com.hbm.world.DesertAtom002;
-import com.hbm.world.DesertAtom003;
-import com.hbm.world.Dud;
 import com.hbm.world.FWatz;
-import com.hbm.world.Factory;
 import com.hbm.world.FactoryAdvanced;
 import com.hbm.world.FactoryTitanium;
 import com.hbm.world.FusionReactor;
-import com.hbm.world.Geyser;
-import com.hbm.world.GeyserLarge;
-import com.hbm.world.LibraryDungeon;
-import com.hbm.world.Meteorite;
 import com.hbm.world.NuclearReactor;
-import com.hbm.world.Radio01;
-import com.hbm.world.Relay;
-import com.hbm.world.Satellite;
-import com.hbm.world.Silo;
-import com.hbm.world.Spaceship;
-import com.hbm.world.Vertibird;
 import com.hbm.world.Watz;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 
 public class ItemWandS extends Item {

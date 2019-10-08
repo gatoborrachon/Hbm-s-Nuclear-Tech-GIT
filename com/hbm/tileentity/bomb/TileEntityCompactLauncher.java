@@ -1,25 +1,23 @@
 package com.hbm.tileentity.bomb;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.hbm.entity.missile.EntityMissileCustom;
-import com.hbm.handler.FluidTypeHandler.FluidType;
+import com.hbm.forgefluid.FFUtils;
+import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.handler.MissileStruct;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
-import com.hbm.interfaces.IFluidContainer;
-import com.hbm.inventory.FluidTank;
+import com.hbm.interfaces.ITankPacketAcceptor;
 import com.hbm.items.ModItems;
 import com.hbm.items.weapon.ItemCustomMissile;
 import com.hbm.items.weapon.ItemMissile;
 import com.hbm.items.weapon.ItemMissile.FuelType;
 import com.hbm.items.weapon.ItemMissile.PartSize;
-import com.hbm.items.weapon.ItemMissile.PartType;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
 import com.hbm.packet.AuxElectricityPacket;
 import com.hbm.packet.AuxGaugePacket;
+import com.hbm.packet.FluidTankPacket;
 import com.hbm.packet.PacketDispatcher;
 import com.hbm.packet.TEMissileMultipartPacket;
 
@@ -35,8 +33,17 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidContainerItem;
+import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityCompactLauncher extends TileEntity implements ISidedInventory, IConsumer, IFluidContainer, IFluidAcceptor {
+public class TileEntityCompactLauncher extends TileEntity implements ISidedInventory, IConsumer, IFluidHandler, ITankPacketAcceptor {
 
 	private ItemStack slots[];
 
@@ -45,6 +52,8 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 	public int solid;
 	public static final int maxSolid = 25000;
 	public FluidTank[] tanks;
+	public Fluid[] tankTypes;
+	public boolean needsUpdate;
 	
 	public MissileStruct load;
 
@@ -55,8 +64,12 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 	public TileEntityCompactLauncher() {
 		slots = new ItemStack[6];
 		tanks = new FluidTank[2];
-		tanks[0] = new FluidTank(FluidType.NONE, 25000, 0);
-		tanks[1] = new FluidTank(FluidType.NONE, 25000, 1);
+		tankTypes = new Fluid[2];
+		tanks[0] = new FluidTank(25000);
+		tankTypes[0] = null;
+		tanks[1] = new FluidTank(25000);
+		tankTypes[1] = null;
+		needsUpdate = false;
 	}
 
 	@Override
@@ -164,11 +177,13 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 			
 			updateTypes();
 
-			tanks[0].loadTank(2, 3, slots);
-			tanks[1].loadTank(2, 3, slots);
+			if(this.inputValidForTank(0, 2))
+				if(FFUtils.fillFromFluidContainer(slots, tanks[0], 2, 3))
+					needsUpdate = true;
+			if(this.inputValidForTank(1, 2))
+				if(FFUtils.fillFromFluidContainer(slots, tanks[2], 2, 3))
+					needsUpdate = true;
 
-			for (int i = 0; i < 2; i++)
-				tanks[i].updateTank(xCoord, yCoord, zCoord);
 			
 			power = Library.chargeTEFromItems(slots, 5, power, maxPower);
 			
@@ -178,6 +193,10 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 				solid += 250;
 			}
 			
+			if(needsUpdate){
+				PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[]{tanks[0], tanks[1]}));
+				needsUpdate = false;
+			}
 			PacketDispatcher.wrapper.sendToAll(new AuxElectricityPacket(xCoord, yCoord, zCoord, power));
 			PacketDispatcher.wrapper.sendToAll(new AuxGaugePacket(xCoord, yCoord, zCoord, solid, 0));
 			
@@ -272,19 +291,19 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 		
 		switch((FuelType)fuselage.attributes[0]) {
 			case KEROSENE:
-				tanks[0].setFill(tanks[0].getFill() - fuel);
-				tanks[1].setFill(tanks[1].getFill() - fuel);
+				tanks[0].drain(fuel, true);
+				tanks[1].drain(fuel, true);
 				break;
 			case HYDROGEN:
-				tanks[0].setFill(tanks[0].getFill() - fuel);
-				tanks[1].setFill(tanks[1].getFill() - fuel);
+				tanks[0].drain(fuel, true);
+				tanks[1].drain(fuel, true);
 				break;
 			case XENON:
-				tanks[0].setFill(tanks[0].getFill() - fuel);
+				tanks[0].drain(fuel, true);
 				break;
 			case BALEFIRE:
-				tanks[0].setFill(tanks[0].getFill() - fuel);
-				tanks[1].setFill(tanks[1].getFill() - fuel);
+				tanks[0].drain(fuel, true);
+				tanks[1].drain(fuel, true);
 				break;
 			case SOLID:
 				this.solid -= fuel; break;
@@ -292,6 +311,24 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 		}
 		
 		this.power -= maxPower * 0.75;
+	}
+	
+	protected boolean inputValidForTank(int tank, int slot){
+		if(slots[slot] != null && tanks[tank] != null){
+			if(slots[slot].getItem() instanceof IFluidContainerItem && isValidFluidForTank(tank, ((IFluidContainerItem)slots[slot].getItem()).getFluid(slots[slot]))){
+				return true;
+			}
+			if(FluidContainerRegistry.isFilledContainer(slots[slot]) && isValidFluidForTank(tank, FluidContainerRegistry.getFluidForFilledItem(slots[slot]))){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isValidFluidForTank(int tank, FluidStack stack) {
+		if(stack == null || tanks[tank] == null)
+			return false;
+		return stack.getFluid() == tankTypes[tank];
 	}
 	
 	public static MissileStruct getStruct(ItemStack stack) {
@@ -356,7 +393,7 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 			case XENON:
 			case BALEFIRE:
 				
-				if(tanks[0].getFill() >= (Float)fuselage.attributes[1])
+				if(tanks[0].getFluidAmount() >= (Float)fuselage.attributes[1])
 					return 1;
 				else
 					return 0;
@@ -380,7 +417,7 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 			case HYDROGEN:
 			case BALEFIRE:
 				
-				if(tanks[1].getFill() >= (Float)fuselage.attributes[1])
+				if(tanks[1].getFluidAmount() >= (Float)fuselage.attributes[1])
 					return 1;
 				else
 					return 0;
@@ -401,21 +438,28 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 		
 		switch((FuelType)fuselage.attributes[0]) {
 			case KEROSENE:
-				tanks[0].setTankType(FluidType.KEROSENE);
-				tanks[1].setTankType(FluidType.ACID);
+				tankTypes[0] = ModForgeFluids.kerosene;
+				tankTypes[1] = ModForgeFluids.acid;
 				break;
 			case HYDROGEN:
-				tanks[0].setTankType(FluidType.HYDROGEN);
-				tanks[1].setTankType(FluidType.OXYGEN);
+				tankTypes[0] = ModForgeFluids.hydrogen;
+				tankTypes[1] = ModForgeFluids.oxygen;
 				break;
 			case XENON:
-				tanks[0].setTankType(FluidType.XENON);
+				tankTypes[0] = ModForgeFluids.xenon;
 				break;
 			case BALEFIRE:
-				tanks[0].setTankType(FluidType.BALEFIRE);
-				tanks[1].setTankType(FluidType.ACID);
+				tankTypes[0] = ModForgeFluids.balefire;
+				tankTypes[1] = ModForgeFluids.acid;
 				break;
 			default: break;
+		}
+		
+		if(tanks[0].getFluid() != null && tanks[0].getFluid().getFluid() != tankTypes[0]){
+			tanks[0].drain(tanks[0].getCapacity(), true);
+		}
+		if(tanks[1].getFluid() != null && tanks[1].getFluid().getFluid() != tankTypes[1]){
+			tanks[1].drain(tanks[1].getCapacity(), true);
 		}
 	}
 
@@ -424,8 +468,19 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 		super.readFromNBT(nbt);
 		NBTTagList list = nbt.getTagList("items", 10);
 
-		tanks[0].readFromNBT(nbt, "fuel");
-		tanks[1].readFromNBT(nbt, "oxidizer");
+		NBTTagList tankList = nbt.getTagList("tanks", 10);
+		for (int i = 0; i < tankList.tagCount(); i++) {
+			NBTTagCompound tag = list.getCompoundTagAt(i);
+			byte b0 = tag.getByte("tank");
+			if (b0 >= 0 && b0 < tanks.length) {
+				tanks[b0].readFromNBT(tag);
+			}
+		}
+		if(nbt.hasKey("tankType0"))
+			tankTypes[0] = FluidRegistry.getFluid(nbt.getInteger("tankType0"));
+		if(nbt.hasKey("tankType1"))
+			tankTypes[1] = FluidRegistry.getFluid(nbt.getInteger("tankType1"));
+		
 		solid = nbt.getInteger("solidfuel");
 		power = nbt.getLong("power");
 
@@ -446,8 +501,21 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 		
 		NBTTagList list = new NBTTagList();
 
-		tanks[0].writeToNBT(nbt, "fuel");
-		tanks[1].writeToNBT(nbt, "oxidizer");
+		NBTTagList tankList = new NBTTagList();
+		for (int i = 0; i < tanks.length; i++) {
+			if (tanks[i] != null) {
+				NBTTagCompound tag = new NBTTagCompound();
+				tag.setByte("tank", (byte) i);
+				tanks[i].writeToNBT(tag);
+				tankList.appendTag(tag);
+			}
+		}
+		nbt.setTag("tanks", tankList);
+		if(tankTypes[0] != null)
+			nbt.setInteger("tankType0", FluidRegistry.getFluidID(tankTypes[0]));
+		if(tankTypes[1] != null)
+			nbt.setInteger("tankType1", FluidRegistry.getFluidID(tankTypes[1]));
+		
 		nbt.setInteger("solidfuel", solid);
 		nbt.setLong("power", power);
 
@@ -477,54 +545,6 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 		return false;
 	}
 
-	@Override
-	public int getMaxFluidFill(FluidType type) {
-		if (type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getMaxFill();
-		else if (type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getMaxFill();
-		else
-			return 0;
-	}
-
-	@Override
-	public void setFillstate(int fill, int index) {
-		if (index < 2 && tanks[index] != null)
-			tanks[index].setFill(fill);
-	}
-
-	@Override
-	public void setFluidFill(int fill, FluidType type) {
-		if (type.name().equals(tanks[0].getTankType().name()))
-			tanks[0].setFill(fill);
-		else if (type.name().equals(tanks[1].getTankType().name()))
-			tanks[1].setFill(fill);
-	}
-
-	@Override
-	public void setType(FluidType type, int index) {
-		if (index < 2 && tanks[index] != null)
-			tanks[index].setTankType(type);
-	}
-
-	@Override
-	public List<FluidTank> getTanks() {
-		List<FluidTank> list = new ArrayList();
-		list.add(tanks[0]);
-		list.add(tanks[1]);
-		
-		return list;
-	}
-
-	@Override
-	public int getFluidFill(FluidType type) {
-		if (type.name().equals(tanks[0].getTankType().name()))
-			return tanks[0].getFill();
-		else if (type.name().equals(tanks[1].getTankType().name()))
-			return tanks[1].getFill();
-		else
-			return 0;
-	}
 	
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
@@ -550,6 +570,60 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 
 	@Override
 	public long getMaxPower() {
-		return this.maxPower;
+		return TileEntityCompactLauncher.maxPower;
+	}
+
+	@Override
+	public void recievePacket(NBTTagCompound[] tags) {
+		if(tags.length != 2){
+			return;
+		} else {
+			tanks[0].readFromNBT(tags[0]);
+			tanks[1].readFromNBT(tags[1]);
+		}
+		
+	}
+
+	@Override
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		if(resource == null){
+			return 0;
+		} else if(resource.getFluid() == tankTypes[0]){
+			needsUpdate = true;
+			return tanks[0].fill(resource, doFill);
+		} else if(resource.getFluid() == tankTypes[1]){
+			needsUpdate = true;
+			return tanks[1].fill(resource, doFill);
+		} else {
+			return 0;
+		}
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+		// can't drain
+		return null;
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		// can't drain
+		return null;
+	}
+
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		return fluid == tankTypes[0] || fluid == tankTypes[1];
+	}
+
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		// can't drain
+		return false;
+	}
+
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		return new FluidTankInfo[]{tanks[0].getInfo(), tanks[1].getInfo()};
 	}
 }

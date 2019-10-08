@@ -3,8 +3,6 @@ package com.hbm.entity.projectile;
 import java.util.List;
 
 import com.hbm.entity.grenade.EntityGrenadeZOMG;
-import com.hbm.lib.ModDamageSource;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;

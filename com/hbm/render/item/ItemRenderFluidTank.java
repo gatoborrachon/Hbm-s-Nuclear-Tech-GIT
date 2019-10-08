@@ -1,11 +1,6 @@
 package com.hbm.render.item;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
-import com.hbm.render.misc.RenderItemStack;
-
-import codechicken.lib.render.CCRenderState;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;

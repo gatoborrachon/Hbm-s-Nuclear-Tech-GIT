@@ -5,9 +5,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 import java.util.List;
 
-import com.hbm.entity.particle.EntityGasFX;
-import com.hbm.entity.particle.EntityOilSpillFX;
-import com.hbm.entity.particle.EntitySSmokeFX;
 import com.hbm.explosion.ExplosionLarge;
 import com.hbm.items.ModItems;
 

@@ -9,8 +9,6 @@ import com.hbm.main.MainRegistry;
 import com.hbm.tileentity.machine.TileEntityDummy;
 import com.hbm.tileentity.machine.TileEntityDummyFluidPort;
 import com.hbm.tileentity.machine.TileEntityMachineFluidTank;
-import com.hbm.tileentity.machine.TileEntityMachineGasFlare;
-
 import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;

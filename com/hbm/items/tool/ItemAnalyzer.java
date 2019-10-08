@@ -3,10 +3,8 @@ package com.hbm.items.tool;
 import java.util.List;
 
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidContainer;
 import com.hbm.interfaces.IFluidDuct;
 import com.hbm.interfaces.ISource;
-import com.hbm.inventory.FluidTank;
 import com.hbm.tileentity.conductor.TileEntityPylonRedWire;
 import com.hbm.tileentity.machine.TileEntityDummy;
 import com.hbm.tileentity.machine.TileEntityLockableBase;
@@ -15,7 +13,6 @@ import net.minecraft.block.Block;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -82,7 +79,7 @@ public class ItemAnalyzer extends Item {
 							"Electricity: " + ((ISource)te).getSPower() + " HE"));
 				}
 				
-				if(te instanceof IFluidContainer) {
+				/*if(te instanceof IFluidContainer) {
 					
 					player.addChatMessage(new ChatComponentText(
 							"Fluid Tanks:"));
@@ -93,7 +90,7 @@ public class ItemAnalyzer extends Item {
 						player.addChatMessage(new ChatComponentText(
 								" *Tank " + (i + 1) + ": " + tanks.get(i).getFill() + "mB " + I18n.format(tanks.get(i).getTankType().getUnlocalizedName())));
 					}
-				}
+				}*/
 				
 				if(te instanceof IFluidDuct) {
 					

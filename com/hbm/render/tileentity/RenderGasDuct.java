@@ -4,8 +4,6 @@ import org.lwjgl.opengl.GL11;
 
 import com.hbm.lib.RefStrings;
 import com.hbm.tileentity.conductor.TileEntityFFGasDuct;
-import com.hbm.tileentity.conductor.TileEntityGasDuct;
-
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;

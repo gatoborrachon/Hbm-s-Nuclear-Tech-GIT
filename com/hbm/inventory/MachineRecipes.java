@@ -14,8 +14,6 @@ import com.hbm.items.special.ItemBattery;
 import com.hbm.items.tool.ItemAssemblyTemplate;
 import com.hbm.items.tool.ItemAssemblyTemplate.EnumAssemblyTemplate;
 import com.hbm.items.tool.ItemChemistryTemplate;
-import com.hbm.items.tool.ItemFluidIcon;
-import com.hbm.items.tool.ItemSatChip;
 import com.hbm.main.MainRegistry;
 
 import net.minecraft.enchantment.Enchantment;

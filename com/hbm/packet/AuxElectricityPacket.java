@@ -2,8 +2,6 @@ package com.hbm.packet;
 
 import com.hbm.interfaces.IConsumer;
 import com.hbm.interfaces.ISource;
-import com.hbm.tileentity.machine.TileEntityMachinePress;
-
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
@@ -11,8 +9,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
 public class AuxElectricityPacket implements IMessage {

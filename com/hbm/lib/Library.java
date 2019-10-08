@@ -6,24 +6,13 @@ import java.util.Random;
 
 import com.hbm.blocks.ModBlocks;
 import com.hbm.calc.UnionOfTileEntitiesAndBooleans;
-import com.hbm.calc.UnionOfTileEntitiesAndBooleansForFluids;
-import com.hbm.calc.UnionOfTileEntitiesAndBooleansForGas;
-import com.hbm.calc.UnionOfTileEntitiesAndBooleansForOil;
 import com.hbm.entity.mob.EntityHunterChopper;
 import com.hbm.entity.projectile.EntityChopperMine;
 import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.handler.HazmatRegistry;
 import com.hbm.interfaces.IConductor;
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidAcceptor;
 import com.hbm.interfaces.IFluidDuct;
-import com.hbm.interfaces.IFluidSource;
-import com.hbm.interfaces.IGasAcceptor;
-import com.hbm.interfaces.IGasDuct;
-import com.hbm.interfaces.IGasSource;
-import com.hbm.interfaces.IOilDuct;
-import com.hbm.interfaces.IOilAcceptor;
-import com.hbm.interfaces.IOilSource;
 import com.hbm.interfaces.ISource;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemBattery;
@@ -32,16 +21,10 @@ import com.hbm.potion.HbmPotion;
 import com.hbm.saveddata.RadEntitySavedData;
 import com.hbm.tileentity.conductor.TileEntityCable;
 import com.hbm.tileentity.conductor.TileEntityCableSwitch;
-import com.hbm.tileentity.conductor.TileEntityFluidDuct;
-import com.hbm.tileentity.conductor.TileEntityGasDuct;
-import com.hbm.tileentity.conductor.TileEntityGasDuctSolid;
-import com.hbm.tileentity.conductor.TileEntityOilDuct;
-import com.hbm.tileentity.conductor.TileEntityOilDuctSolid;
 import com.hbm.tileentity.conductor.TileEntityPylonRedWire;
 import com.hbm.tileentity.conductor.TileEntityWireCoated;
 import com.hbm.tileentity.machine.TileEntityDummy;
 import com.hbm.tileentity.machine.TileEntityMachineBattery;
-import com.hbm.tileentity.machine.TileEntityMachineFluidTank;
 import com.hbm.tileentity.machine.TileEntityMachineTransformer;
 
 import net.minecraft.block.Block;
@@ -51,7 +34,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -435,36 +417,7 @@ public class Library {
 		return false;
 	}
 	
-	public static boolean checkFluidConnectables(World world, int x, int y, int z, FluidType type)
-	{
-		TileEntity tileentity = world.getTileEntity(x, y, z);
-		if(tileentity != null && tileentity instanceof IFluidDuct && ((IFluidDuct)tileentity).getType() == type)
-			return true;
-		if((tileentity != null && (tileentity instanceof IFluidAcceptor || 
-				tileentity instanceof IFluidSource)) || 
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_well ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_flare ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_chemplant ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_fluidtank ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_refinery ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_pumpjack ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_turbofan ||
-				world.getBlock(x, y, z) == ModBlocks.reactor_hatch ||
-				world.getBlock(x, y, z) == ModBlocks.reactor_conductor ||
-				world.getBlock(x, y, z) == ModBlocks.fusion_hatch ||
-				world.getBlock(x, y, z) == ModBlocks.watz_hatch ||
-				world.getBlock(x, y, z) == ModBlocks.fwatz_hatch ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_ams_limiter ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_ams_emitter ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_ams_base ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_reactor_small ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_compact_launcher ||
-				world.getBlock(x, y, z) == ModBlocks.dummy_port_launch_table)
-		{
-			return true;
-		}
-		return false;
-	}
+
 	
 	public static boolean checkUnionList(List<UnionOfTileEntitiesAndBooleans> list, ISource that) {
 		
@@ -478,19 +431,7 @@ public class Library {
 		
 		return false;
 	}
-	
-	public static boolean checkUnionListForFluids(List<UnionOfTileEntitiesAndBooleansForFluids> list, IFluidSource that) {
-		
-		for(UnionOfTileEntitiesAndBooleansForFluids union : list)
-		{
-			if(union.source == that)
-			{
-				return true;
-			}
-		}
-		
-		return false;
-	}
+
 	
 	//////  //////  //////  //////  //////  ////        //////  //////  //////
 	//      //  //  //        //    //      //  //      //      //      //    
@@ -1069,269 +1010,6 @@ public class Library {
 		}
 	}
 	
-	public static void transmitFluid(int x, int y, int z, boolean newTact, IFluidSource that, World worldObj, FluidType type) {
-		Block block = worldObj.getBlock(x, y, z);
-		TileEntity tileentity = worldObj.getTileEntity(x, y, z);
-		
-		//Chemplant
-		if(block == ModBlocks.dummy_port_chemplant)
-		{
-			tileentity = worldObj.getTileEntity(((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetX, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetY, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetZ);
-		}
-		//Fluid Tank
-		if(block == ModBlocks.dummy_port_fluidtank)
-		{
-			tileentity = worldObj.getTileEntity(((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetX, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetY, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetZ);
-		}
-		//Refinery
-		if(block == ModBlocks.dummy_port_refinery)
-		{
-			tileentity = worldObj.getTileEntity(((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetX, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetY, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetZ);
-		}
-		//Gas Flare
-		if(block == ModBlocks.dummy_port_flare)
-		{
-			tileentity = worldObj.getTileEntity(((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetX, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetY, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetZ);
-		}
-		//Turbofan
-		if(block == ModBlocks.dummy_port_turbofan)
-		{
-			tileentity = worldObj.getTileEntity(((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetX, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetY, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetZ);
-		}
-		//Large Nuclear Reactor
-		if(block == ModBlocks.reactor_hatch && worldObj.getBlock(x, y, z + 2) == ModBlocks.reactor_computer)
-		{
-			tileentity = worldObj.getTileEntity(x, y, z + 2);
-		}
-		if(block == ModBlocks.reactor_hatch && worldObj.getBlock(x, y, z - 2) == ModBlocks.reactor_computer)
-		{
-			tileentity = worldObj.getTileEntity(x, y, z - 2);
-		}
-		if(block == ModBlocks.reactor_hatch && worldObj.getBlock(x + 2, y, z) == ModBlocks.reactor_computer)
-		{
-			tileentity = worldObj.getTileEntity(x + 2, y, z);
-		}
-		if(block == ModBlocks.reactor_hatch && worldObj.getBlock(x - 2, y, z) == ModBlocks.reactor_computer)
-		{
-			tileentity = worldObj.getTileEntity(x - 2, y, z);
-		}
-		//Large Fusion Reactor
-		if(block == ModBlocks.fusion_hatch && worldObj.getBlock(x, y, z + 8) == ModBlocks.fusion_core)
-		{
-			tileentity = worldObj.getTileEntity(x, y, z + 8);
-		}
-		if(block == ModBlocks.fusion_hatch && worldObj.getBlock(x, y, z - 8) == ModBlocks.fusion_core)
-		{
-			tileentity = worldObj.getTileEntity(x, y, z - 8);
-		}
-		if(block == ModBlocks.fusion_hatch && worldObj.getBlock(x + 8, y, z) == ModBlocks.fusion_core)
-		{
-			tileentity = worldObj.getTileEntity(x + 8, y, z);
-		}
-		if(block == ModBlocks.fusion_hatch && worldObj.getBlock(x - 8, y, z) == ModBlocks.fusion_core)
-		{
-			tileentity = worldObj.getTileEntity(x - 8, y, z);
-		}
-		//FWatz Reactor
-		if(block == ModBlocks.fwatz_hatch && worldObj.getBlock(x, y + 11, z + 9) == ModBlocks.fwatz_core)
-		{
-			tileentity = worldObj.getTileEntity(x, y + 11, z + 9);
-		}
-		if(block == ModBlocks.fwatz_hatch && worldObj.getBlock(x, y + 11, z - 9) == ModBlocks.fwatz_core)
-		{
-			tileentity = worldObj.getTileEntity(x, y + 11, z - 9);
-		}
-		if(block == ModBlocks.fwatz_hatch && worldObj.getBlock(x + 9, y + 11, z) == ModBlocks.fwatz_core)
-		{
-			tileentity = worldObj.getTileEntity(x + 9, y + 11, z);
-		}
-		if(block == ModBlocks.fwatz_hatch && worldObj.getBlock(x - 9, y + 11, z) == ModBlocks.fwatz_core)
-		{
-			tileentity = worldObj.getTileEntity(x - 9, y + 11, z);
-		}
-		//AMS Limiter
-		if(block == ModBlocks.dummy_port_ams_limiter)
-		{
-			tileentity = worldObj.getTileEntity(((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetX, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetY, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetZ);
-		}
-		//AMS Limiter
-		if(block == ModBlocks.dummy_port_ams_emitter)
-		{
-			tileentity = worldObj.getTileEntity(((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetX, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetY, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetZ);
-		}
-		//AMS Base
-		if(block == ModBlocks.dummy_port_ams_base)
-		{
-			tileentity = worldObj.getTileEntity(((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetX, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetY, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetZ);
-		}
-		//Small Nuclear Reactor
-		if(block == ModBlocks.dummy_port_reactor_small)
-		{
-			tileentity = worldObj.getTileEntity(((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetX, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetY, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetZ);
-		}
-		//Launchers
-		if(block == ModBlocks.dummy_port_compact_launcher || block == ModBlocks.dummy_port_launch_table)
-		{
-			tileentity = worldObj.getTileEntity(((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetX, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetY, ((TileEntityDummy)worldObj.getTileEntity(x, y, z)).targetZ);
-		}
-		
-		if(tileentity == that)
-			tileentity = null;
-		
-		if(tileentity instanceof IFluidDuct)
-		{
-			if(tileentity instanceof TileEntityFluidDuct && ((TileEntityFluidDuct)tileentity).type.name().equals(type.name()))
-			{
-				if(Library.checkUnionListForFluids(((TileEntityFluidDuct)tileentity).uoteab, that))
-				{
-					for(int i = 0; i < ((TileEntityFluidDuct)tileentity).uoteab.size(); i++)
-					{
-						if(((TileEntityFluidDuct)tileentity).uoteab.get(i).source == that)
-						{
-							if(((TileEntityFluidDuct)tileentity).uoteab.get(i).ticked != newTact)
-							{
-								((TileEntityFluidDuct)tileentity).uoteab.get(i).ticked = newTact;
-								that.fillFluid(x, y + 1, z, that.getTact(), type);
-								that.fillFluid(x, y - 1, z, that.getTact(), type);
-								that.fillFluid(x - 1, y, z, that.getTact(), type);
-								that.fillFluid(x + 1, y, z, that.getTact(), type);
-								that.fillFluid(x, y, z - 1, that.getTact(), type);
-								that.fillFluid(x, y, z + 1, that.getTact(), type);
-							}
-						}
-					}
-				} else {
-					((TileEntityFluidDuct)tileentity).uoteab.add(new UnionOfTileEntitiesAndBooleansForFluids(that, newTact));
-				}
-			}
-			if(tileentity instanceof TileEntityGasDuct && ((TileEntityGasDuct)tileentity).type.name().equals(type.name()))
-			{
-				if(Library.checkUnionListForFluids(((TileEntityGasDuct)tileentity).uoteab, that))
-				{
-					for(int i = 0; i < ((TileEntityGasDuct)tileentity).uoteab.size(); i++)
-					{
-						if(((TileEntityGasDuct)tileentity).uoteab.get(i).source == that)
-						{
-							if(((TileEntityGasDuct)tileentity).uoteab.get(i).ticked != newTact)
-							{
-								((TileEntityGasDuct)tileentity).uoteab.get(i).ticked = newTact;
-								that.fillFluid(x, y + 1, z, that.getTact(), type);
-								that.fillFluid(x, y - 1, z, that.getTact(), type);
-								that.fillFluid(x - 1, y, z, that.getTact(), type);
-								that.fillFluid(x + 1, y, z, that.getTact(), type);
-								that.fillFluid(x, y, z - 1, that.getTact(), type);
-								that.fillFluid(x, y, z + 1, that.getTact(), type);
-							}
-						}
-					}
-				} else {
-					((TileEntityGasDuct)tileentity).uoteab.add(new UnionOfTileEntitiesAndBooleansForFluids(that, newTact));
-				}
-			}
-			if(tileentity instanceof TileEntityOilDuct && ((TileEntityOilDuct)tileentity).type.getUnlocalizedName().equals(type.name()))
-			{
-				if(Library.checkUnionListForFluids(((TileEntityOilDuct)tileentity).uoteab, that))
-				{
-					for(int i = 0; i < ((TileEntityOilDuct)tileentity).uoteab.size(); i++)
-					{
-						if(((TileEntityOilDuct)tileentity).uoteab.get(i).source == that)
-						{
-							if(((TileEntityOilDuct)tileentity).uoteab.get(i).ticked != newTact)
-							{
-								((TileEntityOilDuct)tileentity).uoteab.get(i).ticked = newTact;
-								that.fillFluid(x, y + 1, z, that.getTact(), type);
-								that.fillFluid(x, y - 1, z, that.getTact(), type);
-								that.fillFluid(x - 1, y, z, that.getTact(), type);
-								that.fillFluid(x + 1, y, z, that.getTact(), type);
-								that.fillFluid(x, y, z - 1, that.getTact(), type);
-								that.fillFluid(x, y, z + 1, that.getTact(), type);
-							}
-						}
-					}
-				} else {
-					((TileEntityOilDuct)tileentity).uoteab.add(new UnionOfTileEntitiesAndBooleansForFluids(that, newTact));
-				}
-			}
-			if(tileentity instanceof TileEntityGasDuctSolid && ((TileEntityGasDuctSolid)tileentity).type.name().equals(type.name()))
-			{
-				if(Library.checkUnionListForFluids(((TileEntityGasDuctSolid)tileentity).uoteab, that))
-				{
-					for(int i = 0; i < ((TileEntityGasDuctSolid)tileentity).uoteab.size(); i++)
-					{
-						if(((TileEntityGasDuctSolid)tileentity).uoteab.get(i).source == that)
-						{
-							if(((TileEntityGasDuctSolid)tileentity).uoteab.get(i).ticked != newTact)
-							{
-								((TileEntityGasDuctSolid)tileentity).uoteab.get(i).ticked = newTact;
-								that.fillFluid(x, y + 1, z, that.getTact(), type);
-								that.fillFluid(x, y - 1, z, that.getTact(), type);
-								that.fillFluid(x - 1, y, z, that.getTact(), type);
-								that.fillFluid(x + 1, y, z, that.getTact(), type);
-								that.fillFluid(x, y, z - 1, that.getTact(), type);
-								that.fillFluid(x, y, z + 1, that.getTact(), type);
-							}
-						}
-					}
-				} else {
-					((TileEntityGasDuctSolid)tileentity).uoteab.add(new UnionOfTileEntitiesAndBooleansForFluids(that, newTact));
-				}
-			}
-			if(tileentity instanceof TileEntityOilDuctSolid && ((TileEntityOilDuctSolid)tileentity).type.name().equals(type.name()))
-			{
-				if(Library.checkUnionListForFluids(((TileEntityOilDuctSolid)tileentity).uoteab, that))
-				{
-					for(int i = 0; i < ((TileEntityOilDuctSolid)tileentity).uoteab.size(); i++)
-					{
-						if(((TileEntityOilDuctSolid)tileentity).uoteab.get(i).source == that)
-						{
-							if(((TileEntityOilDuctSolid)tileentity).uoteab.get(i).ticked != newTact)
-							{
-								((TileEntityOilDuctSolid)tileentity).uoteab.get(i).ticked = newTact;
-								that.fillFluid(x, y + 1, z, that.getTact(), type);
-								that.fillFluid(x, y - 1, z, that.getTact(), type);
-								that.fillFluid(x - 1, y, z, that.getTact(), type);
-								that.fillFluid(x + 1, y, z, that.getTact(), type);
-								that.fillFluid(x, y, z - 1, that.getTact(), type);
-								that.fillFluid(x, y, z + 1, that.getTact(), type);
-							}
-						}
-					}
-				} else {
-					((TileEntityOilDuctSolid)tileentity).uoteab.add(new UnionOfTileEntitiesAndBooleansForFluids(that, newTact));
-				}
-			}
-		}
-		
-		if(tileentity instanceof IFluidAcceptor && newTact && !(tileentity instanceof TileEntityMachineFluidTank && ((TileEntityMachineFluidTank)tileentity).dna())
-				&& ((IFluidAcceptor)tileentity).getMaxFluidFill(type) > 0 && ((IFluidAcceptor)tileentity).getMaxFluidFill(type) - ((IFluidAcceptor)tileentity).getFluidFill(type) > 0)
-		{
-			that.getFluidList(type).add((IFluidAcceptor)tileentity);
-		}
-		
-		if(!newTact)
-		{
-			int size = that.getFluidList(type).size();
-			if(size > 0)
-			{
-				int part = that.getFluidFill(type) / size;
-				for(IFluidAcceptor consume : that.getFluidList(type))
-				{
-					if(consume.getFluidFill(type) < consume.getMaxFluidFill(type))
-					{
-						if(consume.getMaxFluidFill(type) - consume.getFluidFill(type) >= part)
-						{
-							that.setFluidFill(that.getFluidFill(type)-part, type);
-							consume.setFluidFill(consume.getFluidFill(type) + part, type);
-						} else {
-							that.setFluidFill(that.getFluidFill(type) - (consume.getMaxFluidFill(type) - consume.getFluidFill(type)), type);
-							consume.setFluidFill(consume.getMaxFluidFill(type), type);
-						}
-					}
-				}
-			}
-			that.clearFluidList(type);
-		}
-	}
 	
 	public static boolean isArrayEmpty(Object[] array) {
 		if(array == null)

@@ -1,25 +1,18 @@
 package com.hbm.packet;
 
-import java.util.List;
-
 import com.hbm.items.ModItems;
 import com.hbm.items.tool.ItemAssemblyTemplate;
 import com.hbm.items.tool.ItemCassette;
 import com.hbm.items.tool.ItemChemistryTemplate;
-import com.hbm.items.tool.ItemFluidIdentifier;
 import com.hbm.items.tool.ItemForgeFluidIdentifier;
-import com.hbm.tileentity.machine.TileEntityMachineAssembler;
-
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 
 public class ItemFolderPacket implements IMessage {
 

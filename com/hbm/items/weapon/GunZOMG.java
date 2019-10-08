@@ -7,8 +7,6 @@ import com.google.common.collect.Multimap;
 import com.hbm.entity.projectile.EntityBullet;
 import com.hbm.entity.projectile.EntityRainbow;
 import com.hbm.items.ModItems;
-import com.hbm.lib.Library;
-
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.SharedMonsterAttributes;

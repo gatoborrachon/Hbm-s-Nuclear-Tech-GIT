@@ -8,8 +8,6 @@ import com.hbm.main.MainRegistry;
 import com.hbm.tileentity.machine.TileEntityAMSEmitter;
 import com.hbm.tileentity.machine.TileEntityDummy;
 import com.hbm.tileentity.machine.TileEntityDummyFluidPort;
-import com.hbm.tileentity.machine.TileEntityMachineTurbofan;
-
 import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

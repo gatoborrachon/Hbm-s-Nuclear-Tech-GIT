@@ -2,8 +2,6 @@ package com.hbm.tileentity.machine;
 
 import java.util.List;
 
-import com.hbm.packet.AuxElectricityPacket;
-import com.hbm.packet.PacketDispatcher;
 import com.hbm.saveddata.RadEntitySavedData;
 
 import net.minecraft.entity.Entity;

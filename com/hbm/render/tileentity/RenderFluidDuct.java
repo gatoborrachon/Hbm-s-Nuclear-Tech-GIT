@@ -5,8 +5,6 @@ import org.lwjgl.opengl.GL11;
 import com.hbm.forgefluid.FFUtils;
 import com.hbm.lib.RefStrings;
 import com.hbm.tileentity.conductor.TileEntityFFFluidDuct;
-import com.hbm.tileentity.conductor.TileEntityFluidDuct;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;

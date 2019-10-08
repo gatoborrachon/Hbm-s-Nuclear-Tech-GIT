@@ -8,8 +8,6 @@ import java.util.Set;
 import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.items.ModItems;
 import com.hbm.tileentity.conductor.TileEntityFFFluidDuct;
-import com.hbm.tileentity.conductor.TileEntityFluidDuct;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.texture.IIconRegister;

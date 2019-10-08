@@ -4,8 +4,6 @@ import java.util.Map.Entry;
 
 import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.interfaces.IFluidPipe;
-import com.hbm.tileentity.conductor.TileEntityFluidDuct;
-
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;

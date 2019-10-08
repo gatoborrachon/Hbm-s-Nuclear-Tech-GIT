@@ -5,14 +5,8 @@ import java.util.List;
 
 import com.hbm.interfaces.IFluidPipe;
 import com.hbm.main.MainRegistry;
-import com.hbm.tileentity.machine.TileEntityDummyFluidPort;
-import com.hbm.tileentity.machine.TileEntityMachineBoiler;
-import com.hbm.tileentity.machine.TileEntityMachineBoilerElectric;
-import com.hbm.tileentity.machine.TileEntityMachineFluidTank;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
-import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;

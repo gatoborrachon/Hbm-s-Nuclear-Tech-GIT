@@ -2,11 +2,8 @@ package com.hbm.blocks.machine;
 
 import java.util.Random;
 
-import com.hbm.blocks.ModBlocks;
 import com.hbm.lib.RefStrings;
 import com.hbm.tileentity.machine.TileEntityDecon;
-import com.hbm.tileentity.machine.TileEntityMachineDeuterium;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockContainer;

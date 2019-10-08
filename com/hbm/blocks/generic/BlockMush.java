@@ -3,7 +3,6 @@ package com.hbm.blocks.generic;
 import java.util.Random;
 
 import com.hbm.blocks.ModBlocks;
-import com.hbm.main.MainRegistry;
 import com.hbm.world.HugeMush;
 
 import net.minecraft.block.Block;

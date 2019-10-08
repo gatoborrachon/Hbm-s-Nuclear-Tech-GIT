@@ -1,8 +1,5 @@
 package com.hbm.explosion;
 
-import com.hbm.blocks.ModBlocks;
-
-import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;

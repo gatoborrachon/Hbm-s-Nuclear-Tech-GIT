@@ -3,13 +3,9 @@ package com.hbm.inventory.gui;
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.forgefluid.FFUtils;
-import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.container.ContainerMachineInserter;
-import com.hbm.inventory.container.ContainerMachineTurbofan;
 import com.hbm.lib.RefStrings;
 import com.hbm.tileentity.machine.TileEntityMachineInserter;
-import com.hbm.tileentity.machine.TileEntityMachineTurbofan;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;

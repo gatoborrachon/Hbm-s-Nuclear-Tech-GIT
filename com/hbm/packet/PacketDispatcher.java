@@ -29,14 +29,10 @@ public class PacketDispatcher {
 		wrapper.registerMessage(TEDrillSoundPacket.Handler.class, TEDrillSoundPacket.class, i++, Side.CLIENT);
 		//Assembler cog rotation for rendering
 		wrapper.registerMessage(TEAssemblerPacket.Handler.class, TEAssemblerPacket.class, i++, Side.CLIENT);
-		//Fluid type for pipe rendering
-		wrapper.registerMessage(TEFluidPipePacket.Handler.class, TEFluidPipePacket.class, i++, Side.CLIENT);
 		//Drillgon200: Test packet for forge fluids pipe system
 		wrapper.registerMessage(TEFluidTypePacketTest.Handler.class,TEFluidTypePacketTest.class, i++, Side.CLIENT);
 		//Missile type for rendering
 		wrapper.registerMessage(TEMissilePacket.Handler.class, TEMissilePacket.class, i++, Side.CLIENT);
-		//Fluid packet for GUI
-		wrapper.registerMessage(TEFluidPacket.Handler.class, TEFluidPacket.class, i++, Side.CLIENT);
 		//Sound packet that keeps client and server separated
 		wrapper.registerMessage(LoopedSoundPacket.Handler.class, LoopedSoundPacket.class, i++, Side.CLIENT);
 		//Chemplant piston rotation for rendering

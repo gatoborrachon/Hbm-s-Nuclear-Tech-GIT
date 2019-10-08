@@ -6,8 +6,6 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.BlockSlab;
-import net.minecraft.block.BlockStairs;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentProtection;
 import net.minecraft.entity.Entity;
@@ -26,7 +24,6 @@ import net.minecraft.world.WorldSettings.GameType;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import com.hbm.blocks.ModBlocks;
-import com.hbm.blocks.generic.DecoBlockAlt;
 import com.hbm.entity.effect.EntityBlackHole;
 import com.hbm.entity.effect.EntityNukeCloudSmall;
 import com.hbm.entity.grenade.EntityGrenadeASchrab;
@@ -41,8 +38,6 @@ import com.hbm.items.ModItems;
 import com.hbm.lib.Library;
 import com.hbm.lib.ModDamageSource;
 import com.hbm.tileentity.bomb.TileEntityTurretBase;
-import com.hbm.tileentity.machine.TileEntityDummy;
-
 import cofh.api.energy.IEnergyProvider;
 
 public class ExplosionNukeGeneric {

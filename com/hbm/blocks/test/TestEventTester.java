@@ -1,6 +1,5 @@
 package com.hbm.blocks.test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -8,57 +7,19 @@ import java.util.Map;
 import java.util.Random;
 
 import com.hbm.blocks.ModBlocks;
-import com.hbm.entity.effect.EntityBlackHole;
-import com.hbm.entity.effect.EntityCloudFleija;
-import com.hbm.entity.effect.EntityCloudFleijaRainbow;
-import com.hbm.entity.logic.EntityEMP;
-import com.hbm.entity.missile.EntityMinerRocket;
-import com.hbm.entity.projectile.EntityBurningFOEQ;
-import com.hbm.entity.projectile.EntityMeteor;
-import com.hbm.explosion.ExplosionLarge;
-import com.hbm.explosion.ExplosionNukeRay;
-import com.hbm.explosion.ExplosionNukeRay.FloatTriplet;
-import com.hbm.lib.HbmChestContents;
-import com.hbm.main.MainRegistry;
-import com.hbm.main.ModEventHandler;
-import com.hbm.packet.AuxParticlePacket;
-import com.hbm.packet.PacketDispatcher;
-import com.hbm.potion.HbmPotion;
-import com.hbm.render.misc.MissilePart;
 import com.hbm.saveddata.RadiationSaveStructure;
 import com.hbm.saveddata.RadiationSavedData;
-import com.hbm.saveddata.SatelliteSaveStructure;
-import com.hbm.saveddata.SatelliteSavedData;
-import com.hbm.tileentity.machine.TileEntityCrateSteel;
-import com.hbm.world.Barrel;
-import com.hbm.world.Geyser;
-import com.hbm.world.GeyserLarge;
-import com.hbm.world.Meteorite;
-import com.hbm.world.Sellafield;
-
-import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentProtection;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
-import net.minecraft.util.WeightedRandomChestContent;
-import net.minecraft.village.VillageCollection;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.gen.ChunkProviderServer;
 
 public class TestEventTester extends Block {
 	

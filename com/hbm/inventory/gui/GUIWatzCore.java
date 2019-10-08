@@ -3,13 +3,11 @@ package com.hbm.inventory.gui;
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.forgefluid.FFUtils;
-import com.hbm.inventory.FluidTank;
 import com.hbm.inventory.container.ContainerWatzCore;
 import com.hbm.lib.RefStrings;
 import com.hbm.tileentity.machine.TileEntityWatzCore;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;

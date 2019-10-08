@@ -2,18 +2,15 @@ package com.hbm.render.tileentity;
 
 import org.lwjgl.opengl.GL11;
 
-import com.hbm.lib.RefStrings;
 import com.hbm.main.ResourceManager;
 import com.hbm.render.misc.MissileMultipart;
 import com.hbm.render.misc.MissilePart;
 import com.hbm.render.misc.MissilePronter;
-import com.hbm.render.model.ModelTestRender;
 import com.hbm.tileentity.machine.TileEntityMachineMissileAssembly;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
 
 public class RenderMissileAssembly extends TileEntitySpecialRenderer {
 	

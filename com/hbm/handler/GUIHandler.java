@@ -5,7 +5,6 @@ import com.hbm.inventory.container.*;
 import com.hbm.inventory.gui.*;
 import com.hbm.inventory.inv.InventoryLeadBox;
 import com.hbm.items.ModItems;
-import com.hbm.items.tool.ItemLeadBox;
 import com.hbm.tileentity.bomb.*;
 import com.hbm.tileentity.machine.*;
 

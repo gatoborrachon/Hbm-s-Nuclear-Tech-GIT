@@ -1,18 +1,9 @@
 package com.hbm.render.tileentity;
 
-import java.util.Random;
-
 import org.lwjgl.opengl.GL11;
 
 import com.hbm.lib.RefStrings;
-import com.hbm.main.ResourceManager;
 import com.hbm.render.misc.SoyuzPronter;
-import com.hbm.render.misc.TomPronter;
-import com.hbm.render.model.ModelCalBarrel;
-import com.hbm.render.model.ModelCalDualStock;
-import com.hbm.render.model.ModelCalStock;
-
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
