@@ -22,7 +22,9 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -53,7 +55,7 @@ import com.hbm.forgefluid.FFPipeNetwork;
 import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.handler.*;
 import com.hbm.handler.FluidTypeHandler.FluidType;
-import com.hbm.inventory.*;
+import com.hbm.inventory.MachineRecipes;
 import com.hbm.inventory.MachineRecipes.ShredderRecipe;
 import com.hbm.items.ModItems;
 import com.hbm.lib.HbmWorld;
@@ -1004,7 +1006,7 @@ public class MainRegistry
 		}));*/
 		achSacrifice = new Achievement("achievement.sacrifice", "sacrifice", 0, 0, ModItems.burnt_bark, null).initIndependentStat().setSpecial().registerStat();
 		achImpossible = new Achievement("achievement.impossible", "impossible", 2, 0, ModItems.nothing, null).initIndependentStat().setSpecial().registerStat();
-		achTOB = new Achievement("achievement.tasteofblood", "tasteofblood", 0, 2, new ItemStack(ModItems.fluid_icon, 1, FluidType.ASCHRAB.getID()), null).initIndependentStat().setSpecial().registerStat();
+		achTOB = new Achievement("achievement.tasteofblood", "tasteofblood", 0, 2, new ItemStack(ModItems.fluid_icon, 1, ModForgeFluids.aschrab.getID()), null).initIndependentStat().setSpecial().registerStat();
 		achFreytag = new Achievement("achievement.freytag", "freytag", 0, -2, ModItems.gun_mp40, null).initIndependentStat().setSpecial().registerStat();
 		achSelenium = new Achievement("achievement.selenium", "selenium", -2, -2, ModItems.ingot_starmetal, null).initIndependentStat().setSpecial().registerStat();
 		achPotato = new Achievement("achievement.potato", "potato", -2, 0, ModItems.battery_potatos, null).initIndependentStat().setSpecial().registerStat();
@@ -1333,72 +1335,62 @@ public class MainRegistry
 		
 		recipes.PrintRecipes();
 
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(Items.water_bucket), new ItemStack(Items.bucket), FluidType.WATER, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(Items.lava_bucket), new ItemStack(Items.bucket), FluidType.LAVA, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.bucket_mud), new ItemStack(Items.bucket), FluidType.WATZ, 1000));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.watz, 1000), new ItemStack(ModItems.bucket_mud), new ItemStack(Items.bucket));
 		
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.rod_water), new ItemStack(ModItems.rod_empty), FluidType.WATER, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.rod_dual_water), new ItemStack(ModItems.rod_dual_empty), FluidType.WATER, 2000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.rod_quad_water), new ItemStack(ModItems.rod_quad_empty), FluidType.WATER, 4000));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(FluidRegistry.WATER, 1000), new ItemStack(ModItems.rod_water), new ItemStack(ModItems.rod_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(FluidRegistry.WATER, 2000), new ItemStack(ModItems.rod_dual_water), new ItemStack(ModItems.rod_dual_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(FluidRegistry.WATER, 4000), new ItemStack(ModItems.rod_quad_water), new ItemStack(ModItems.rod_quad_empty));
 		
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.rod_coolant), new ItemStack(ModItems.rod_empty), FluidType.COOLANT, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.rod_dual_coolant), new ItemStack(ModItems.rod_dual_empty), FluidType.COOLANT, 2000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.rod_quad_coolant), new ItemStack(ModItems.rod_quad_empty), FluidType.COOLANT, 4000));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.coolant, 1000), new ItemStack(ModItems.rod_coolant), new ItemStack(ModItems.rod_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.coolant, 2000), new ItemStack(ModItems.rod_dual_coolant), new ItemStack(ModItems.rod_dual_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.coolant, 4000), new ItemStack(ModItems.rod_quad_coolant), new ItemStack(ModItems.rod_quad_empty));
 		
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_oil), new ItemStack(ModItems.canister_empty), FluidType.OIL, 1000));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.oil, 1000), new ItemStack(ModItems.canister_oil), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.smear, 1000), new ItemStack(ModItems.canister_smear), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.heavyoil, 1000), new ItemStack(ModItems.canister_heavyoil), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.bitumen, 1000), new ItemStack(ModItems.canister_bitumen), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.heatingoil, 1000), new ItemStack(ModItems.canister_heatingoil), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.reclaimed, 1000), new ItemStack(ModItems.canister_reoil), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.petroil, 1000), new ItemStack(ModItems.canister_petroil), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.lubricant, 1000), new ItemStack(ModItems.canister_canola), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.napatha, 1000), new ItemStack(ModItems.canister_naphtha), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.diesel, 1000), new ItemStack(ModItems.canister_fuel), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.lightoil, 1000), new ItemStack(ModItems.canister_lightoil), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.kerosene, 1000), new ItemStack(ModItems.canister_kerosene), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.biofuel, 1000), new ItemStack(ModItems.canister_biofuel), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.nitan, 1000), new ItemStack(ModItems.canister_NITAN), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.gas, 1000), new ItemStack(ModItems.gas_full), new ItemStack(ModItems.gas_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.petroleum, 1000), new ItemStack(ModItems.gas_petroleum), new ItemStack(ModItems.gas_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.biogas, 1000), new ItemStack(ModItems.gas_biogas), new ItemStack(ModItems.gas_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.diesel, 10000), new ItemStack(ModBlocks.red_barrel), new ItemStack(ModItems.tank_steel));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.kerosene, 10000), new ItemStack(ModBlocks.pink_barrel), new ItemStack(ModItems.tank_steel));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.oxygen, 10000), new ItemStack(ModBlocks.lox_barrel), new ItemStack(ModItems.tank_steel));
 		
-		net.minecraftforge.fluids.FluidContainerRegistry.registerFluidContainer(net.minecraftforge.fluids.FluidRegistry.getFluidStack("hbmoil", 1000), new ItemStack(ModItems.canister_oil), new ItemStack(ModItems.canister_empty));
-		
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_smear), new ItemStack(ModItems.canister_empty), FluidType.SMEAR, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_heavyoil), new ItemStack(ModItems.canister_empty), FluidType.HEAVYOIL, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_bitumen), new ItemStack(ModItems.canister_empty), FluidType.BITUMEN, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_heatingoil), new ItemStack(ModItems.canister_empty), FluidType.HEATINGOIL, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_reoil), new ItemStack(ModItems.canister_empty), FluidType.RECLAIMED, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_petroil), new ItemStack(ModItems.canister_empty), FluidType.PETROIL, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_canola), new ItemStack(ModItems.canister_empty), FluidType.LUBRICANT, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_naphtha), new ItemStack(ModItems.canister_empty), FluidType.NAPHTHA, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_fuel), new ItemStack(ModItems.canister_empty), FluidType.DIESEL, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_lightoil), new ItemStack(ModItems.canister_empty), FluidType.LIGHTOIL, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_kerosene), new ItemStack(ModItems.canister_empty), FluidType.KEROSENE, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_biofuel), new ItemStack(ModItems.canister_empty), FluidType.BIOFUEL, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.canister_NITAN), new ItemStack(ModItems.canister_empty), FluidType.NITAN, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.gas_full), new ItemStack(ModItems.gas_empty), FluidType.GAS, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.gas_petroleum), new ItemStack(ModItems.gas_empty), FluidType.PETROLEUM, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.gas_biogas), new ItemStack(ModItems.gas_empty), FluidType.BIOGAS, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModBlocks.red_barrel), new ItemStack(ModItems.tank_steel), FluidType.DIESEL, 10000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModBlocks.pink_barrel), new ItemStack(ModItems.tank_steel), FluidType.KEROSENE, 10000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModBlocks.lox_barrel), new ItemStack(ModItems.tank_steel), FluidType.OXYGEN, 10000));
-		
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.cell_deuterium), new ItemStack(ModItems.cell_empty), FluidType.DEUTERIUM, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.cell_tritium), new ItemStack(ModItems.cell_empty), FluidType.TRITIUM, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.rod_tritium), new ItemStack(ModItems.rod_empty), FluidType.TRITIUM, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.rod_dual_tritium), new ItemStack(ModItems.rod_dual_empty), FluidType.TRITIUM, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.rod_quad_tritium), new ItemStack(ModItems.rod_quad_empty), FluidType.TRITIUM, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.cell_uf6), new ItemStack(ModItems.cell_empty), FluidType.UF6, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.cell_puf6), new ItemStack(ModItems.cell_empty), FluidType.PUF6, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.cell_antimatter), new ItemStack(ModItems.cell_empty), FluidType.AMAT, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.cell_anti_schrabidium), new ItemStack(ModItems.cell_empty), FluidType.ASCHRAB, 1000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.cell_sas3), new ItemStack(ModItems.cell_empty), FluidType.SAS3, 1000));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.deuterium, 1000), new ItemStack(ModItems.cell_deuterium), new ItemStack(ModItems.cell_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.tritium, 1000), new ItemStack(ModItems.cell_tritium), new ItemStack(ModItems.cell_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.tritium, 1000), new ItemStack(ModItems.rod_tritium), new ItemStack(ModItems.rod_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.tritium, 2000), new ItemStack(ModItems.rod_dual_tritium), new ItemStack(ModItems.rod_dual_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.tritium, 4000), new ItemStack(ModItems.rod_quad_tritium), new ItemStack(ModItems.rod_quad_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.uf6, 1000), new ItemStack(ModItems.cell_uf6), new ItemStack(ModItems.cell_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.puf6, 1000), new ItemStack(ModItems.cell_puf6), new ItemStack(ModItems.cell_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.amat, 1000), new ItemStack(ModItems.cell_antimatter), new ItemStack(ModItems.cell_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.aschrab, 1000), new ItemStack(ModItems.cell_anti_schrabidium), new ItemStack(ModItems.cell_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.sas3, 1000), new ItemStack(ModItems.cell_sas3), new ItemStack(ModItems.cell_empty));
 
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModBlocks.ore_oil), new ItemStack(ModBlocks.ore_oil_empty), FluidType.OIL, 250));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.oil, 250), new ItemStack(ModBlocks.ore_oil), new ItemStack(ModBlocks.ore_oil_empty));
 
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.tank_waste, 1, 1), new ItemStack(ModItems.tank_waste, 1, 0), FluidType.WATZ, 8000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.tank_waste, 1, 2), new ItemStack(ModItems.tank_waste, 1, 1), FluidType.WATZ, 8000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.tank_waste, 1, 3), new ItemStack(ModItems.tank_waste, 1, 2), FluidType.WATZ, 8000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.tank_waste, 1, 4), new ItemStack(ModItems.tank_waste, 1, 3), FluidType.WATZ, 8000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.tank_waste, 1, 5), new ItemStack(ModItems.tank_waste, 1, 4), FluidType.WATZ, 8000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.tank_waste, 1, 6), new ItemStack(ModItems.tank_waste, 1, 5), FluidType.WATZ, 8000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.tank_waste, 1, 7), new ItemStack(ModItems.tank_waste, 1, 6), FluidType.WATZ, 8000));
-		FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.tank_waste, 1, 8), new ItemStack(ModItems.tank_waste, 1, 7), FluidType.WATZ, 8000));
-		int i = 1;
-		for(;i < FluidType.values().length; i++) {
-			FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.fluid_tank_full, 1, i), new ItemStack(ModItems.fluid_tank_empty), FluidType.getEnum(i), 1000));
-			FluidContainerRegistry.instance.registerContainer(new FluidContainer(new ItemStack(ModItems.fluid_barrel_full, 1, i), new ItemStack(ModItems.fluid_barrel_empty), FluidType.getEnum(i), 16000));
-		}
+		// TODO Replace mud container with fluid handling item
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.watz, 8000), new ItemStack(ModItems.tank_waste, 1, 1), new ItemStack(ModItems.tank_waste, 1, 0));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.watz, 8000), new ItemStack(ModItems.tank_waste, 1, 2), new ItemStack(ModItems.tank_waste, 1, 1));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.watz, 8000), new ItemStack(ModItems.tank_waste, 1, 3), new ItemStack(ModItems.tank_waste, 1, 2));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.watz, 8000), new ItemStack(ModItems.tank_waste, 1, 4), new ItemStack(ModItems.tank_waste, 1, 3));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.watz, 8000), new ItemStack(ModItems.tank_waste, 1, 5), new ItemStack(ModItems.tank_waste, 1, 4));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.watz, 8000), new ItemStack(ModItems.tank_waste, 1, 6), new ItemStack(ModItems.tank_waste, 1, 5));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.watz, 8000), new ItemStack(ModItems.tank_waste, 1, 7), new ItemStack(ModItems.tank_waste, 1, 6));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.watz, 8000), new ItemStack(ModItems.tank_waste, 1, 8), new ItemStack(ModItems.tank_waste, 1, 7));
 		for(Map.Entry<String, Fluid> entry : FluidRegistry.getRegisteredFluids().entrySet()){
-			i++;
-			net.minecraftforge.fluids.FluidContainerRegistry.registerFluidContainer(net.minecraftforge.fluids.FluidRegistry.getFluidStack(entry.getKey(), 1000), new ItemStack(ModItems.fluid_tank_full, 1, FluidRegistry.getFluidID(entry.getKey()) + FluidType.values().length + 10), new ItemStack(ModItems.fluid_tank_empty));
-			net.minecraftforge.fluids.FluidContainerRegistry.registerFluidContainer(net.minecraftforge.fluids.FluidRegistry.getFluidStack(entry.getKey(), 16000), new ItemStack(ModItems.fluid_barrel_full, 1, FluidRegistry.getFluidID(entry.getKey()) + FluidType.values().length + 10), new ItemStack(ModItems.fluid_barrel_empty));
+			FluidContainerRegistry.registerFluidContainer(FluidRegistry.getFluidStack(entry.getKey(), 1000), new ItemStack(ModItems.fluid_tank_full, 1, FluidRegistry.getFluidID(entry.getKey())), new ItemStack(ModItems.fluid_tank_empty));
+			FluidContainerRegistry.registerFluidContainer(FluidRegistry.getFluidStack(entry.getKey(), 16000), new ItemStack(ModItems.fluid_barrel_full, 1, FluidRegistry.getFluidID(entry.getKey())), new ItemStack(ModItems.fluid_barrel_empty));
 		}
 				
 				

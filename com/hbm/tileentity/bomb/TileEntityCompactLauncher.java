@@ -173,9 +173,8 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 	@Override
 	public void updateEntity() {
 
+		updateTypes();
 		if (!worldObj.isRemote) {
-			
-			updateTypes();
 
 			if(this.inputValidForTank(0, 2))
 				if(FFUtils.fillFromFluidContainer(slots, tanks[0], 2, 3))
@@ -206,7 +205,7 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 				PacketDispatcher.wrapper.sendToAll(new TEMissileMultipartPacket(xCoord, yCoord, zCoord, multipart));
 			else
 				PacketDispatcher.wrapper.sendToAll(new TEMissileMultipartPacket(xCoord, yCoord, zCoord, new MissileStruct()));
-
+			
 			outer:
 			for(int x = -1; x <= 1; x++) {
 				for(int z = -1; z <= 1; z++) {
@@ -309,7 +308,7 @@ public class TileEntityCompactLauncher extends TileEntity implements ISidedInven
 				this.solid -= fuel; break;
 			default: break;
 		}
-		
+		needsUpdate = true;
 		this.power -= maxPower * 0.75;
 	}
 	

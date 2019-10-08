@@ -29,19 +29,15 @@ public class ItemFluidTank extends Item {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item item, CreativeTabs tabs, List list) {
-		int i = 1;
-		for (; i < FluidType.values().length; ++i) {
-			list.add(new ItemStack(item, 1, i));
-		}
 		for(Entry<Fluid, Integer> entry : FluidRegistry.getRegisteredFluidIDsByFluid().entrySet()){
-			list.add(new ItemStack(item, 1, entry.getValue() + FluidType.values().length + 10));
+			list.add(new ItemStack(item, 1, entry.getValue()));
 		}
 	}
 
 	public String getItemStackDisplayName(ItemStack stack) {
 		String s = ("" + StatCollector.translateToLocal(this.getUnlocalizedName() + ".name")).trim();
-		String s1 = ("" + StatCollector.translateToLocal(FluidType.getEnum(stack.getItemDamage()).getUnlocalizedName()))
-				.trim();
+		String s1 = null;// ("" + StatCollector.translateToLocal(FluidType.getEnum(stack.getItemDamage()).getUnlocalizedName()))
+				//.trim();
 		if (FluidContainerRegistry.isContainer(stack)) {
 			s1 = ("" + StatCollector.translateToLocal(
 					FluidContainerRegistry.getFluidForFilledItem(stack).getFluid().getUnlocalizedName())).trim();
@@ -83,7 +79,8 @@ public class ItemFluidTank extends Item {
 		if (p_82790_2_ == 0) {
 			return 16777215;
 		} else {
-			int j = FluidType.getEnum(stack.getItemDamage()).getMSAColor();
+			int j;// = FluidType.getEnum(stack.getItemDamage()).getMSAColor();
+			j = 16777215;
 			if (FluidContainerRegistry.isContainer(stack)) {
 
 				j = FluidContainerRegistry.getFluidForFilledItem(stack).getFluid().getColor();
