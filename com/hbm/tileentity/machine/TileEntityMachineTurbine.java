@@ -13,6 +13,7 @@ import com.hbm.items.special.ItemBattery;
 import com.hbm.lib.Library;
 import com.hbm.packet.AuxElectricityPacket;
 import com.hbm.packet.FluidTankPacket;
+import com.hbm.packet.FluidTypePacketTest;
 import com.hbm.packet.PacketDispatcher;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -245,18 +246,6 @@ public class TileEntityMachineTurbine extends TileEntity implements ISidedInvent
 	
 	@Override
 	public void updateEntity() {
-		
-		if(tanks[0].getFluid() != null) {
-			tankTypes[0] = tanks[0].getFluid().getFluid();
-			Object[] duck = MachineRecipes.getTurbineOutput(tankTypes[0]);
-			if(duck != null) {
-				tankTypes[1] = (Fluid) duck[0];
-			}
-		}
-		
-		if(tanks[1].getFluid() != null) {
-			tankTypes[1] = tanks[1].getFluid().getFluid();
-		}
 		if(!worldObj.isRemote)
 		{
 			age++;
@@ -270,10 +259,10 @@ public class TileEntityMachineTurbine extends TileEntity implements ISidedInvent
 
 			if(inputValidForTank(0, 2))
 				if(FFUtils.fillFromFluidContainer(slots, tanks[0], 2, 3)) {
-					needsUpdate = true;
-					if(tanks[0].getFluid() != null) {
+					if(tanks[0].getFluid() != null){
 						tankTypes[0] = tanks[0].getFluid().getFluid();
 					}
+					needsUpdate = true;
 				}
 			
 			Object[] outs = MachineRecipes.getTurbineOutput(tanks[0].getFluid() == null ? null : tanks[0].getFluid().getFluid());
@@ -310,9 +299,10 @@ public class TileEntityMachineTurbine extends TileEntity implements ISidedInvent
 			
 			if(needsUpdate){
 				PacketDispatcher.wrapper.sendToAll(new FluidTankPacket(xCoord, yCoord, zCoord, new FluidTank[]{tanks[0], tanks[1]}));
+				PacketDispatcher.wrapper.sendToAll(new FluidTypePacketTest(xCoord, yCoord, zCoord, tankTypes));
 				needsUpdate = false;
 			}
-
+			
 			PacketDispatcher.wrapper.sendToAll(new AuxElectricityPacket(xCoord, yCoord, zCoord, power));
 		}
 	}

@@ -91,6 +91,8 @@ public class PacketDispatcher {
 		wrapper.registerMessage(TEMissileMultipartPacket.Handler.class, TEMissileMultipartPacket.class, i++, Side.CLIENT);
 		//Packet to update fluid tanks without also updating item stacks
 		wrapper.registerMessage(FluidTankPacket.Handler.class, FluidTankPacket.class, i++, Side.CLIENT);
+		//Quick fix for turbine tank packets
+		wrapper.registerMessage(FluidTypePacketTest.Handler.class, FluidTypePacketTest.class, i++, Side.CLIENT);
 	}
 	
 }
