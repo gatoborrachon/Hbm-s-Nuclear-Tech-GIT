@@ -7,6 +7,8 @@ import net.minecraftforge.fluids.Fluid;
 
 public class TileEntityFFGasDuctSolid extends TileEntityFFDuctBase {
 	public TileEntityFFGasDuctSolid(){
+		System.out.println("whateafd");
+		thisIsATest = true;
 		this.type = ModForgeFluids.gas;
 	}
 	

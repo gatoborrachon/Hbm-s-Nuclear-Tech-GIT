@@ -54,7 +54,7 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 	public TileEntityMachineRefinery() {
 		slots = new ItemStack[12];
 		tanks = new FluidTank[5];
-		tankTypes = new Fluid[] {ModForgeFluids.hotoil, ModForgeFluids.heavyoil, ModForgeFluids.napatha, ModForgeFluids.lightoil, ModForgeFluids.petroleum};
+		tankTypes = new Fluid[] {ModForgeFluids.hotoil, ModForgeFluids.heavyoil, ModForgeFluids.naphtha, ModForgeFluids.lightoil, ModForgeFluids.petroleum};
 		tanks[0] = new FluidTank(64000);
 		tanks[1] = new FluidTank(16000);
 		tanks[2] = new FluidTank(16000);
@@ -177,7 +177,7 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 		
 		tankTypes[0] = ModForgeFluids.hotoil;
 		tankTypes[1] = ModForgeFluids.heavyoil;
-		tankTypes[2] = ModForgeFluids.napatha;
+		tankTypes[2] = ModForgeFluids.naphtha;
 		tankTypes[3] = ModForgeFluids.lightoil;
 		tankTypes[4] = ModForgeFluids.petroleum;
 		
@@ -316,7 +316,7 @@ public class TileEntityMachineRefinery extends TileEntity implements ISidedInven
 
 				tanks[0].drain(100, true);
 				tanks[1].fill(new FluidStack(ModForgeFluids.heavyoil, ho), true);
-				tanks[2].fill(new FluidStack(ModForgeFluids.napatha, nt), true);
+				tanks[2].fill(new FluidStack(ModForgeFluids.naphtha, nt), true);
 				tanks[3].fill(new FluidStack(ModForgeFluids.lightoil, lo), true);
 				tanks[4].fill(new FluidStack(ModForgeFluids.petroleum, pe), true);
 				sulfur += 1;

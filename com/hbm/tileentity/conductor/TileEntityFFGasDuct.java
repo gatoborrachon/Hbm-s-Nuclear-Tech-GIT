@@ -8,6 +8,7 @@ import net.minecraftforge.fluids.Fluid;
 public class TileEntityFFGasDuct extends TileEntityFFDuctBase {
 	
 	public TileEntityFFGasDuct(){
+		thisIsATest = true;
 		this.type = ModForgeFluids.gas;
 	}
 	

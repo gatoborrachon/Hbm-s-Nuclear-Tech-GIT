@@ -8,6 +8,7 @@ import net.minecraftforge.fluids.Fluid;
 public class TileEntityFFOilDuctSolid extends TileEntityFFDuctBase {
 
 	public TileEntityFFOilDuctSolid(){
+		thisIsATest = true;
 		this.type = ModForgeFluids.oil;
 	}
 	

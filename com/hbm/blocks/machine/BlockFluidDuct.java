@@ -103,7 +103,7 @@ public class BlockFluidDuct extends BlockContainer {
 	public boolean onBlockActivated(World world, int x, int y, int z,
 			EntityPlayer p_149727_5_, int p_149727_6_, float p_149727_7_, float p_149727_8_, float p_149727_9_) {
 		//if(!world.isRemote)
-		//	System.out.println(((TileEntityFFDuctBase)world.getTileEntity(x, y, z)).getNetworkTrue().getTankInfo(ForgeDirection.UNKNOWN)[0].fluid.amount);
+		//	System.out.println(((TileEntityFFDuctBase)world.getTileEntity(x, y, z)).getNetworkTrue());
 		return super.onBlockActivated(world, x, y, z, p_149727_5_, p_149727_6_, p_149727_7_,
 				p_149727_8_, p_149727_9_);
 	}

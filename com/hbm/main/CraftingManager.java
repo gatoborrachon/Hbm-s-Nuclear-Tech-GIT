@@ -4,7 +4,6 @@ import java.util.Map.Entry;
 
 import com.hbm.blocks.ModBlocks;
 import com.hbm.forgefluid.ModForgeFluids;
-import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemBattery;
 import com.hbm.items.weapon.GunB92Cell;

@@ -26,7 +26,7 @@ public class ModForgeFluids {
 	
 	public static Fluid lubricant;
 	
-	public static Fluid napatha;
+	public static Fluid naphtha;
 	public static Fluid diesel;
 	
 	public static Fluid lightoil;
@@ -59,8 +59,8 @@ public class ModForgeFluids {
 	public static void PreInit(){
 		
 		steam = new Fluid("hbmsteam").setUnlocalizedName("hbmsteam");
-		hotsteam = new Fluid("hbmdensesteam").setUnlocalizedName("hbmdensesteam");
-		superhotsteam = new Fluid("hbmsuperdensesteam").setUnlocalizedName("hbmsuperdensesteam");
+		hotsteam = new Fluid("hbmhotsteam").setUnlocalizedName("hbmhotsteam");
+		superhotsteam = new Fluid("hbmsuperhotsteam").setUnlocalizedName("hbmsuperhotsteam");
 		coolant = new Fluid("hbmcoolant").setUnlocalizedName("hbmcoolant");
 		
 		deuterium = new Fluid("hbmdeuterium").setUnlocalizedName("hbmdeuterium");
@@ -79,7 +79,7 @@ public class ModForgeFluids {
 		
 		lubricant = new Fluid("hbmlubircant").setUnlocalizedName("hbmlubricant");
 		
-		napatha = new Fluid("hbmnapatha").setUnlocalizedName("hbmnapatha");
+		naphtha = new Fluid("hbmnaphtha").setUnlocalizedName("hbmnaphtha");
 		diesel = new Fluid("hbmdiesel").setUnlocalizedName("hbmdiesel");
 		
 		lightoil = new Fluid("hbmlightoil").setUnlocalizedName("hbmlightoil");
@@ -135,7 +135,7 @@ public class ModForgeFluids {
 		
 		FluidRegistry.registerFluid(lubricant);
 		
-		FluidRegistry.registerFluid(napatha);
+		FluidRegistry.registerFluid(naphtha);
 		FluidRegistry.registerFluid(diesel);
 		
 		FluidRegistry.registerFluid(lightoil);

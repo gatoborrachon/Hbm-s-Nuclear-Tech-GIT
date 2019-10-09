@@ -7,6 +7,7 @@ import com.hbm.forgefluid.ModForgeFluids;
 public class TileEntityFFOilDuct extends TileEntityFFDuctBase {
 
 	public TileEntityFFOilDuct(){
+		thisIsATest = true;
 		this.type = ModForgeFluids.oil;
 	}
 	

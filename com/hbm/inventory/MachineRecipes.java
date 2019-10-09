@@ -1,19 +1,18 @@
 package com.hbm.inventory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.hbm.blocks.ModBlocks;
 import com.hbm.forgefluid.ModForgeFluids;
-import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.items.ModItems;
 import com.hbm.items.special.ItemBattery;
 import com.hbm.items.tool.ItemAssemblyTemplate;
 import com.hbm.items.tool.ItemAssemblyTemplate.EnumAssemblyTemplate;
 import com.hbm.items.tool.ItemChemistryTemplate;
+import com.hbm.items.tool.ItemFluidIcon;
 import com.hbm.main.MainRegistry;
 
 import net.minecraft.enchantment.Enchantment;
@@ -23,6 +22,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidContainerRegistry.FluidContainerData;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
@@ -1310,13 +1311,11 @@ public class MachineRecipes {
 
 	public Map<Object, Object[]> getGasCentrifugeRecipes() {
 		Map<Object, Object[]> recipes = new HashMap<Object, Object[]>();
-		//TODO add fluid icon recipe system later
-		/*
-		for(int i = 0; i < FluidType.values().length; i++) {
+		for(Fluid f : FluidRegistry.getRegisteredFluidIDsByFluid().keySet()) {
 			
-			if(getGasCentOutput(FluidType.getEnum(i)) != null) {
+			if(getGasCentOutput(f) != null) {
 				
-				List<GasCentOutput> outputs = getGasCentOutput(FluidType.getEnum(i));
+				List<GasCentOutput> outputs = getGasCentOutput(f);
 				
 				int totalWeight = 0;
 				
@@ -1324,9 +1323,9 @@ public class MachineRecipes {
 					totalWeight += o.weight;
 				}
 				
-				ItemStack input = new ItemStack(ModItems.fluid_icon, 1, i);
+				ItemStack input = new ItemStack(ModItems.fluid_icon, 1, f.getID());
 				
-				//ItemFluidIcon.addQuantity(input, getFluidConsumedGasCent(FluidType.getEnum(i)) * totalWeight);
+				ItemFluidIcon.addQuantity(input, getFluidConsumedGasCent(f) * totalWeight);
 
 				ItemStack[] out = new ItemStack[4];
 				
@@ -1343,7 +1342,7 @@ public class MachineRecipes {
 				recipes.put(input, out);
 			}
 		}
-		*/
+		
 		return recipes;
 	}
 
@@ -2402,7 +2401,7 @@ public class MachineRecipes {
 			list.add(new ItemStack(ModItems.circuit_targeting_tier1, 1));
 			break;
 		case CARRIER:
-			list.add(new ItemStack(ModItems.fluid_barrel_full, 16, FluidType.KEROSENE.getID()));
+			list.add(new ItemStack(ModItems.fluid_barrel_full, 16, ModForgeFluids.kerosene.getID()));
 			list.add(new ItemStack(ModItems.thruster_medium, 4));
 			list.add(new ItemStack(ModItems.thruster_large, 1));
 			list.add(new ItemStack(ModItems.hull_big_titanium, 6));
@@ -2518,7 +2517,7 @@ public class MachineRecipes {
 			list.add(new ItemStack(ModItems.plate_steel, 6));
 			list.add(new ItemStack(ModItems.plate_desh, 4));
 			list.add(new ItemStack(ModItems.hull_big_titanium, 3));
-			list.add(new ItemStack(ModItems.fluid_barrel_full, 1, FluidType.KEROSENE.getID()));
+			list.add(new ItemStack(ModItems.fluid_barrel_full, 1, ModForgeFluids.kerosene.getID()));
 			list.add(new ItemStack(ModItems.photo_panel, 24));
 			list.add(new ItemStack(ModItems.board_copper, 12));
 			list.add(new ItemStack(ModItems.circuit_gold, 6));
@@ -2580,7 +2579,7 @@ public class MachineRecipes {
 			list.add(new ItemStack(ModItems.plate_titanium, 12));
 			list.add(new ItemStack(ModItems.plate_desh, 8));
 			list.add(new ItemStack(ModItems.hull_big_titanium, 3));
-			list.add(new ItemStack(ModItems.fluid_barrel_full, 1, FluidType.WATER.getID()));
+			list.add(new ItemStack(ModItems.fluid_barrel_full, 1, FluidRegistry.WATER.getID()));
 			list.add(new ItemStack(ModItems.photo_panel, 16));
 			list.add(new ItemStack(ModItems.thruster_nuclear, 1));
 			list.add(new ItemStack(ModItems.rod_quad_uranium_fuel, 2));
@@ -2594,7 +2593,7 @@ public class MachineRecipes {
 			list.add(new ItemStack(ModItems.motor, 2));
 			list.add(new ItemStack(ModItems.drill_titanium, 2));
 			list.add(new ItemStack(ModItems.circuit_targeting_tier4, 2));
-			list.add(new ItemStack(ModItems.fluid_barrel_full, 1, FluidType.KEROSENE.getID()));
+			list.add(new ItemStack(ModItems.fluid_barrel_full, 1, ModForgeFluids.kerosene.getID()));
 			list.add(new ItemStack(ModItems.thruster_small, 1));
 			list.add(new ItemStack(ModItems.photo_panel, 12));
 			list.add(new ItemStack(ModItems.centrifuge_element, 4));
@@ -4826,11 +4825,11 @@ public class MachineRecipes {
         		for(int j = 0; j < listIn.size(); j++)
         			if(listIn.get(j) != null)
         				inputs[j + 2] = listIn.get(j).copy();
-        	
-        	/*for(int j = 0; j < fluidIn.length; j++)
+        	FluidStack[] fluidIn = MachineRecipes.getFluidInputFromTempate(inputs[6]);
+        	for(int j = 0; j < fluidIn.length; j++)
         		if(fluidIn[j] != null)
-        			inputs[j] = ItemFluidIcon.addQuantity(new ItemStack(ModItems.fluid_icon, 1, Arrays.asList(FluidType.values()).indexOf(fluidIn[j].type)), fluidIn[j].fill);
-        	*/
+        			inputs[j] = ItemFluidIcon.addQuantity(new ItemStack(ModItems.fluid_icon, 1, fluidIn[j].getFluidID()), fluidIn[j].amount);
+        	
         	ItemStack[] listOut = MachineRecipes.getChemOutputFromTempate(inputs[6]);
         	for(int j = 0; j < listOut.length; j++)
         		if(listOut[j] != null)
@@ -4854,23 +4853,23 @@ public class MachineRecipes {
 
 		Map<Object, Object[]> recipes = new HashMap<Object, Object[]>();
 
-		ItemStack oil = new ItemStack(ModItems.fluid_icon, 1, Arrays.asList(FluidType.values()).indexOf(FluidType.HOTOIL));
+		ItemStack oil = new ItemStack(ModItems.fluid_icon, 1, ModForgeFluids.hotoil.getID());
 		oil.stackTagCompound = new NBTTagCompound();
 		oil.stackTagCompound.setInteger("fill", 1000);
 		
-		ItemStack heavy = new ItemStack(ModItems.fluid_icon, 1, Arrays.asList(FluidType.values()).indexOf(FluidType.HEAVYOIL));
+		ItemStack heavy = new ItemStack(ModItems.fluid_icon, 1, ModForgeFluids.heavyoil.getID());
 		heavy.stackTagCompound = new NBTTagCompound();
 		heavy.stackTagCompound.setInteger("fill", 500);
 		
-		ItemStack naphtha = new ItemStack(ModItems.fluid_icon, 1, Arrays.asList(FluidType.values()).indexOf(FluidType.NAPHTHA));
+		ItemStack naphtha = new ItemStack(ModItems.fluid_icon, 1, ModForgeFluids.naphtha.getID());
 		naphtha.stackTagCompound = new NBTTagCompound();
 		naphtha.stackTagCompound.setInteger("fill", 250);
 		
-		ItemStack light = new ItemStack(ModItems.fluid_icon, 1, Arrays.asList(FluidType.values()).indexOf(FluidType.LIGHTOIL));
+		ItemStack light = new ItemStack(ModItems.fluid_icon, 1, ModForgeFluids.lightoil.getID());
 		light.stackTagCompound = new NBTTagCompound();
 		light.stackTagCompound.setInteger("fill", 150);
 		
-		ItemStack petroleum = new ItemStack(ModItems.fluid_icon, 1, Arrays.asList(FluidType.values()).indexOf(FluidType.PETROLEUM));
+		ItemStack petroleum = new ItemStack(ModItems.fluid_icon, 1, ModForgeFluids.petroleum.getID());
 		petroleum.stackTagCompound = new NBTTagCompound();
 		petroleum.stackTagCompound.setInteger("fill", 100);
 		
@@ -5048,7 +5047,7 @@ public class MachineRecipes {
 			input[0] = new FluidStack(ModForgeFluids.smear, 1000);
 			break;
         case FP_NAPHTHA:
-			input[0] = new FluidStack(ModForgeFluids.napatha, 1000);
+			input[0] = new FluidStack(ModForgeFluids.naphtha, 1000);
 			break;
         case FP_LIGHTOIL:
 			input[0] = new FluidStack(ModForgeFluids.lightoil, 1000);
@@ -5097,7 +5096,7 @@ public class MachineRecipes {
 			input[1] = new FluidStack(FluidRegistry.WATER, 1400);
 			break;
         case CC_NAPHTHA:
-			input[0] = new FluidStack(ModForgeFluids.napatha, 1200);
+			input[0] = new FluidStack(ModForgeFluids.naphtha, 1200);
 			input[1] = new FluidStack(ModForgeFluids.steam, 2400);
 			break;
         case ASPHALT:
@@ -5148,7 +5147,7 @@ public class MachineRecipes {
 			input[0] = new FluidStack(ModForgeFluids.lubricant, 250);
         	break;
     	case SF_NAPHTHA:
-			input[0] = new FluidStack(ModForgeFluids.napatha, 300);
+			input[0] = new FluidStack(ModForgeFluids.naphtha, 300);
         	break;
     	case SF_DIESEL:
 			input[0] = new FluidStack(ModForgeFluids.diesel, 400);
@@ -5378,7 +5377,7 @@ public class MachineRecipes {
 			output[1] = new FluidStack(ModForgeFluids.petroleum, 200);
 			break;
         case FC_I_NAPHTHA:
-			output[0] = new FluidStack(ModForgeFluids.napatha, 800);
+			output[0] = new FluidStack(ModForgeFluids.naphtha, 800);
 			break;
         case FC_GAS_PETROLEUM:
 			output[0] = new FluidStack(ModForgeFluids.petroleum, 800);
@@ -5402,7 +5401,7 @@ public class MachineRecipes {
 			output[0] = new FluidStack(ModForgeFluids.heavyoil, 1800);
 			break;
         case CC_NAPHTHA:
-			output[0] = new FluidStack(ModForgeFluids.napatha, 2000);
+			output[0] = new FluidStack(ModForgeFluids.naphtha, 2000);
 			break;
         case COOLANT:
 			output[0] = new FluidStack(ModForgeFluids.coolant, 2000);
@@ -5651,18 +5650,19 @@ public class MachineRecipes {
 		return map;
 	}
 	
-	public Map<Object, Object> getFluidContainers() {
-		Map<Object, Object> map = new HashMap<Object, Object>();
+	public Map<ItemStack, ItemStack> getFluidContainers() {
+		Map<ItemStack, ItemStack> map = new HashMap<ItemStack, ItemStack>();
 		
-		for(FluidContainer con : FluidContainerRegistry.instance.allContainers) {
-			if(con != null) {
-				ItemStack fluid = new ItemStack(ModItems.fluid_icon, 1, Arrays.asList(FluidType.values()).indexOf(con.type));
+		for(FluidContainerData con : FluidContainerRegistry.getRegisteredFluidContainerData()) {
+			if(con != null && con.fluid != null) {
+				ItemStack fluid = new ItemStack(ModItems.fluid_icon, 1, con.fluid.getFluidID());
 				fluid.stackTagCompound = new NBTTagCompound();
-				fluid.stackTagCompound.setInteger("fill", con.content);
-				map.put(fluid, con.fullContainer);
+				fluid.stackTagCompound.setInteger("fill", con.fluid.amount);
+				map.put(fluid, con.filledContainer);
 			}
 		}
 		
 		return map;
 	}
 }
+

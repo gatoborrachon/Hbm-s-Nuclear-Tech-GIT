@@ -2,7 +2,6 @@ package com.hbm.packet;
 
 import java.util.Map.Entry;
 
-import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.interfaces.IFluidPipe;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;

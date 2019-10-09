@@ -25,7 +25,6 @@ public class FFPipeNetwork implements IFluidHandler {
 
 	private int tickTimer = 0;
 
-	//TODO fix bug where network can't fill tile entities (probably because they weren't loaded when the network was built, try waiting until next update tick to build network)
 	
 	/**
 	 * Constructor.
@@ -83,7 +82,6 @@ public class FFPipeNetwork implements IFluidHandler {
 	 */
 	public void updateTick(){
 		//System.out.println(this.getType().getName() + " " + this.fillables.size());
-		//TODO Fix thing where several thousand boilers are added for some reason.
 		if(tickTimer < 20){
 			tickTimer ++;
 		} else {

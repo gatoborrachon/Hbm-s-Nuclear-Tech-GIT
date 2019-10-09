@@ -330,7 +330,7 @@ public class ModEventHandlerClient {
 			
 			ModForgeFluids.lubricant.setIcons(fluidIcons[28], fluidIcons[29]);
 			
-			ModForgeFluids.napatha.setIcons(fluidIcons[30], fluidIcons[31]);
+			ModForgeFluids.naphtha.setIcons(fluidIcons[30], fluidIcons[31]);
 			ModForgeFluids.diesel.setIcons(fluidIcons[32], fluidIcons[33]);
 			
 			ModForgeFluids.lightoil.setIcons(fluidIcons[34], fluidIcons[35]);

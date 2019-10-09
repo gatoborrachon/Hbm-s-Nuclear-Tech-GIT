@@ -2,8 +2,7 @@ package com.hbm.render.item;
 
 import org.lwjgl.opengl.GL11;
 
-import com.hbm.items.tool.ItemForgeFluidIdentifier;
-
+import com.hbm.items.tool.ItemFluidIcon;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
@@ -20,17 +19,17 @@ import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.fluids.Fluid;
 
 @SideOnly(Side.CLIENT)
-public class ItemRenderFFIdentifier implements IItemRenderer {
+public class ItemRenderFluidIcon implements IItemRenderer {
 
 	RenderItem renderItem = new RenderItem();
 
-	public ItemRenderFFIdentifier() {
+	public ItemRenderFluidIcon() {
 
 	}
 
 	@Override
 	public boolean handleRenderType(ItemStack item, ItemRenderType type) {
-		if (item.getItem() instanceof ItemForgeFluidIdentifier) {
+		if (item.getItem() instanceof ItemFluidIcon) {
 			return true;
 		}
 		return false;
@@ -53,8 +52,8 @@ public class ItemRenderFFIdentifier implements IItemRenderer {
 		OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 
 		Tessellator tes = Tessellator.instance;
-		if (item.getItem() instanceof ItemForgeFluidIdentifier) {
-			Fluid fluid = ItemForgeFluidIdentifier.getType(item);
+		if (item.getItem() instanceof ItemFluidIcon) {
+			Fluid fluid = ItemFluidIcon.getFluid(item);
 			IIcon itemIcon = item.getItem().getIcon(item, 0);
 			IIcon fluidIcon = fluid.getStillIcon();
 
@@ -148,57 +147,57 @@ public class ItemRenderFFIdentifier implements IItemRenderer {
 	protected void drawLiquid(IIcon fluidIcon, Fluid fluid, Tessellator tes) {
 		float iconMaxU = fluidIcon.getInterpolatedU(9);
 		float iconMinU = fluidIcon.getInterpolatedU(7);
-		float iconMaxV = fluidIcon.getInterpolatedV(12);
+		float iconMaxV = fluidIcon.getInterpolatedV(14);
 		float iconMinV = fluidIcon.getInterpolatedV(4);
 
 		// Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 		bindTexture(Minecraft.getMinecraft().getTextureManager(), fluid.getSpriteNumber());
 		tes.startDrawingQuads();
 
-		tes.addVertexWithUV(7, 12, 0, iconMinU, iconMaxV);
-		tes.addVertexWithUV(9, 12, 0, iconMaxU, iconMaxV);
+		tes.addVertexWithUV(7, 14, 0, iconMinU, iconMaxV);
+		tes.addVertexWithUV(9, 14, 0, iconMaxU, iconMaxV);
 		tes.addVertexWithUV(9, 4, 0, iconMaxU, iconMinV);
 		tes.addVertexWithUV(7, 4, 0, iconMinU, iconMinV);
 
 		iconMaxU = fluidIcon.getInterpolatedU(10);
 		iconMinU = fluidIcon.getInterpolatedU(9);
-		iconMaxV = fluidIcon.getInterpolatedV(11);
-		iconMinV = fluidIcon.getInterpolatedV(6);
+		iconMaxV = fluidIcon.getInterpolatedV(14);
+		iconMinV = fluidIcon.getInterpolatedV(7);
 
-		tes.addVertexWithUV(9, 11, 0, iconMinU, iconMaxV);
-		tes.addVertexWithUV(10, 11, 0, iconMaxU, iconMaxV);
-		tes.addVertexWithUV(10, 6, 0, iconMaxU, iconMinV);
-		tes.addVertexWithUV(9, 6, 0, iconMinU, iconMinV);
+		tes.addVertexWithUV(9, 14, 0, iconMinU, iconMaxV);
+		tes.addVertexWithUV(10, 14, 0, iconMaxU, iconMaxV);
+		tes.addVertexWithUV(10, 7, 0, iconMaxU, iconMinV);
+		tes.addVertexWithUV(9, 7, 0, iconMinU, iconMinV);
 
 		iconMaxU = fluidIcon.getInterpolatedU(7);
 		iconMinU = fluidIcon.getInterpolatedU(6);
-		iconMaxV = fluidIcon.getInterpolatedV(11);
-		iconMinV = fluidIcon.getInterpolatedV(6);
+		iconMaxV = fluidIcon.getInterpolatedV(14);
+		iconMinV = fluidIcon.getInterpolatedV(7);
 
-		tes.addVertexWithUV(6, 11, 0, iconMinU, iconMaxV);
-		tes.addVertexWithUV(7, 11, 0, iconMaxU, iconMaxV);
-		tes.addVertexWithUV(7, 6, 0, iconMaxU, iconMinV);
-		tes.addVertexWithUV(6, 6, 0, iconMinU, iconMinV);
+		tes.addVertexWithUV(6, 14, 0, iconMinU, iconMaxV);
+		tes.addVertexWithUV(7, 14, 0, iconMaxU, iconMaxV);
+		tes.addVertexWithUV(7, 7, 0, iconMaxU, iconMinV);
+		tes.addVertexWithUV(6, 7, 0, iconMinU, iconMinV);
 
 		iconMaxU = fluidIcon.getInterpolatedU(6);
 		iconMinU = fluidIcon.getInterpolatedU(5);
-		iconMaxV = fluidIcon.getInterpolatedV(10);
-		iconMinV = fluidIcon.getInterpolatedV(8);
+		iconMaxV = fluidIcon.getInterpolatedV(13);
+		iconMinV = fluidIcon.getInterpolatedV(10);
 
-		tes.addVertexWithUV(5, 10, 0, iconMinU, iconMaxV);
-		tes.addVertexWithUV(6, 10, 0, iconMaxU, iconMaxV);
-		tes.addVertexWithUV(6, 8, 0, iconMaxU, iconMinV);
-		tes.addVertexWithUV(5, 8, 0, iconMinU, iconMinV);
+		tes.addVertexWithUV(5, 13, 0, iconMinU, iconMaxV);
+		tes.addVertexWithUV(6, 13, 0, iconMaxU, iconMaxV);
+		tes.addVertexWithUV(6, 10, 0, iconMaxU, iconMinV);
+		tes.addVertexWithUV(5, 10, 0, iconMinU, iconMinV);
 
 		iconMaxU = fluidIcon.getInterpolatedU(11);
 		iconMinU = fluidIcon.getInterpolatedU(10);
-		iconMaxV = fluidIcon.getInterpolatedV(10);
-		iconMinV = fluidIcon.getInterpolatedV(8);
+		iconMaxV = fluidIcon.getInterpolatedV(13);
+		iconMinV = fluidIcon.getInterpolatedV(10);
 
-		tes.addVertexWithUV(10, 10, 0, iconMinU, iconMaxV);
-		tes.addVertexWithUV(11, 10, 0, iconMaxU, iconMaxV);
-		tes.addVertexWithUV(11, 8, 0, iconMaxU, iconMinV);
-		tes.addVertexWithUV(10, 8, 0, iconMinU, iconMinV);
+		tes.addVertexWithUV(10, 13, 0, iconMinU, iconMaxV);
+		tes.addVertexWithUV(11, 13, 0, iconMaxU, iconMaxV);
+		tes.addVertexWithUV(11, 10, 0, iconMaxU, iconMinV);
+		tes.addVertexWithUV(10, 10, 0, iconMinU, iconMinV);
 
 		tes.draw();
 	}
@@ -219,93 +218,93 @@ public class ItemRenderFFIdentifier implements IItemRenderer {
 		if (reverse) {
 			tes.addVertexWithUV(7 * pixel, 12 * pixel, offset, iconMinU, iconMaxV);
 			tes.addVertexWithUV(9 * pixel, 12 * pixel, offset, iconMaxU, iconMaxV);
-			tes.addVertexWithUV(9 * pixel, 4 * pixel, offset, iconMaxU, iconMinV);
-			tes.addVertexWithUV(7 * pixel, 4 * pixel, offset, iconMinU, iconMinV);
+			tes.addVertexWithUV(9 * pixel, 2 * pixel, offset, iconMaxU, iconMinV);
+			tes.addVertexWithUV(7 * pixel, 2 * pixel, offset, iconMinU, iconMinV);
 
 			iconMaxU = fluidIcon.getInterpolatedU(10);
 			iconMinU = fluidIcon.getInterpolatedU(9);
-			iconMaxV = fluidIcon.getInterpolatedV(10);
-			iconMinV = fluidIcon.getInterpolatedV(5);
+			iconMaxV = fluidIcon.getInterpolatedV(9);
+			iconMinV = fluidIcon.getInterpolatedV(2);
 
-			tes.addVertexWithUV(9 * pixel, 10 * pixel, offset, iconMinU, iconMaxV);
-			tes.addVertexWithUV(10 * pixel, 10 * pixel, offset, iconMaxU, iconMaxV);
-			tes.addVertexWithUV(10 * pixel, 5 * pixel, offset, iconMaxU, iconMinV);
-			tes.addVertexWithUV(9 * pixel, 5 * pixel, offset, iconMinU, iconMinV);
+			tes.addVertexWithUV(9 * pixel, 9 * pixel, offset, iconMinU, iconMaxV);
+			tes.addVertexWithUV(10 * pixel, 9 * pixel, offset, iconMaxU, iconMaxV);
+			tes.addVertexWithUV(10 * pixel, 2 * pixel, offset, iconMaxU, iconMinV);
+			tes.addVertexWithUV(9 * pixel, 2 * pixel, offset, iconMinU, iconMinV);
 
 			iconMaxU = fluidIcon.getInterpolatedU(7);
 			iconMinU = fluidIcon.getInterpolatedU(6);
-			iconMaxV = fluidIcon.getInterpolatedV(10);
-			iconMinV = fluidIcon.getInterpolatedV(5);
+			iconMaxV = fluidIcon.getInterpolatedV(9);
+			iconMinV = fluidIcon.getInterpolatedV(2);
 
-			tes.addVertexWithUV(6 * pixel, 10 * pixel, offset, iconMinU, iconMaxV);
-			tes.addVertexWithUV(7 * pixel, 10 * pixel, offset, iconMaxU, iconMaxV);
-			tes.addVertexWithUV(7 * pixel, 5 * pixel, offset, iconMaxU, iconMinV);
-			tes.addVertexWithUV(6 * pixel, 5 * pixel, offset, iconMinU, iconMinV);
+			tes.addVertexWithUV(6 * pixel, 9 * pixel, offset, iconMinU, iconMaxV);
+			tes.addVertexWithUV(7 * pixel, 9 * pixel, offset, iconMaxU, iconMaxV);
+			tes.addVertexWithUV(7 * pixel, 2 * pixel, offset, iconMaxU, iconMinV);
+			tes.addVertexWithUV(6 * pixel, 2 * pixel, offset, iconMinU, iconMinV);
 
 			iconMaxU = fluidIcon.getInterpolatedU(6);
 			iconMinU = fluidIcon.getInterpolatedU(5);
-			iconMaxV = fluidIcon.getInterpolatedV(8);
-			iconMinV = fluidIcon.getInterpolatedV(6);
+			iconMaxV = fluidIcon.getInterpolatedV(6);
+			iconMinV = fluidIcon.getInterpolatedV(3);
 
-			tes.addVertexWithUV(5 * pixel, 8 * pixel, offset, iconMinU, iconMaxV);
-			tes.addVertexWithUV(6 * pixel, 8 * pixel, offset, iconMaxU, iconMaxV);
-			tes.addVertexWithUV(6 * pixel, 6 * pixel, offset, iconMaxU, iconMinV);
-			tes.addVertexWithUV(5 * pixel, 6 * pixel, offset, iconMinU, iconMinV);
+			tes.addVertexWithUV(5 * pixel, 6 * pixel, offset, iconMinU, iconMaxV);
+			tes.addVertexWithUV(6 * pixel, 6 * pixel, offset, iconMaxU, iconMaxV);
+			tes.addVertexWithUV(6 * pixel, 3 * pixel, offset, iconMaxU, iconMinV);
+			tes.addVertexWithUV(5 * pixel, 3 * pixel, offset, iconMinU, iconMinV);
 
 			iconMaxU = fluidIcon.getInterpolatedU(11);
 			iconMinU = fluidIcon.getInterpolatedU(10);
-			iconMaxV = fluidIcon.getInterpolatedV(8);
-			iconMinV = fluidIcon.getInterpolatedV(6);
+			iconMaxV = fluidIcon.getInterpolatedV(6);
+			iconMinV = fluidIcon.getInterpolatedV(3);
 
-			tes.addVertexWithUV(10 * pixel, 8 * pixel, offset, iconMinU, iconMaxV);
-			tes.addVertexWithUV(11 * pixel, 8 * pixel, offset, iconMaxU, iconMaxV);
-			tes.addVertexWithUV(11 * pixel, 6 * pixel, offset, iconMaxU, iconMinV);
-			tes.addVertexWithUV(10 * pixel, 6 * pixel, offset, iconMinU, iconMinV);
+			tes.addVertexWithUV(10 * pixel, 6 * pixel, offset, iconMinU, iconMaxV);
+			tes.addVertexWithUV(11 * pixel, 6 * pixel, offset, iconMaxU, iconMaxV);
+			tes.addVertexWithUV(11 * pixel, 3 * pixel, offset, iconMaxU, iconMinV);
+			tes.addVertexWithUV(10 * pixel, 3 * pixel, offset, iconMinU, iconMinV);
 		} else {
-			tes.addVertexWithUV(7 * pixel, 4 * pixel, offset, iconMinU, iconMaxV);
-			tes.addVertexWithUV(9 * pixel, 4 * pixel, offset, iconMaxU, iconMaxV);
+			tes.addVertexWithUV(7 * pixel, 2 * pixel, offset, iconMinU, iconMaxV);
+			tes.addVertexWithUV(9 * pixel, 2 * pixel, offset, iconMaxU, iconMaxV);
 			tes.addVertexWithUV(9 * pixel, 12 * pixel, offset, iconMaxU, iconMinV);
 			tes.addVertexWithUV(7 * pixel, 12 * pixel, offset, iconMinU, iconMinV);
 
 			iconMaxU = fluidIcon.getInterpolatedU(10);
 			iconMinU = fluidIcon.getInterpolatedU(9);
-			iconMaxV = fluidIcon.getInterpolatedV(10);
-			iconMinV = fluidIcon.getInterpolatedV(5);
+			iconMaxV = fluidIcon.getInterpolatedV(9);
+			iconMinV = fluidIcon.getInterpolatedV(2);
 
-			tes.addVertexWithUV(9 * pixel, 5 * pixel, offset, iconMinU, iconMaxV);
-			tes.addVertexWithUV(10 * pixel, 5 * pixel, offset, iconMaxU, iconMaxV);
-			tes.addVertexWithUV(10 * pixel, 10 * pixel, offset, iconMaxU, iconMinV);
-			tes.addVertexWithUV(9 * pixel, 10 * pixel, offset, iconMinU, iconMinV);
+			tes.addVertexWithUV(9 * pixel, 2 * pixel, offset, iconMinU, iconMaxV);
+			tes.addVertexWithUV(10 * pixel, 2 * pixel, offset, iconMaxU, iconMaxV);
+			tes.addVertexWithUV(10 * pixel, 9 * pixel, offset, iconMaxU, iconMinV);
+			tes.addVertexWithUV(9 * pixel, 9 * pixel, offset, iconMinU, iconMinV);
 
 			iconMaxU = fluidIcon.getInterpolatedU(7);
 			iconMinU = fluidIcon.getInterpolatedU(6);
-			iconMaxV = fluidIcon.getInterpolatedV(10);
-			iconMinV = fluidIcon.getInterpolatedV(5);
+			iconMaxV = fluidIcon.getInterpolatedV(9);
+			iconMinV = fluidIcon.getInterpolatedV(2);
 
-			tes.addVertexWithUV(6 * pixel, 5 * pixel, offset, iconMinU, iconMaxV);
-			tes.addVertexWithUV(7 * pixel, 5 * pixel, offset, iconMaxU, iconMaxV);
-			tes.addVertexWithUV(7 * pixel, 10 * pixel, offset, iconMaxU, iconMinV);
-			tes.addVertexWithUV(6 * pixel, 10 * pixel, offset, iconMinU, iconMinV);
+			tes.addVertexWithUV(6 * pixel, 2 * pixel, offset, iconMinU, iconMaxV);
+			tes.addVertexWithUV(7 * pixel, 2 * pixel, offset, iconMaxU, iconMaxV);
+			tes.addVertexWithUV(7 * pixel, 9 * pixel, offset, iconMaxU, iconMinV);
+			tes.addVertexWithUV(6 * pixel, 9 * pixel, offset, iconMinU, iconMinV);
 
 			iconMaxU = fluidIcon.getInterpolatedU(6);
 			iconMinU = fluidIcon.getInterpolatedU(5);
-			iconMaxV = fluidIcon.getInterpolatedV(8);
-			iconMinV = fluidIcon.getInterpolatedV(6);
+			iconMaxV = fluidIcon.getInterpolatedV(6);
+			iconMinV = fluidIcon.getInterpolatedV(3);
 
-			tes.addVertexWithUV(5 * pixel, 6 * pixel, offset, iconMinU, iconMaxV);
-			tes.addVertexWithUV(6 * pixel, 6 * pixel, offset, iconMaxU, iconMaxV);
-			tes.addVertexWithUV(6 * pixel, 8 * pixel, offset, iconMaxU, iconMinV);
-			tes.addVertexWithUV(5 * pixel, 8 * pixel, offset, iconMinU, iconMinV);
+			tes.addVertexWithUV(5 * pixel, 3 * pixel, offset, iconMinU, iconMaxV);
+			tes.addVertexWithUV(6 * pixel, 3 * pixel, offset, iconMaxU, iconMaxV);
+			tes.addVertexWithUV(6 * pixel, 6 * pixel, offset, iconMaxU, iconMinV);
+			tes.addVertexWithUV(5 * pixel, 6 * pixel, offset, iconMinU, iconMinV);
 
 			iconMaxU = fluidIcon.getInterpolatedU(11);
 			iconMinU = fluidIcon.getInterpolatedU(10);
-			iconMaxV = fluidIcon.getInterpolatedV(8);
-			iconMinV = fluidIcon.getInterpolatedV(6);
+			iconMaxV = fluidIcon.getInterpolatedV(6);
+			iconMinV = fluidIcon.getInterpolatedV(3);
 
-			tes.addVertexWithUV(10 * pixel, 6 * pixel, offset, iconMinU, iconMaxV);
-			tes.addVertexWithUV(11 * pixel, 6 * pixel, offset, iconMaxU, iconMaxV);
-			tes.addVertexWithUV(11 * pixel, 8 * pixel, offset, iconMaxU, iconMinV);
-			tes.addVertexWithUV(10 * pixel, 8 * pixel, offset, iconMinU, iconMinV);
+			tes.addVertexWithUV(10 * pixel, 3 * pixel, offset, iconMinU, iconMaxV);
+			tes.addVertexWithUV(11 * pixel, 3 * pixel, offset, iconMaxU, iconMaxV);
+			tes.addVertexWithUV(11 * pixel, 6 * pixel, offset, iconMaxU, iconMinV);
+			tes.addVertexWithUV(10 * pixel, 6 * pixel, offset, iconMinU, iconMinV);
 		}
 		tes.draw();
 	}

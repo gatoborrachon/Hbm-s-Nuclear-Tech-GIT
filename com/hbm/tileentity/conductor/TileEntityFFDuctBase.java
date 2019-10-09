@@ -31,6 +31,7 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 	public boolean isValidForForming = true;
 	public boolean firstUpdate = true;
 	public boolean needsBuildNetwork = false;
+	public boolean thisIsATest = false;
 	
 	public int weirdTest = 0;
 
@@ -52,13 +53,22 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 			//this.getNetwork();
 			//this.checkOtherNetworks();
 			//this.network.addPipe(this);
-			//this.checkFluidHandlers();
 			this.checkOtherNetworks();
+			
+			
 			if(this.network == null) {
 				FFPipeNetwork.buildNewNetwork(this);
 				System.out.println("here");
 			}
+			this.checkFluidHandlers();
 			needsBuildNetwork = false;
+		}
+		
+		if(thisIsATest){
+			System.out.println("dfasfdadf");
+			this.typeChanged(this.type);
+			this.checkFluidHandlers();
+			thisIsATest = false;
 		}
 	}
 	
@@ -193,6 +203,7 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 	}
 	
 	public void typeChanged(Fluid type){
+		
 		this.getNetwork().setType(type);;
 		for(int i = 0; i < 6; i++){
 			TileEntity ent = FFPipeNetwork.getTileEntityAround(this, i);
@@ -213,12 +224,13 @@ public class TileEntityFFDuctBase extends TileEntity implements IFluidPipe, IFlu
 		for(int i = 0; i < 6;i++) {
 			TileEntity te = FFPipeNetwork.getTileEntityAround(this, i);
 			if(te != null && !(te instanceof IFluidPipe) && te instanceof IFluidHandler) {
-				if(!this.network.getConsumers().contains(te)) {
-					this.network.getConsumers().add((IFluidHandler) te);
-				}
 				if(fluidHandlerCache[i] != null){
 					this.network.getConsumers().remove(fluidHandlerCache[i]);
 				}
+				if(!this.network.getConsumers().contains(te)) {
+					this.network.getConsumers().add((IFluidHandler) te);
+				}
+				
 				fluidHandlerCache[i] = (IFluidHandler)te;
 					
 			}

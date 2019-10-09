@@ -51,8 +51,8 @@ public class FluidRecipeHandler extends TemplateRecipeHandler {
 	@Override
 	public void loadCraftingRecipes(String outputId, Object... results) {
 		if ((outputId.equals("fluidcons")) && getClass() == FluidRecipeHandler.class) {
-			Map<Object, Object> recipes = MachineRecipes.instance().getFluidContainers();
-			for (Map.Entry<Object, Object> recipe : recipes.entrySet()) {
+			Map<ItemStack, ItemStack> recipes = MachineRecipes.instance().getFluidContainers();
+			for (Map.Entry<ItemStack, ItemStack> recipe : recipes.entrySet()) {
 				this.arecipes.add(new SmeltingSet((ItemStack)recipe.getKey(), (ItemStack)recipe.getValue()));
 			}
 		} else {
@@ -62,8 +62,8 @@ public class FluidRecipeHandler extends TemplateRecipeHandler {
 
 	@Override
 	public void loadCraftingRecipes(ItemStack result) {
-		Map<Object, Object> recipes = MachineRecipes.instance().getFluidContainers();
-		for (Map.Entry<Object, Object> recipe : recipes.entrySet()) {
+		Map<ItemStack, ItemStack> recipes = MachineRecipes.instance().getFluidContainers();
+		for (Map.Entry<ItemStack, ItemStack> recipe : recipes.entrySet()) {
 			if (NEIServerUtils.areStacksSameType((ItemStack)recipe.getValue(), result) || compareFluidStacks(result, (ItemStack)recipe.getKey()))
 				this.arecipes.add(new SmeltingSet((ItemStack)recipe.getKey(), (ItemStack)recipe.getValue()));
 		}
@@ -80,8 +80,8 @@ public class FluidRecipeHandler extends TemplateRecipeHandler {
 
 	@Override
 	public void loadUsageRecipes(ItemStack ingredient) {
-		Map<Object, Object> recipes = MachineRecipes.instance().getFluidContainers();
-		for (Map.Entry<Object, Object> recipe : recipes.entrySet()) {
+		Map<ItemStack, ItemStack> recipes = MachineRecipes.instance().getFluidContainers();
+		for (Map.Entry<ItemStack, ItemStack> recipe : recipes.entrySet()) {
 			if (NEIServerUtils.areStacksSameType((ItemStack)recipe.getValue(), ingredient) || compareFluidStacks(ingredient, (ItemStack)recipe.getKey()))
 				this.arecipes.add(new SmeltingSet((ItemStack)recipe.getKey(), (ItemStack)recipe.getValue()));				
 		}

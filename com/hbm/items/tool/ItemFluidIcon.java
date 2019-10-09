@@ -1,7 +1,8 @@
 package com.hbm.items.tool;
 
 import java.util.List;
-import com.hbm.handler.FluidTypeHandler.FluidType;
+import java.util.Map.Entry;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.resources.I18n;
@@ -11,6 +12,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 
 public class ItemFluidIcon extends Item {
 	
@@ -26,9 +29,8 @@ public class ItemFluidIcon extends Item {
 	@SideOnly(Side.CLIENT)
     public void getSubItems(Item item, CreativeTabs tabs, List list)
     {
-        for (int i = 0; i < FluidType.values().length; ++i)
-        {
-            list.add(new ItemStack(item, 1, i));
+        for(Entry<Fluid, Integer> entry : FluidRegistry.getRegisteredFluidIDsByFluid().entrySet()){
+        	list.add(new ItemStack(item, 1, entry.getValue()));
         }
     }
 	
@@ -52,7 +54,11 @@ public class ItemFluidIcon extends Item {
 
     public String getItemStackDisplayName(ItemStack stack)
     {
-        String s = (I18n.format(FluidType.getEnum(stack.getItemDamage()).getUnlocalizedName())).trim();
+        String s;
+        if(FluidRegistry.getFluid(stack.getItemDamage()) != null)
+        	s = (I18n.format(FluidRegistry.getFluid(stack.getItemDamage()).getUnlocalizedName())).trim();
+        else
+        	s = null;
 
         if (s != null)
         {
@@ -83,15 +89,17 @@ public class ItemFluidIcon extends Item {
 	 * super.getIconFromDamageForRenderPass(p_77618_1_, p_77618_2_); }
 	 */
 
+    public static Fluid getFluid(ItemStack stack){
+    	if(stack != null && stack.getItem() instanceof ItemFluidIcon){
+    		return FluidRegistry.getFluid(stack.getItemDamage());
+    	} else {
+    		return null;
+    	}
+    }
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getColorFromItemStack(ItemStack stack, int p_82790_2_) {
-		int j = FluidType.getEnum(stack.getItemDamage()).getMSAColor();
-
-		if (j < 0) {
-			j = 16777215;
-		}
-
+		int j = 16777215;
 		return j;
 	}
 

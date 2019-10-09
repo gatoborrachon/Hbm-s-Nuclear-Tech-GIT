@@ -3,7 +3,7 @@ package com.hbm.items.tool;
 import java.util.List;
 
 import com.hbm.interfaces.IConsumer;
-import com.hbm.interfaces.IFluidDuct;
+import com.hbm.interfaces.IFluidPipe;
 import com.hbm.interfaces.ISource;
 import com.hbm.tileentity.conductor.TileEntityPylonRedWire;
 import com.hbm.tileentity.machine.TileEntityDummy;
@@ -92,10 +92,10 @@ public class ItemAnalyzer extends Item {
 					}
 				}*/
 				
-				if(te instanceof IFluidDuct) {
+				if(te instanceof IFluidPipe) {
 					
 					player.addChatMessage(new ChatComponentText(
-							"Duct Type: " + I18n.format(((IFluidDuct)te).getType().getUnlocalizedName())));
+							"Duct Type: " + I18n.format(((IFluidPipe)te).getType().getUnlocalizedName())));
 				}
 				
 				if(te instanceof TileEntityPylonRedWire) {

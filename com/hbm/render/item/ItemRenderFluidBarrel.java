@@ -35,6 +35,10 @@ public class ItemRenderFluidBarrel implements IItemRenderer {
 
 	@Override
 	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
+		if(helper.ordinal() < ItemRendererHelper.EQUIPPED_BLOCK.ordinal()){
+			
+		return true;
+		}
 		return false;
 	}
 
@@ -110,17 +114,75 @@ public class ItemRenderFluidBarrel implements IItemRenderer {
 
 				}
 			} else {
-
+				if (type == ItemRenderType.ENTITY) {
+					tes.addTranslation(-0.5F, -0.25F, 0F);
+					//GL11.glTranslatef(0.5f, 4 / -16f, 0);
+					//GL11.glRotatef(180, 0, 1, 0);
+				}
 				ItemRenderer.renderItemIn2D(tes, iconMaxU2, iconMinV2, iconMinU2, iconMaxV2, itemIcon.getIconWidth(),
 						itemIcon.getIconHeight(), 0.0625F);
 				if (fluidIcon != null) {
 					float iconMaxU = fluidIcon.getInterpolatedU(9);
 					float iconMinU = fluidIcon.getInterpolatedU(7);
-					float iconMaxV = fluidIcon.getInterpolatedV(11);
-					float iconMinV = fluidIcon.getInterpolatedV(5);
+					float iconMaxV = fluidIcon.getInterpolatedV(9);
+					float iconMinV = fluidIcon.getInterpolatedV(3);
 
 					bindTexture(Minecraft.getMinecraft().getTextureManager(), fluid.getSpriteNumber());
-				
+					 tes.startDrawingQuads();
+				        tes.setNormal(0.0F, 0.0F, 0.5F);
+				        tes.addVertexWithUV((7.0*0.0625), (3.0*0.0625), 0.0D, (double)iconMaxU, (double)iconMaxV);
+				        tes.addVertexWithUV((9.0*0.0625), (3.0*0.0625), 0.0D, (double)iconMinU, (double)iconMaxV);
+				        tes.addVertexWithUV((9.0*0.0625), (9.0*0.0625), 0.0D, (double)iconMinU, (double)iconMinV);
+				        tes.addVertexWithUV((7.0*0.0625), (9.0*0.0625), 0.0D, (double)iconMaxU, (double)iconMinV);
+				        tes.draw();
+				        tes.startDrawingQuads();
+				        tes.setNormal(0.0F, 0.0F, -.05F);
+				        tes.addVertexWithUV((7.0*0.0625), (9.0*0.0625), (double)(0.0F - 0.0625), (double)iconMaxU, (double)iconMinV);
+				        tes.addVertexWithUV((9.0*0.0625), (9.0*0.0625), (double)(0.0F - 0.0625), (double)iconMinU, (double)iconMinV);
+				        tes.addVertexWithUV((9.0*0.0625), (3.0*0.0625), (double)(0.0F - 0.0625), (double)iconMinU, (double)iconMaxV);
+				        tes.addVertexWithUV((7.0*0.0625), (3.0*0.0625), (double)(0.0F - 0.0625), (double)iconMaxU, (double)iconMaxV);
+				        
+				        iconMaxU = fluidIcon.getInterpolatedU(7);
+						iconMinU = fluidIcon.getInterpolatedU(6);
+						iconMaxV = fluidIcon.getInterpolatedV(12);
+						iconMinV = fluidIcon.getInterpolatedV(11);
+						
+				        tes.setNormal(0.0F, 0.0F, 0.5F);
+				        tes.addVertexWithUV((6.0*0.0625), (11.0*0.0625), 0.0D, (double)iconMaxU, (double)iconMaxV);
+				        tes.addVertexWithUV((7.0*0.0625), (11.0*0.0625), 0.0D, (double)iconMinU, (double)iconMaxV);
+				        tes.addVertexWithUV((7.0*0.0625), (12.0*0.0625), 0.0D, (double)iconMinU, (double)iconMinV);
+				        tes.addVertexWithUV((6.0*0.0625), (12.0*0.0625), 0.0D, (double)iconMaxU, (double)iconMinV);
+				        tes.draw();
+				        tes.startDrawingQuads();
+				        tes.setNormal(0.0F, 0.0F, -.05F);
+				        tes.addVertexWithUV((6.0*0.0625), (12.0*0.0625), (double)(0.0F - 0.0625), (double)iconMaxU, (double)iconMinV);
+				        tes.addVertexWithUV((7.0*0.0625), (12.0*0.0625), (double)(0.0F - 0.0625), (double)iconMinU, (double)iconMinV);
+				        tes.addVertexWithUV((7.0*0.0625), (11.0*0.0625), (double)(0.0F - 0.0625), (double)iconMinU, (double)iconMaxV);
+				        tes.addVertexWithUV((6.0*0.0625), (11.0*0.0625), (double)(0.0F - 0.0625), (double)iconMaxU, (double)iconMaxV);
+				        iconMaxU = fluidIcon.getInterpolatedU(8);
+						iconMinU = fluidIcon.getInterpolatedU(7);
+						iconMaxV = fluidIcon.getInterpolatedV(13);
+						iconMinV = fluidIcon.getInterpolatedV(12);
+						
+				        tes.setNormal(0.0F, 0.0F, 0.5F);
+				        tes.addVertexWithUV((7.0*0.0625), (12.0*0.0625), 0.0D, (double)iconMaxU, (double)iconMaxV);
+				        tes.addVertexWithUV((8.0*0.0625), (12.0*0.0625), 0.0D, (double)iconMinU, (double)iconMaxV);
+				        tes.addVertexWithUV((8.0*0.0625), (13.0*0.0625), 0.0D, (double)iconMinU, (double)iconMinV);
+				        tes.addVertexWithUV((7.0*0.0625), (13.0*0.0625), 0.0D, (double)iconMaxU, (double)iconMinV);
+				        tes.draw();
+				        tes.startDrawingQuads();
+				        tes.setNormal(0.0F, 0.0F, -.05F);
+				        tes.addVertexWithUV((7.0*0.0625), (13.0*0.0625), (double)(0.0F - 0.0625), (double)iconMaxU, (double)iconMinV);
+				        tes.addVertexWithUV((8.0*0.0625), (13.0*0.0625), (double)(0.0F - 0.0625), (double)iconMinU, (double)iconMinV);
+				        tes.addVertexWithUV((8.0*0.0625), (12.0*0.0625), (double)(0.0F - 0.0625), (double)iconMinU, (double)iconMaxV);
+				        tes.addVertexWithUV((7.0*0.0625), (12.0*0.0625), (double)(0.0F - 0.0625), (double)iconMaxU, (double)iconMaxV);
+				     tes.draw();
+					
+				}
+				if (type == ItemRenderType.ENTITY) {
+					tes.addTranslation(0.5F, 0.25F, 0F);
+					//GL11.glTranslatef(0.5f, 4 / -16f, 0);
+					//GL11.glRotatef(180, 0, 1, 0);
 					
 				}
 			}

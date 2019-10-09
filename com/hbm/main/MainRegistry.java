@@ -54,7 +54,6 @@ import com.hbm.entity.projectile.*;
 import com.hbm.forgefluid.FFPipeNetwork;
 import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.handler.*;
-import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.inventory.MachineRecipes;
 import com.hbm.inventory.MachineRecipes.ShredderRecipe;
 import com.hbm.items.ModItems;
@@ -1353,7 +1352,7 @@ public class MainRegistry
 		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.reclaimed, 1000), new ItemStack(ModItems.canister_reoil), new ItemStack(ModItems.canister_empty));
 		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.petroil, 1000), new ItemStack(ModItems.canister_petroil), new ItemStack(ModItems.canister_empty));
 		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.lubricant, 1000), new ItemStack(ModItems.canister_canola), new ItemStack(ModItems.canister_empty));
-		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.napatha, 1000), new ItemStack(ModItems.canister_naphtha), new ItemStack(ModItems.canister_empty));
+		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.naphtha, 1000), new ItemStack(ModItems.canister_naphtha), new ItemStack(ModItems.canister_empty));
 		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.diesel, 1000), new ItemStack(ModItems.canister_fuel), new ItemStack(ModItems.canister_empty));
 		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.lightoil, 1000), new ItemStack(ModItems.canister_lightoil), new ItemStack(ModItems.canister_empty));
 		FluidContainerRegistry.registerFluidContainer(new FluidStack(ModForgeFluids.kerosene, 1000), new ItemStack(ModItems.canister_kerosene), new ItemStack(ModItems.canister_empty));

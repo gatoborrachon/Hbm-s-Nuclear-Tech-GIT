@@ -58,6 +58,7 @@ public class ClientProxy extends ServerProxy
 		MinecraftForgeClient.registerItemRenderer(ModItems.fluid_barrel_full, new ItemRenderFluidBarrel());
 		MinecraftForgeClient.registerItemRenderer(ModItems.fluid_tank_full, new ItemRenderFluidTank());
 		MinecraftForgeClient.registerItemRenderer(ModItems.forge_fluid_identifier, new ItemRenderFFIdentifier());
+		MinecraftForgeClient.registerItemRenderer(ModItems.fluid_icon, new ItemRenderFluidIcon());
 		MinecraftForgeClient.registerItemRenderer(ModItems.ff_fluid_duct, new ItemRenderFFFluidDuct());
 		MinecraftForgeClient.registerItemRenderer(ModItems.assembly_template, new ItemRenderTemplate());
 		MinecraftForgeClient.registerItemRenderer(ModItems.chemistry_template, new ItemRenderTemplate());

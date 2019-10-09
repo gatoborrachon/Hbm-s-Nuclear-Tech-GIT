@@ -3,7 +3,6 @@ package com.hbm.items.tool;
 import java.util.List;
 import java.util.Map.Entry;
 
-import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.items.ModItems;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

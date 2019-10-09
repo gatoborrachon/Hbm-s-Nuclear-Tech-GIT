@@ -2,7 +2,6 @@ package com.hbm.blocks.machine;
 
 import com.hbm.tileentity.conductor.TileEntityFFDuctBase;
 import com.hbm.tileentity.conductor.TileEntityFFGasDuct;
-import com.hbm.tileentity.conductor.TileEntityFFOilDuct;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -102,7 +101,7 @@ public class BlockGasDuct extends BlockContainer {
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int p_149727_6_, float p_149727_7_, float p_149727_8_, float p_149727_9_)
     {
 		//if(!world.isRemote)
-		//	System.out.println(((TileEntityFFGasDuct)world.getTileEntity(x, y, z)).getNetwork());
+		//	System.out.println(((TileEntityFFGasDuct)world.getTileEntity(x, y, z)).getNetworkTrue());
         return false;
     }
 }

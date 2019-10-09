@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.hbm.handler.FluidTypeHandler.FluidType;
 import com.hbm.items.ModItems;
 import com.hbm.tileentity.conductor.TileEntityFFFluidDuct;
 import cpw.mods.fml.relauncher.Side;

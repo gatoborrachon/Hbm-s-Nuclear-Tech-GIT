@@ -125,7 +125,7 @@ public class ItemRenderFluidTank implements IItemRenderer {
 				        tes.addVertexWithUV((9.0*0.0625), (11.0*0.0625), (double)(0.0F - 0.0625), (double)iconMinU, (double)iconMinV);
 				        tes.addVertexWithUV((9.0*0.0625), (5.0*0.0625), (double)(0.0F - 0.0625), (double)iconMinU, (double)iconMaxV);
 				        tes.addVertexWithUV((7.0*0.0625), (5.0*0.0625), (double)(0.0F - 0.0625), (double)iconMaxU, (double)iconMaxV);
-				        tes.draw();
+				     tes.draw();
 					
 				}
 				if (type == ItemRenderType.ENTITY) {
