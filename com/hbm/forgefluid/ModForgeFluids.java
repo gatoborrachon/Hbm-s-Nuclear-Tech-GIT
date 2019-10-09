@@ -70,7 +70,7 @@ public class ModForgeFluids {
 		hotoil = new Fluid("hbmhotoil").setUnlocalizedName("hbmhotoil");
 
 		heavyoil = new Fluid("hbmheavyoil").setUnlocalizedName("hbmheavyoil");
-		bitumen = new Fluid("hbmbitumen").setUnlocalizedName("bmbitumen");
+		bitumen = new Fluid("hbmbitumen").setUnlocalizedName("hbmbitumen");
 		smear = new Fluid("hbmsmear").setUnlocalizedName("hbmsmear");
 		heatingoil = new Fluid("hbmheatingoil").setUnlocalizedName("hbmheatingoil");
 		
@@ -97,7 +97,7 @@ public class ModForgeFluids {
 		puf6 = new Fluid("hbmpuf6").setUnlocalizedName("hbmpuf6");
 		sas3 = new Fluid("hbmsas3").setUnlocalizedName("hbmsas3");
 		
-		amat = new Fluid("hbmamat").setUnlocalizedName("bmamat");
+		amat = new Fluid("hbmamat").setUnlocalizedName("hbmamat");
 		aschrab = new Fluid("hbmaschrab").setUnlocalizedName("hbmaschrab");
 		
 		acid = new Fluid("hbmacid").setUnlocalizedName("hbmacid");
