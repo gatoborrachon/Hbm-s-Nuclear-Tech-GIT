@@ -32,9 +32,9 @@ public class ModForgeFluids {
 	public static Fluid tritium = new Fluid("tritium", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/tritium_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/tritium_flowing"), null, Color.WHITE);
 
 	public static Fluid oil = new Fluid("oil", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/oil_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/oil_flowing"), null, Color.WHITE);
-	public static Fluid hotoil = new Fluid("hotoil", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/hotoil_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/hotoil_flowing"), null, Color.WHITE).setTemperature(350 + 273);
+	public static Fluid hotoil = new Fluid("oil_heat_1", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/hotoil_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/hotoil_flowing"), null, Color.WHITE).setTemperature(350 + 273); //Rockhounding
 
-	public static Fluid heavyoil = new Fluid("heavyoil", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/heavyoil_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/heavyoil_flowing"), null, Color.WHITE);
+	public static Fluid heavyoil = new Fluid("oil_heavy_heat_1", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/heavyoil_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/heavyoil_flowing"), null, Color.WHITE); //Rockhounding
 	public static Fluid bitumen = new Fluid("bitumen", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/bitumen_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/bitumen_flowing"), null, Color.WHITE);
 	public static Fluid smear = new Fluid("smear", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/smear_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/smear_flowing"), null, Color.WHITE);
 	public static Fluid heatingoil = new Fluid("heatingoil", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/heatingoil_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/heatingoil_flowing"), null, Color.WHITE);
@@ -52,10 +52,10 @@ public class ModForgeFluids {
 	public static Fluid lightoil = new Fluid("lightoil", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/lightoil_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/lightoil_flowing"), null, Color.WHITE);
 	public static Fluid kerosene = new Fluid("kerosene", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/kerosene_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/kerosene_flowing"), null, Color.WHITE);
 
-	public static Fluid gas = new Fluid("gas", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/gas_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/gas_flowing"), null, Color.WHITE);
+	public static Fluid gas = new Fluid("natgas", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/gas_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/gas_flowing"), null, Color.WHITE); //Rockhounding
 	public static Fluid petroleum = new Fluid("petroleum", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/petroleum_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/petroleum_flowing"), null, Color.WHITE);
 
-	public static Fluid biogas = new Fluid("biogas", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/biogas_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/biogas_flowing"), null, Color.WHITE);
+	public static Fluid biogas = new Fluid("ic2biogas", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/biogas_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/biogas_flowing"), null, Color.WHITE); //Rockhounding
 	public static Fluid biofuel = new Fluid("biofuel", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/biofuel_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/biofuel_flowing"), null, Color.WHITE);
 
 	public static Fluid nitan = new Fluid("nitan", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/nitan_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/nitan_flowing"), null, Color.WHITE);
@@ -67,7 +67,7 @@ public class ModForgeFluids {
 	public static Fluid amat = new Fluid("amat", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/amat_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/amat_flowing"), null, Color.WHITE);
 	public static Fluid aschrab = new Fluid("aschrab", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/aschrab_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/aschrab_flowing"), null, Color.WHITE);
 
-	public static Fluid acid = new Fluid("acid", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/acid_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/acid_flowing"), null, Color.WHITE);
+	public static Fluid acid = new Fluid("hydrogen_peroxide", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/acid_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/acid_flowing"), null, Color.WHITE); //Rockhounding
 	public static Fluid watz = new Fluid("watz", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/watz_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/watz_flowing"), null, Color.WHITE).setDensity(2500).setViscosity(3000).setLuminosity(5).setTemperature(2773);
 	public static Fluid cryogel = new Fluid("cryogel", new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/cryogel_still"), new ResourceLocation(RefStrings.MODID, "blocks/forgefluid/cryogel_flowing"), null, Color.WHITE).setTemperature(50);
 
@@ -109,10 +109,10 @@ public class ModForgeFluids {
 		if(!FluidRegistry.registerFluid(oil))
 			oil = FluidRegistry.getFluid("oil");
 		if(!FluidRegistry.registerFluid(hotoil))
-			hotoil = FluidRegistry.getFluid("hotoil");
+			hotoil = FluidRegistry.getFluid("oil_heat_1"); //Rockhounding
 
 		if(!FluidRegistry.registerFluid(heavyoil))
-			heavyoil = FluidRegistry.getFluid("heavyoil");
+			heavyoil = FluidRegistry.getFluid("oil_heavy_heat_1"); //Rockhounding
 		if(!FluidRegistry.registerFluid(bitumen))
 			bitumen = FluidRegistry.getFluid("bitumen");
 		if(!FluidRegistry.registerFluid(smear))
@@ -139,12 +139,12 @@ public class ModForgeFluids {
 			kerosene = FluidRegistry.getFluid("kerosene");
 
 		if(!FluidRegistry.registerFluid(gas))
-			gas = FluidRegistry.getFluid("gas");
+			gas = FluidRegistry.getFluid("natgas"); //Rockhounding
 		if(!FluidRegistry.registerFluid(petroleum))
 			petroleum = FluidRegistry.getFluid("petroleum");
 
 		if(!FluidRegistry.registerFluid(biogas))
-			biogas = FluidRegistry.getFluid("biogas");
+			biogas = FluidRegistry.getFluid("ic2biogas"); //Rockhounding
 		if(!FluidRegistry.registerFluid(biofuel))
 			biofuel = FluidRegistry.getFluid("biofuel");
 
@@ -164,7 +164,7 @@ public class ModForgeFluids {
 			aschrab = FluidRegistry.getFluid("aschrab");
 
 		if(!FluidRegistry.registerFluid(acid))
-			acid = FluidRegistry.getFluid("acid");
+			acid = FluidRegistry.getFluid("hydrogen_peroxide"); //Rockhounding
 		if(!FluidRegistry.registerFluid(watz))
 			watz = FluidRegistry.getFluid("watz");
 		if(!FluidRegistry.registerFluid(cryogel))
@@ -223,9 +223,9 @@ public class ModForgeFluids {
 		tritium = FluidRegistry.getFluid("tritium");
 
 		oil = FluidRegistry.getFluid("oil");
-		hotoil = FluidRegistry.getFluid("hotoil");
+		hotoil = FluidRegistry.getFluid("oil_heat_1"); //Rockhounding
 
-		heavyoil = FluidRegistry.getFluid("heavyoil");
+		heavyoil = FluidRegistry.getFluid("oil_heavy_heat_1"); //Rockhounding
 		bitumen = FluidRegistry.getFluid("bitumen");
 		smear = FluidRegistry.getFluid("smear");
 		heatingoil = FluidRegistry.getFluid("heatingoil");
@@ -241,10 +241,10 @@ public class ModForgeFluids {
 		lightoil = FluidRegistry.getFluid("lightoil");
 		kerosene = FluidRegistry.getFluid("kerosene");
 
-		gas = FluidRegistry.getFluid("gas");
+		gas = FluidRegistry.getFluid("natgas"); //Rockhounding
 		petroleum = FluidRegistry.getFluid("petroleum");
 
-		biogas = FluidRegistry.getFluid("biogas");
+		biogas = FluidRegistry.getFluid("ic2biogas"); //Rockhounding
 		biofuel = FluidRegistry.getFluid("biofuel");
 
 		nitan = FluidRegistry.getFluid("nitan");
@@ -256,7 +256,7 @@ public class ModForgeFluids {
 		amat = FluidRegistry.getFluid("amat");
 		aschrab = FluidRegistry.getFluid("aschrab");
 
-		acid = FluidRegistry.getFluid("acid");
+		acid = FluidRegistry.getFluid("hydrogen_peroxide"); //Rockhounding
 		watz = FluidRegistry.getFluid("watz");
 		cryogel = FluidRegistry.getFluid("cryogel");
 

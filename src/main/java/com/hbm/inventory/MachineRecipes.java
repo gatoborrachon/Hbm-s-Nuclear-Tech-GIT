@@ -7,11 +7,13 @@ import com.hbm.blocks.ModBlocks;
 import com.hbm.config.GeneralConfig;
 import com.hbm.forgefluid.ModForgeFluids;
 import com.hbm.interfaces.Spaghetti;
+import com.hbm.items.ItemBase;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemChemistryTemplate;
 import com.hbm.items.special.ItemCell;
 import com.hbm.items.tool.ItemFluidCanister;
 
+import ic2.api.item.IC2Items;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -106,9 +108,9 @@ public class MachineRecipes {
 				return new ItemStack(Items.DIAMOND);
 			if (mODE(input, "dustEmerald"))
 				return new ItemStack(Items.EMERALD);
-			if (input.getItem() == ModItems.pellet_coal)
-				return new ItemStack(Items.DIAMOND);
-			if (input.getItem() == ModItems.biomass)
+			/*if (input.getItem() == ModItems.pellet_coal)
+				return new ItemStack(Items.DIAMOND);*/ //rockhounding
+			if (input.getItem() == new ItemStack(ItemBase.getByNameOrId("ic2:crop_res"),1,2).getItem()) //Rockhounding 
 				return new ItemStack(ModItems.biomass_compressed);
 			if (input.getItem() == ModItems.powder_lignite)
 				return new ItemStack(ModItems.briquette_lignite);
@@ -169,11 +171,11 @@ public class MachineRecipes {
 				return new ItemStack(ModItems.wire_magnetized_tungsten, 8);
 		}
 
-		if (stamps_circuit.contains(stamp.getItem())) {
+		/*if (stamps_circuit.contains(stamp.getItem())) {
 
 			if (input.getItem() == ModItems.circuit_raw)
 				return new ItemStack(ModItems.circuit_aluminium);
-		}
+		}*/ //rockhounding
 
 		if (stamp.getItem() == ModItems.stamp_357) {
 
@@ -233,7 +235,7 @@ public class MachineRecipes {
 
 	public static ItemStack getFurnaceOutput(ItemStack item, ItemStack item2) {
 
-		if (item == null || item2 == null)
+		/*if (item == null || item2 == null) Rockhounding
 			return null;
 
 		if (GeneralConfig.enableDebugMode) {
@@ -282,6 +284,11 @@ public class MachineRecipes {
 				|| mODE(item, "nuggetSchrabidium") && mODE(item2, new String[] {"ingotTungsten", "dustTungsten"})) {
 			return new ItemStack(ModItems.ingot_magnetized_tungsten, 1);
 		}
+		
+		if (mODE(item, new String[] {"ingotTungsten", "dustTungsten"}) && mODE(item2, "dustCunife")
+				|| mODE(item, "dustCunife") && mODE(item2, new String[] {"ingotTungsten", "dustTungsten"})) {
+			return new ItemStack(ModItems.ingot_magnetized_tungsten, 1); //rockhounding
+		}
 
 		if (item.getItem() == ModItems.plate_mixed && mODE(item2, "plateGold")
 				|| mODE(item, "plateGold") && item2.getItem() == ModItems.plate_mixed) {
@@ -319,7 +326,7 @@ public class MachineRecipes {
 				|| mODE(item, new String[] {"ingotCobalt", "dustCobalt"}) && item2.getItem() == ModItems.meteorite_sword_hardened) {
 			return new ItemStack(ModItems.meteorite_sword_alloyed, 1);
 		}
-		
+		*/
 		return null;
 	}
 
@@ -425,9 +432,9 @@ public class MachineRecipes {
 		case DEUTERIUM:
 			list.add(new ItemStack(ModItems.sulfur, 1));
 			break;
-		case BP_BIOGAS:
+		/*case BP_BIOGAS:
 			list.add(new ItemStack(ModItems.biomass, 16));
-			break;
+			break;*/ //Rockhounding
 		case YELLOWCAKE:
 			list.add(new ItemStack(ModItems.powder_uranium, 1));
 			list.add(new ItemStack(ModItems.sulfur, 2));
@@ -476,6 +483,7 @@ public class MachineRecipes {
 			list.add(new ItemStack(ModItems.niter, 2));
 			list.add(new ItemStack(Items.BRICK, 1));
 			list.add(new ItemStack(Items.COAL, 1));
+			list.add(new ItemStack(com.globbypotato.rockhounding_chemistry.ModItems.ALLOY_PARTS, 1, 91)); //rockhounding
 			break;
 		case SOLID_FUEL:
 			list.add(new ItemStack(ModItems.solid_fuel, 2));
@@ -513,7 +521,7 @@ public class MachineRecipes {
 		FluidStack[] input = new FluidStack[2];
 
 		switch (ItemChemistryTemplate.EnumChemistryTemplate.getEnum(stack.getItemDamage())) {
-		case FP_HEAVYOIL:
+		/*case FP_HEAVYOIL:
 			input[0] = new FluidStack(ModForgeFluids.heavyoil, 1000);
 			break;
 		case FP_SMEAR:
@@ -524,7 +532,7 @@ public class MachineRecipes {
 			break;
 		case FP_LIGHTOIL:
 			input[0] = new FluidStack(ModForgeFluids.lightoil, 1000);
-			break;
+			break; Rockhounding */
 		case FR_REOIL:
 			input[0] = new FluidStack(ModForgeFluids.smear, 1000);
 			break;
@@ -532,7 +540,7 @@ public class MachineRecipes {
 			input[0] = new FluidStack(ModForgeFluids.reclaimed, 800);
 			input[1] = new FluidStack(ModForgeFluids.lubricant, 200);
 			break;
-		case FC_BITUMEN:
+		/*case FC_BITUMEN:
 			input[0] = new FluidStack(ModForgeFluids.bitumen, 1200);
 			input[1] = new FluidStack(ModForgeFluids.steam, 2400);
 			break;
@@ -551,7 +559,7 @@ public class MachineRecipes {
 		case FC_KEROSENE_PETROLEUM:
 			input[0] = new FluidStack(ModForgeFluids.kerosene, 1400);
 			input[1] = new FluidStack(ModForgeFluids.steam, 2000);
-			break;
+			break; Rockhounding */
 		case CC_I:
 			input[0] = new FluidStack(ModForgeFluids.smear, 800);
 			input[1] = new FluidStack(FluidRegistry.WATER, 1800);
@@ -653,9 +661,9 @@ public class MachineRecipes {
 		case DEUTERIUM:
 			input[0] = new FluidStack(FluidRegistry.WATER, 4000);
 			break;
-		case STEAM:
+		/*case STEAM:
 			input[0] = new FluidStack(FluidRegistry.WATER, 1000);
-			break;
+			break; Rockhounding */
 		case BP_BIOFUEL:
 			input[0] = new FluidStack(ModForgeFluids.biogas, 2000);
 			break;
@@ -686,12 +694,12 @@ public class MachineRecipes {
 		case SOLID_FUEL:
 			input[0] = new FluidStack(ModForgeFluids.petroleum, 200);
 			break;
-		case ELECTROLYSIS:
+		/*case ELECTROLYSIS:
 			input[0] = new FluidStack(FluidRegistry.WATER, 8000);
 			break;
 		case XENON:
-			//input[0] = null;
-			break;
+			input[0] = null;
+			break; Rockhounding */
 		case SATURN:
 			input[0] = new FluidStack(ModForgeFluids.acid, 100);
 			input[1] = new FluidStack(ModForgeFluids.mercury, 50);
@@ -827,7 +835,7 @@ public class MachineRecipes {
 			output[0] = new ItemStack(ModItems.cordite, 4);
 			break;
 		case KEVLAR:
-			output[0] = new ItemStack(ModItems.plate_kevlar, 4);
+			output[0] = new ItemStack(ModItems.plate_kevlar, 6); //rockhounding
 			break;
 		case SOLID_FUEL:
 			output[0] = new ItemStack(ModItems.rocket_fuel, 4);
@@ -856,7 +864,7 @@ public class MachineRecipes {
 		FluidStack[] output = new FluidStack[2];
 
 		switch (ItemChemistryTemplate.EnumChemistryTemplate.getEnum(stack.getItemDamage())) {
-		case FP_HEAVYOIL:
+		/*case FP_HEAVYOIL:
 			output[0] = new FluidStack(ModForgeFluids.bitumen, 300);
 			output[1] = new FluidStack(ModForgeFluids.smear, 700);
 			break;
@@ -871,14 +879,14 @@ public class MachineRecipes {
 		case FP_LIGHTOIL:
 			output[0] = new FluidStack(ModForgeFluids.diesel, 400);
 			output[1] = new FluidStack(ModForgeFluids.kerosene, 600);
-			break;
+			break; Rockhounding */
 		case FR_REOIL:
 			output[0] = new FluidStack(ModForgeFluids.reclaimed, 800);
 			break;
 		case FR_PETROIL:
 			output[0] = new FluidStack(ModForgeFluids.petroil, 1000);
 			break;
-		case FC_BITUMEN:
+		/*case FC_BITUMEN:
 			output[0] = new FluidStack(ModForgeFluids.oil, 1000);
 			output[1] = new FluidStack(ModForgeFluids.petroleum, 200);
 			break;
@@ -893,7 +901,7 @@ public class MachineRecipes {
 			break;
 		case FC_KEROSENE_PETROLEUM:
 			output[0] = new FluidStack(ModForgeFluids.petroleum, 800);
-			break;
+			break; Rockhounding */
 		case CC_OIL:
 			output[0] = new FluidStack(ModForgeFluids.oil, 2000);
 			break;
@@ -921,12 +929,12 @@ public class MachineRecipes {
 		case DEUTERIUM:
 			output[0] = new FluidStack(ModForgeFluids.deuterium, 500);
 			break;
-		case STEAM:
+		/*case STEAM:
 			output[0] = new FluidStack(ModForgeFluids.steam, 1000);
 			break;
 		case BP_BIOGAS:
 			output[0] = new FluidStack(ModForgeFluids.biogas, 4000);
-			break;
+			break;*/ //Rockhounding
 		case BP_BIOFUEL:
 			output[0] = new FluidStack(ModForgeFluids.biofuel, 1000);
 			break;
@@ -954,13 +962,13 @@ public class MachineRecipes {
 		case DYN_DNT:
 			output[0] = new FluidStack(ModForgeFluids.watz, 150);
 			break;
-		case ELECTROLYSIS:
+		/*case ELECTROLYSIS:
 			output[0] = new FluidStack(ModForgeFluids.hydrogen, 400);
 			output[1] = new FluidStack(ModForgeFluids.oxygen, 400);
 			break;
 		case XENON:
 			output[0] = new FluidStack(ModForgeFluids.xenon, 50);
-			break;
+			break; Rockhounding */
 		case BALEFIRE:
 			output[0] = new FluidStack(ModForgeFluids.balefire, 8000);
         	break;
@@ -993,7 +1001,7 @@ public class MachineRecipes {
 	// return: FluidType, amount produced, amount required, heat required (°C * 100)
 	public static Object[] getBoilerOutput(Fluid type) {
 
-		if (type == FluidRegistry.WATER) {
+		/*if (type == FluidRegistry.WATER) {
 			return new Object[] { ModForgeFluids.steam, 500, 5, 10000 };
 		} else if (type == ModForgeFluids.steam) {
 			return new Object[] { ModForgeFluids.hotsteam, 5, 50, 30000 };
@@ -1001,9 +1009,9 @@ public class MachineRecipes {
 			return new Object[] { ModForgeFluids.superhotsteam, 5, 50, 45000 };
 		} else if (type == ModForgeFluids.oil) {
 			return new Object[] { ModForgeFluids.hotoil, 5, 5, 35000 };
-		} else {
+		} else {*/
 			return null;
-		}
+		//} Rockhounding
 
 	}
 	

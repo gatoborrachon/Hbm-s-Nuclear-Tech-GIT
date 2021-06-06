@@ -35,17 +35,17 @@ public class ItemChemistryTemplate extends Item implements IHasCustomModel {
 		//SF - Solid Fuel Production
 		//BP - Biofuel Production
 		
-		FP_HEAVYOIL,
+		/*FP_HEAVYOIL,
 		FP_SMEAR,
 		FP_NAPHTHA,
-		FP_LIGHTOIL,
+		FP_LIGHTOIL, Buildcraft Refinery*/
 		FR_REOIL,
 		FR_PETROIL,
-		FC_BITUMEN,
+		/*FC_BITUMEN,
 		FC_I_NAPHTHA,
 		FC_GAS_PETROLEUM,
 		FC_DIESEL_KEROSENE,
-		FC_KEROSENE_PETROLEUM,
+		FC_KEROSENE_PETROLEUM, Magneticraft Refinery */
 		CC_OIL,
 		CC_I,
 		CC_HEATING,
@@ -76,10 +76,10 @@ public class ItemChemistryTemplate extends Item implements IHasCustomModel {
 		NITAN,
 		PEROXIDE,
 		CIRCUIT_4,
-		CIRCUIT_5,
+		CIRCUIT_5, //CREO QUE LOS VOY A DEJAR ASI  LOS CIRCUIT
 		POLYMER,
 		DEUTERIUM,
-		STEAM,
+		// STEAM, Rockhounding
 		YELLOWCAKE,
 		UF6,
 		PUF6,
@@ -91,8 +91,8 @@ public class ItemChemistryTemplate extends Item implements IHasCustomModel {
 		KEVLAR,
 		CONCRETE,
 		SOLID_FUEL,
-		ELECTROLYSIS,
-		XENON,
+		//ELECTROLYSIS, Rockhounding
+		//XENON, Rockhounding
 		SATURN,
 		BALEFIRE,
 		SCHRABIDIC,
@@ -102,7 +102,7 @@ public class ItemChemistryTemplate extends Item implements IHasCustomModel {
 			if(i < EnumChemistryTemplate.values().length)
 				return EnumChemistryTemplate.values()[i];
 			else
-				return FP_HEAVYOIL;
+				return FR_REOIL; //Rockhounding
 		}
 		
 		public String getName() {
@@ -153,21 +153,21 @@ public static int getProcessTime(ItemStack stack) {
         EnumChemistryTemplate enum1 = EnumChemistryTemplate.getEnum(i);
         
         switch (enum1) {
-        case FP_HEAVYOIL:
+        /*case FP_HEAVYOIL:
         	return 50;
         case FP_SMEAR:
         	return 50;
         case FP_NAPHTHA:
         	return 50;
         case FP_LIGHTOIL:
-        	return 50;
+        	return 50;*/
         case FR_REOIL:
         	return 30;
         case FR_PETROIL:
         	return 30;
         case OIL_SAND:
         	return 200;
-        case FC_BITUMEN:
+        /*case FC_BITUMEN:
         	return 100;
         case FC_I_NAPHTHA:
         	return 150;
@@ -176,7 +176,7 @@ public static int getProcessTime(ItemStack stack) {
         case FC_DIESEL_KEROSENE:
         	return 150;
         case FC_KEROSENE_PETROLEUM:
-        	return 150;
+        	return 150;*/
         case CC_OIL:
         	return 150;
         case CC_I:
@@ -237,10 +237,10 @@ public static int getProcessTime(ItemStack stack) {
         	return 100;
         case DEUTERIUM:
         	return 200;
-        case STEAM:
+        /*case STEAM:
         	return 20;
-        case BP_BIOGAS:
-        	return 200;
+        case BP_BIOGAS: Rockhounding
+        	return 200;*/
         case BP_BIOFUEL:
         	return 100;
         case YELLOWCAKE:
@@ -265,10 +265,10 @@ public static int getProcessTime(ItemStack stack) {
         	return 100;
         case SOLID_FUEL:
         	return 200;
-        case ELECTROLYSIS:
+        /*case ELECTROLYSIS:
         	return 400;
         case XENON:
-        	return 600;
+        	return 600;*/
         case SATURN:
         	return 60;
         case BALEFIRE:

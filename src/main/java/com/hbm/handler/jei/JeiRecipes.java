@@ -20,6 +20,7 @@ import com.hbm.inventory.MachineRecipes.GasCentOutput;
 import com.hbm.inventory.MagicRecipes;
 import com.hbm.inventory.MagicRecipes.MagicRecipe;
 import com.hbm.inventory.RecipesCommon.AStack;
+import com.hbm.items.ItemBase;
 import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemAssemblyTemplate;
 import com.hbm.items.machine.ItemChemistryTemplate;
@@ -490,8 +491,8 @@ public class JeiRecipes {
 		recipes.put(new Object[] { i_stamps_flat, new ItemStack(ModItems.powder_lapis) }, getPressResultNN(MachineRecipes.stamps_flat.get(0), ModItems.powder_lapis));
 		recipes.put(new Object[] { i_stamps_flat, new ItemStack(ModItems.powder_diamond) }, getPressResultNN(MachineRecipes.stamps_flat.get(0), ModItems.powder_diamond));
 		recipes.put(new Object[] { i_stamps_flat, new ItemStack(ModItems.powder_emerald) }, getPressResultNN(MachineRecipes.stamps_flat.get(0), ModItems.powder_emerald));
-		recipes.put(new Object[] { i_stamps_flat, new ItemStack(ModItems.pellet_coal) }, getPressResultNN(MachineRecipes.stamps_flat.get(0), ModItems.pellet_coal));
-		recipes.put(new Object[] { i_stamps_flat, new ItemStack(ModItems.biomass) }, getPressResultNN(MachineRecipes.stamps_flat.get(0), ModItems.biomass));
+		//recipes.put(new Object[] { i_stamps_flat, new ItemStack(ModItems.pellet_coal) }, getPressResultNN(MachineRecipes.stamps_flat.get(0), ModItems.pellet_coal)); Rockhounding
+		recipes.put(new Object[] { i_stamps_flat, new ItemStack(ItemBase.getByNameOrId("ic2:crop_res"),1,2) }, getPressResultNN(MachineRecipes.stamps_flat.get(0), new ItemStack(ItemBase.getByNameOrId("ic2:crop_res"),1,2).getItem())); //Rockhounding
 		recipes.put(new Object[] { i_stamps_flat, new ItemStack(ModItems.powder_lignite) }, getPressResultNN(MachineRecipes.stamps_flat.get(0), ModItems.powder_lignite));
 
 		recipes.put(new Object[] { i_stamps_plate, new ItemStack(Items.IRON_INGOT) }, getPressResultNN(MachineRecipes.stamps_plate.get(0), Items.IRON_INGOT));
@@ -515,7 +516,7 @@ public class JeiRecipes {
 		recipes.put(new Object[] { i_stamps_wire, new ItemStack(ModItems.ingot_advanced_alloy) }, getPressResultNN(MachineRecipes.stamps_wire.get(0), ModItems.ingot_advanced_alloy));
 		recipes.put(new Object[] { i_stamps_wire, new ItemStack(ModItems.ingot_magnetized_tungsten) }, getPressResultNN(MachineRecipes.stamps_wire.get(0), ModItems.ingot_magnetized_tungsten));
 
-		recipes.put(new Object[] { i_stamps_circuit, new ItemStack(ModItems.circuit_raw) }, getPressResultNN(MachineRecipes.stamps_circuit.get(0), ModItems.circuit_raw));
+		//recipes.put(new Object[] { i_stamps_circuit, new ItemStack(ModItems.circuit_raw) }, getPressResultNN(MachineRecipes.stamps_circuit.get(0), ModItems.circuit_raw)); rockhounding
 
 		recipes.put(new Object[] { i_stamps_357, new ItemStack(ModItems.assembly_iron) }, getPressResultNN(i_stamps_357.get(0).getItem(), ModItems.assembly_iron));
 		recipes.put(new Object[] { i_stamps_357, new ItemStack(ModItems.assembly_steel) }, getPressResultNN(i_stamps_357.get(0).getItem(), ModItems.assembly_steel));
@@ -563,7 +564,7 @@ public class JeiRecipes {
 			recipes.put(new ItemStack[] { new ItemStack(Items.IRON_INGOT), new ItemStack(Items.QUARTZ) },
 					new ItemStack(Item.getItemFromBlock(ModBlocks.test_render)));
 		}
-		try {
+		/*try { Rockhounding
 			recipes.put(new ItemStack[] { new ItemStack(Items.IRON_INGOT), new ItemStack(Items.COAL) },
 					MachineRecipes.getFurnaceOutput(new ItemStack(Items.IRON_INGOT), new ItemStack(Items.COAL)).copy());
 			recipes.put(new ItemStack[] { new ItemStack(ModItems.ingot_lead), new ItemStack(ModItems.ingot_copper) },
@@ -594,7 +595,7 @@ public class JeiRecipes {
 			}
 		} catch (Exception x) {
 			MainRegistry.logger.error("Unable to register alloy recipes for NEI!");
-		}
+		}*/
 		for(Map.Entry<ItemStack[], ItemStack> entry : recipes.entrySet()){
 			List<ItemStack> inputs = new ArrayList<ItemStack>(2);
 			for(ItemStack stack : entry.getKey())
